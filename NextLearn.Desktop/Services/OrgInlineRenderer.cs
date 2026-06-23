@@ -29,6 +29,34 @@ public class OrgInlineRenderer : IInlineRenderer
             return key;
         });
 
+        // Extract math expressions before inline formatting
+        var mathExpressions = new List<(string content, string delimiter)>();
+        var mathIdx = 0;
+
+        result = Regex.Replace(result, @"\$\$([\s\S]*?)\$\$", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, "$$"));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
+        result = Regex.Replace(result, @"\$([^$\s][^$]*[^$\s]|[^$\s])\$", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, "$"));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
+        result = Regex.Replace(result, @"\\\[([\s\S]*?)\\\]", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, @"\["));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
+        result = Regex.Replace(result, @"\\\(([\s\S]*?)\\\)", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, @"\("));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
         result = Regex.Replace(result, @"\b(TODO|DONE)\b", m =>
             m.Groups[1].Value switch
             {
@@ -132,6 +160,22 @@ public class OrgInlineRenderer : IInlineRenderer
 
             return $"<a data-href=\"{url}\" rel=\"noopener\">{url}</a>";
         });
+
+        // Restore math expressions with original delimiters (KaTeX auto-render finds them in DOM)
+        for (var i = 0; i < mathExpressions.Count; i++)
+        {
+            var (content, delim) = mathExpressions[i];
+            var left = delim;
+            var right = delim switch
+            {
+                "$" => "$",
+                "$$" => "$$",
+                @"\[" => @"\]",
+                @"\(" => @"\)",
+                _ => delim,
+            };
+            result = result.Replace($"%%%MATH_{i}%%%", $"{left}{content}{right}");
+        }
 
         return result;
     }

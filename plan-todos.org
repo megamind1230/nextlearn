@@ -1452,3 +1452,101 @@ enables Phase 6 (tests).
 ** Files changed
 - ~Views/MainWindow.axaml~ — ~RowDefinitions~ updated
 
+* TODO Built-in LaTeX math rendering (KaTeX)
+
+** What
+Built-in LaTeX math rendering for deck files using KaTeX (client-side JS
+library). Inline math ($...$ / \(...\)) and display math ($$...$$ / \[...\])
+rendered in the WebView via KaTeX auto-render. Code spans take priority over
+math (`` $x^2$ `` renders as literal code). Display math blocks get a copy
+button (copies raw LaTeX) and dynamic width (same as code blocks).
+
+** Delimiter syntax
+- $...$ — inline math (no space after opening $, no space before closing $)
+- $$...$$ — display math (single or multi-line)
+- \(...\) — inline math (escaped parens)
+- \[...\] — display math (escaped brackets, single or multi-line)
+- Always-on: KaTeX loads for every page, no frontmatter flag needed
+- Code takes priority: code span extraction runs before math extraction
+
+** Implementation plan
+
+*** 1. Download & bundle KaTeX assets
+- Get from npm/UNPKG:
+  - ~katex.min.js~ (~100KB) — core KaTeX renderer
+  - ~katex-auto-render.min.js~ (~5KB) — auto-render extension
+  - ~katex.min.css~ (~15KB) — KaTeX CSS (modify @font-face paths to point at local fonts/)
+  - ~fonts/~ directory — K
+
+aTeX font files (6 font families, ~100KB)
+- Place in ~NextLearn.Desktop/Assets/katex/~
+- Update ~NextLearn.Desktop.csproj~ with ~<Content Include="Assets\katex\**">~
+
+*** 2. Block-level: multi-line display math (~HtmlContentBuilder.Build()~)
+Add ~TryRenderMathBlock()~ in the line-processing loop (before paragraph
+rendering, after list/blockquote). It detects:
+- Lines starting with ~$$~ — collect all lines until closing ~$$~
+- Lines starting with ~\[~ — collect all lines until closing ~\]~
+- Single-line ~$$...$$~ / ~\[...\]~ also caught here (not just inline)
+Output: ~<div class="math-display" data-latex="{escaped latex}">\[...\]</div>~
+with dynamic width CSS (matching ~<pre>~: ~width: max-content; max-width: calc(100vw - 48px)~).
+
+*** 3. Inline-level: protect math in both renderers
+In ~MarkdownInlineRenderer.RenderInline()~ and ~OrgInlineRenderer.RenderInline()~:
+
+1. Extract code spans (backticks / ~=code=~) into placeholders (existing, takes priority)
+2. Extract math expressions into placeholders (new, after code):
+   - Match ~$$...$$~ before ~$...$~ (avoid $ overlap)
+   - Match ~\[...\]~ and ~\(...\)~
+   - Store raw (unescaped) LaTeX content
+3. Run ~EscapeHtml~, then all formatting regexes (bold, italic, links, images)
+4. Restore code span placeholders (existing)
+5. Restore math placeholders — put back original delimiter syntax + HTML-escaped
+   LaTeX as text nodes. KaTeX auto-render will scan the DOM and process them.
+
+*** 4. Update HTML template (~WrapInHtml()~)
+- Add ~<!--KATEX_CSS-->~ placeholder in ~<head>~ (replaced with actual CSS)
+- Add ~<style>~ rules for ~.math-display~:
+  - ~width: max-content; max-width: calc(100vw - 48px)~
+  - ~background: #282C34; border-radius: 8px; padding: 16px; margin: 0 0 12px 0~
+  - ~position: relative; overflow-x: auto~
+- Add KaTeX JS + auto-render script block after highlight.js:
+  ~<script>/* KATEX_AUTO_RENDER */</script>~
+  (auto-render config with all 4 delimiter pairs, runs on ~DOMContentLoaded~)
+
+*** 5. Update copy button script
+Extend existing inline script in ~WrapInHtml()~:
+- Add ~.math-display~ to selector: ~querySelectorAll('pre,blockquote,.math-display')~
+- Prefer ~data-latex~ attribute for copy content when present (raw LaTeX),
+  fall back to existing ~textContent~ for ~pre~ / ~blockquote~
+
+*** 6. Update ~WebViewBridge.LoadHtml()~
+Load KaTeX CSS/JS/auto-render from ~Assets/katex/~ and inject into
+~<!--KATEX_CSS-->~ / ~/* KATEX_AUTO_RENDER */~ placeholders — same
+injection pattern as highlight.js.
+
+*** 7. Add tests (~HtmlContentBuilderTests~)
+- ~$...$~ inline math in both .md and .org survives formatting
+- ~$$...$$~ single-line display math
+- ~\(...\)~ and ~\[...\]~ syntax
+- `` `$x^2$` `` renders as code (math protected, code wins)
+- Multi-line ~$$...$$~ block renders as ~<div class="math-display">~
+- ~data-latex~ attribute present on display math blocks
+- Math content with ~<~ / ~>~ / ~&~ properly encoded
+- Inline math in headings, lists, blockquotes, tables
+
+** Files to create
+- ~Assets/katex/katex.min.js~ — KaTeX core JS
+- ~Assets/katex/katex-auto-render.min.js~ — KaTeX auto-render JS
+- ~Assets/katex/katex.min.css~ — KaTeX stylesheet
+- ~Assets/katex/fonts/~ — KaTeX font files
+
+** Files to modify
+- ~NextLearn.Desktop.csproj~ — add ~<Content>~ entries for ~Assets/katex/**~
+- ~Services/HtmlContentBuilder.cs~ — ~TryRenderMathBlock()~, ~WrapInHtml()~ KaTeX
+  placeholders + CSS + auto-render script + copy button .math-display
+- ~Services/MarkdownInlineRenderer.cs~ — math placeholder extraction + restoration
+- ~Services/OrgInlineRenderer.cs~ — math placeholder extraction + restoration
+- ~Services/WebViewBridge.cs~ — load KaTeX assets from ~Assets/katex/~
+- ~tests/.../HtmlContentBuilderTests.cs~ — math rendering test cases
+

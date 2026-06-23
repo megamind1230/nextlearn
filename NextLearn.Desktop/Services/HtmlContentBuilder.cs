@@ -104,6 +104,14 @@ public static class HtmlContentBuilder
                 continue;
             }
 
+            if (TryRenderMathBlock(lines, ref i, out var mathBlockHtml))
+            {
+                CloseParagraph(body, ref inParagraph);
+                body.AppendLine(mathBlockHtml);
+                i++;
+                continue;
+            }
+
             if (!inParagraph)
             {
                 body.Append("<p>");
@@ -526,6 +534,102 @@ public static class HtmlContentBuilder
         return true;
     }
 
+    // Detects $$...$$ and \[...\] display math blocks (single or multi-line)
+    private static bool TryRenderMathBlock(string[] lines, ref int index, out string html)
+    {
+        html = string.Empty;
+
+        var line = lines[index].TrimEnd('\r');
+        var trimmed = line.Trim();
+
+        var isDoubleDollar = trimmed.StartsWith("$$");
+        var isBracketDisplay = trimmed.StartsWith(@"\[");
+
+        if (!isDoubleDollar && !isBracketDisplay)
+        {
+            return false;
+        }
+
+        string openingDelim;
+        string closingDelim;
+        string htmlLeft;
+        string htmlRight;
+
+        if (isDoubleDollar)
+        {
+            openingDelim = "$$";
+            closingDelim = "$$";
+            htmlLeft = "$$";
+            htmlRight = "$$";
+        }
+        else
+        {
+            openingDelim = @"\[";
+            closingDelim = @"\]";
+            htmlLeft = @"\[";
+            htmlRight = @"\]";
+        }
+
+        // Single-line: opening and closing delimiter on same line
+        string? singleLineContent = null;
+
+        if (isDoubleDollar && trimmed.Length > 4 && trimmed.EndsWith("$$"))
+        {
+            singleLineContent = trimmed.Substring(2, trimmed.Length - 4).Trim();
+        }
+        else if (isBracketDisplay && trimmed.Length > 4 && trimmed.EndsWith(@"\]"))
+        {
+            singleLineContent = trimmed.Substring(2, trimmed.Length - 4).Trim();
+        }
+
+        if (singleLineContent != null)
+        {
+            var escaped = EscapeHtml(singleLineContent);
+            var dataAttr = EscapeHtml(singleLineContent);
+            html = $"<div class=\"math-display\" data-latex=\"{dataAttr}\">{htmlLeft}{escaped}{htmlRight}</div>";
+            return true;
+        }
+
+        // Multi-line: collect content until closing delimiter
+        var contentBuilder = new StringBuilder();
+        var firstPart = trimmed.Substring(openingDelim.Length).Trim();
+
+        if (firstPart.Length > 0)
+        {
+            contentBuilder.AppendLine(firstPart);
+        }
+
+        var startIndex = index + 1;
+        var foundEnd = false;
+
+        for (var j = startIndex; j < lines.Length; j++)
+        {
+            var currentLine = lines[j].TrimEnd('\r');
+            var currentTrimmed = currentLine.Trim();
+
+            if (currentTrimmed == closingDelim ||
+                (isDoubleDollar && currentTrimmed.EndsWith("$$")))
+            {
+                index = j;
+                foundEnd = true;
+                break;
+            }
+
+            contentBuilder.AppendLine(currentTrimmed);
+        }
+
+        if (!foundEnd)
+        {
+            return false;
+        }
+
+        var rawContent = contentBuilder.ToString().TrimEnd('\n', '\r');
+        var escapedContent = EscapeHtml(rawContent);
+        var dataAttrLatex = EscapeHtml(rawContent);
+        html = $"<div class=\"math-display\" data-latex=\"{dataAttrLatex}\">{htmlLeft}{escapedContent}{htmlRight}</div>";
+        return true;
+    }
+
     // Lines starting with > are grouped into <blockquote><p>…</p></blockquote>
     private static bool TryRenderBlockquote(string[] lines, ref int index, bool isOrgFile, out string html, string? imageDir = null, List<string>? accumulatedImagePaths = null)
     {
@@ -650,7 +754,7 @@ public static class HtmlContentBuilder
     private static string WrapInHtml(string bodyContent, string? fontFamily = null)
     {
         fontFamily ??= "Inter";
-        return $$$"""
+        return $$$$"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -661,7 +765,7 @@ public static class HtmlContentBuilder
     html { overflow-x: auto; }
     ::selection { background: #2563EB; color: #FFFFFF; }
     body {
-        font-family: '{{{fontFamily}}}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: '{{{{fontFamily}}}}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 16px; line-height: 1.7;
         color: #E2E8F0; background: #1E293B;
         padding: 24px; max-width: none; min-width: calc(100vw + 200px); overflow-x: auto;
@@ -685,6 +789,7 @@ public static class HtmlContentBuilder
     li { margin: 4px 0; }
     pre { background: #282C34; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 0 0 12px 0; white-space: pre; position: relative; width: max-content; max-width: calc(100vw - 48px); }
     pre code { background: none; color: #ABB2BF; padding: 0; border-radius: 0; }
+    .math-display { background: #282C34; border-radius: 8px; padding: 16px; margin: 0 0 12px 0; position: relative; overflow-x: auto; width: max-content; max-width: calc(100vw - 48px); }
     table { border-collapse: collapse; width: 100%; margin: 0 0 12px 0; }
     th, td { border: 1px solid #475569; padding: 8px 12px; text-align: left; }
     th { background: #334155; color: #F1F5F9; font-weight: 600; }
@@ -725,19 +830,24 @@ public static class HtmlContentBuilder
     }
     blockquote .copy-btn { top: 4px; right: 4px; }
     pre:hover .copy-btn, blockquote:hover .copy-btn,
-    pre.org-block:hover .copy-btn { opacity: 1; }
+    pre.org-block:hover .copy-btn, .math-display:hover .copy-btn { opacity: 1; }
     .copy-btn:hover { background: #64748B; }
     .copy-btn.copied { background: #10B981; }
     <!--HIGHLIGHT_CSS-->
+    <!--KATEX_CSS-->
+</style>
+<style>
+    .katex-html { padding-right: 3em; }
 </style>
 </head>
 <body>
-{{{bodyContent}}}
+{{{{bodyContent}}}}
 <script>/* HIGHLIGHT_JS */</script>
 <script>hljs.highlightAll();</script>
+<script>/* KATEX_AUTO_RENDER */</script>
 <script>(function(){var kr=document.createElement('iframe');kr.style.cssText='display:none!important;width:0!important;height:0!important;border:none!important;position:fixed!important';document.body.appendChild(kr);document.addEventListener('keydown',function(e){var k=e.key,m='',h=false;if(e.ctrlKey)m+='C';if(e.shiftKey)m+='S';if(e.altKey)m+='A';switch(k){case'n':case'N':case'p':case'P':case'j':case'J':case'k':case'K':case'h':case'H':case'l':case'L':case'q':case'Q':case'd':case'D':case'e':case'E':case'i':case'I':case'g':case'G':case'Escape':case'?':case'/':case'Enter':h=true;break;case',':case'=':case'-':case'+':case'_':case'0':case')':if(e.ctrlKey)h=true;break;}if(!h)return;e.preventDefault();e.stopPropagation();kr.src='http://key.local/'+encodeURIComponent(k)+'/'+m+'/'+Date.now();},true);})();</script>
 <script>(function(){var lr=document.createElement('iframe');lr.style.cssText='display:none!important;width:0!important;height:0!important;border:none!important;position:fixed!important';document.body.appendChild(lr);document.addEventListener('click',function(e){var t=e.target.closest('a');if(!t)return;var h=t.getAttribute('data-href');if(!h)return;e.preventDefault();e.stopPropagation();lr.src='http://openurl.local/'+encodeURIComponent(h)+'/'+Date.now();},true);})();</script>
-<script>(function(){var e=document.querySelectorAll('pre,blockquote');for(var i=0;i<e.length;i++){var p=e[i];var c=document.createElement('button');c.className='copy-btn';c.textContent='Copy';c.addEventListener('click',function(el,btn){return function(){var t='';if(el.tagName==='PRE'){t=el.textContent}else{var ps=el.querySelectorAll('p');for(var j=0;j<ps.length;j++){t+=ps[j].textContent+'\n'}}var ta=document.createElement('textarea');ta.value=t.trim();ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied')},2000)}}(p,c));p.appendChild(c)}})();</script>
+<script>(function(){var e=document.querySelectorAll('pre,blockquote,.math-display');for(var i=0;i<e.length;i++){var p=e[i];var c=document.createElement('button');c.className='copy-btn';c.textContent='Copy';c.addEventListener('click',function(el,btn){return function(){var t=el.getAttribute('data-latex');if(!t){if(el.tagName==='PRE'){t=el.textContent}else{var ps=el.querySelectorAll('p');for(var j=0;j<ps.length;j++){t+=ps[j].textContent+'\n'}}}var ta=document.createElement('textarea');ta.value=t.trim();ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied')},2000)}}(p,c));p.appendChild(c)}})();</script>
 </body>
 </html>
 """;

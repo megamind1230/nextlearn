@@ -20,6 +20,38 @@ public class MarkdownInlineRenderer : IInlineRenderer
             return $"%%%CODE_{placeholderIdx++}%%%";
         });
 
+        // Extract math expressions — code takes priority (code extracted first)
+        var mathExpressions = new List<(string content, string delimiter)>();
+        var mathIdx = 0;
+
+        // $$...$$ display math
+        result = Regex.Replace(result, @"\$\$([\s\S]*?)\$\$", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, "$$"));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
+        // $...$ inline math (no space after opening $, no space before closing $)
+        result = Regex.Replace(result, @"\$([^$\s][^$]*[^$\s]|[^$\s])\$", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, "$"));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
+        // \[...\] display math
+        result = Regex.Replace(result, @"\\\[([\s\S]*?)\\\]", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, @"\["));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
+        // \(...\) inline math
+        result = Regex.Replace(result, @"\\\(([\s\S]*?)\\\)", m =>
+        {
+            mathExpressions.Add((m.Groups[1].Value, @"\("));
+            return $"%%%MATH_{mathIdx++}%%%";
+        });
+
         result = Regex.Replace(result, @"\b(TODO|DONE)\b", m =>
             m.Groups[1].Value switch
             {
@@ -71,6 +103,22 @@ public class MarkdownInlineRenderer : IInlineRenderer
         for (var i = 0; i < codeSpans.Count; i++)
         {
             result = result.Replace($"%%%CODE_{i}%%%", $"<code>{codeSpans[i]}</code>");
+        }
+
+        // Restore math expressions with original delimiters (KaTeX auto-render finds them in DOM)
+        for (var i = 0; i < mathExpressions.Count; i++)
+        {
+            var (content, delim) = mathExpressions[i];
+            var left = delim;
+            var right = delim switch
+            {
+                "$" => "$",
+                "$$" => "$$",
+                @"\[" => @"\]",
+                @"\(" => @"\)",
+                _ => delim,
+            };
+            result = result.Replace($"%%%MATH_{i}%%%", $"{left}{content}{right}");
         }
 
         // Bare URL auto-linking (not already inside <a> or href="")
