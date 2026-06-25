@@ -6,7 +6,7 @@ namespace NextLearn.Desktop.Services;
 
 public class MarkdownInlineRenderer : IInlineRenderer
 {
-    public string RenderInline(string text, string? imageDir = null, List<string>? accumulatedImagePaths = null)
+    public string RenderInline(string text, string? imageDir = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? footnoteDefinitions = null)
     {
         ArgumentNullException.ThrowIfNull(text);
         var result = HtmlContentBuilder.EscapeHtml(text);
@@ -51,6 +51,24 @@ public class MarkdownInlineRenderer : IInlineRenderer
             mathExpressions.Add((m.Groups[1].Value, @"\("));
             return $"%%%MATH_{mathIdx++}%%%";
         });
+
+        // Footnote references [^id] — only replace if id exists in definitions
+        var footnotePlaceholders = new Dictionary<string, (string id, string rawText)>();
+        if (footnoteDefinitions != null)
+        {
+            result = Regex.Replace(result, @"\[\^(\w+)\]", m =>
+            {
+                var id = m.Groups[1].Value;
+                if (footnoteDefinitions.TryGetValue(id, out var rawText))
+                {
+                    var key = $"%%%FN_{id}%%%";
+                    footnotePlaceholders[key] = (id, rawText);
+                    return key;
+                }
+
+                return m.Value;
+            });
+        }
 
         result = Regex.Replace(result, @"\b(TODO|DONE)\b", m =>
             m.Groups[1].Value switch
@@ -133,6 +151,13 @@ public class MarkdownInlineRenderer : IInlineRenderer
 
             return $"<a data-href=\"{url}\" rel=\"noopener\">{url}</a>";
         });
+
+        // Restore footnote references with superscript HTML
+        foreach (var (key, (id, rawText)) in footnotePlaceholders)
+        {
+            var escapedTitle = HtmlContentBuilder.EscapeHtml(rawText);
+            result = result.Replace(key, $"<sup class=\"footnote-ref\"><a href=\"#fn-{id}\" id=\"fnref-{id}\" title=\"{escapedTitle}\">{id}</a></sup>");
+        }
 
         return result;
     }
