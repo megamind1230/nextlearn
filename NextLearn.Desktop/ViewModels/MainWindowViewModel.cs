@@ -638,7 +638,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var decksPath = _settingsService.ResolvedDecksPath;
         PinnedDecks.Clear();
-        foreach (var d in DeckFileService.GetPinnedDecks(decksPath))
+        foreach (var d in DeckFileService.GetPinnedDecks(decksPath).OrderBy(d => d.FileName))
         {
             PinnedDecks.Add(d);
         }
@@ -655,7 +655,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var decksPath = _settingsService.ResolvedDecksPath;
         ArchivedDecks.Clear();
-        foreach (var d in DeckFileService.GetArchivedDecks(decksPath))
+        foreach (var d in DeckFileService.GetArchivedDecks(decksPath).OrderBy(d => d.FileName))
         {
             ArchivedDecks.Add(d);
         }

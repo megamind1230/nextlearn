@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NextLearn.Desktop.Models;
@@ -18,6 +21,7 @@ public partial class HomeViewModel : ViewModelBase
     private readonly MainWindowViewModel _mainViewModel;
     private readonly string _decksPath;
     private FileSystemWatcher? _watcher;
+    private CancellationTokenSource? _refreshCts;
     private List<Deck> _allDecks = new();
 
     [ObservableProperty]
@@ -53,10 +57,27 @@ public partial class HomeViewModel : ViewModelBase
             EnableRaisingEvents = true,
         };
 
-        _watcher.Created += (s, e) => Refresh();
-        _watcher.Changed += (s, e) => Refresh();
-        _watcher.Deleted += (s, e) => Refresh();
-        _watcher.Renamed += (s, e) => Refresh();
+        _watcher.Created += (s, e) => ScheduleRefresh();
+        _watcher.Changed += (s, e) => ScheduleRefresh();
+        _watcher.Deleted += (s, e) => ScheduleRefresh();
+        _watcher.Renamed += (s, e) => ScheduleRefresh();
+    }
+
+    private void ScheduleRefresh()
+    {
+        _refreshCts?.Cancel();
+        _refreshCts = new CancellationTokenSource();
+        var token = _refreshCts.Token;
+        Task.Delay(300, token)
+            .ContinueWith(
+                _ =>
+                {
+                    if (!token.IsCancellationRequested)
+                    {
+                        Dispatcher.UIThread.Post(Refresh);
+                    }
+                },
+                token);
     }
 
     public void Refresh()
@@ -92,7 +113,7 @@ public partial class HomeViewModel : ViewModelBase
         }
 
         Decks.Clear();
-        foreach (var deck in _allDecks)
+        foreach (var deck in _allDecks.OrderBy(d => d.FileName))
         {
             Decks.Add(deck);
         }
