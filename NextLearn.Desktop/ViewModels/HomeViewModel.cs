@@ -39,6 +39,7 @@ public partial class HomeViewModel : ViewModelBase
         _deckFileService = deckFileService;
         _mainViewModel = mainViewModel;
         _decksPath = Constants.GetDecksPath(decksPath);
+        Directory.CreateDirectory(_decksPath);
         SetupFileWatcher();
         LoadDecks();
     }
@@ -54,6 +55,7 @@ public partial class HomeViewModel : ViewModelBase
         _watcher = new FileSystemWatcher(decksPath)
         {
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime,
+            IncludeSubdirectories = true,
             EnableRaisingEvents = true,
         };
 
@@ -100,9 +102,9 @@ public partial class HomeViewModel : ViewModelBase
             var extensions = new[] { "*.md", "*.org" };
             foreach (var ext in extensions)
             {
-                foreach (var file in Directory.GetFiles(decksPath, ext))
+                foreach (var file in Directory.GetFiles(decksPath, ext, SearchOption.AllDirectories))
                 {
-                    var deck = DeckFileParser.LoadDeckFromFile(file);
+                    var deck = DeckFileParser.LoadDeckFromFile(file, decksPath);
                     if (deck != null)
                     {
                         _deckService.SaveOrUpdateDeck(deck);
@@ -231,21 +233,24 @@ public partial class HomeViewModel : ViewModelBase
     [RelayCommand]
     private void PinDeck(Deck deck)
     {
-        _deckFileService.PinDeck(deck.Id, _decksPath);
+        _deckFileService.PinDeck(deck, _decksPath);
+        _deckService.SyncDeckMetadata(deck);
         Refresh();
     }
 
     [RelayCommand]
     private void UnpinDeck(Deck deck)
     {
-        _deckFileService.UnpinDeck(deck.Id, _decksPath);
+        _deckFileService.UnpinDeck(deck, _decksPath);
+        _deckService.SyncDeckMetadata(deck);
         Refresh();
     }
 
     [RelayCommand]
     private void ArchiveDeck(Deck deck)
     {
-        _deckFileService.ArchiveDeck(deck.Id, _decksPath);
+        _deckFileService.ArchiveDeck(deck, _decksPath);
+        _deckService.SyncDeckMetadata(deck);
         Refresh();
     }
 
@@ -254,13 +259,14 @@ public partial class HomeViewModel : ViewModelBase
     {
         if (deck.IsPinned)
         {
-            _deckFileService.UnpinDeck(deck.Id, _decksPath);
+            _deckFileService.UnpinDeck(deck, _decksPath);
         }
         else
         {
-            _deckFileService.PinDeck(deck.Id, _decksPath);
+            _deckFileService.PinDeck(deck, _decksPath);
         }
 
+        _deckService.SyncDeckMetadata(deck);
         Refresh();
     }
 
