@@ -1,4 +1,4 @@
-#+TITLE: nextlearn
+﻿#+TITLE: nextlearn
 #+DESCRIPTION: Learn anything. Fight distraction.
 #+DATE: <2026-06-04 Thu>
 
@@ -47,7 +47,7 @@ separate project.
 :CUSTOM_ID: screenshots
 :END:
 For visual walkthroughs of features, see the
-[[file:screenshots.md][Screenshots Gallery]].
+[[file:screenshots.org][Screenshots Gallery]].
 
 * Features
 :PROPERTIES:
