@@ -334,4 +334,9 @@ public partial class TagInferenceViewModel : ViewModelBase
         HasError = false;
         ErrorMessage = null;
     }
+
+    public void FocusSearch()
+    {
+        SearchText = string.Empty;
+    }
 }

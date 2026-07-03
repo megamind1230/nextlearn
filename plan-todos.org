@@ -1,467 +1,1217 @@
 #+TITLE: NextLearn — Plan & Todos
 
 * DONE Sort deck lists by FileName + debounce FS watcher + fix DbContext race
-
+:PROPERTIES:
+:CUSTOM_ID: done-sort-deck-lists-by-filename-debounce-fs-watcher-fix-dbcontext-race
+:END:
 ** Done
-- Home search, pinned, and archived deck lists ordered by `.FileName`
+:PROPERTIES:
+:CUSTOM_ID: done
+:END:
+- Home search, pinned, and archived deck lists ordered by =.FileName=
 - FileSystemWatcher events debounced (300ms) and dispatched to UI thread
 - DbContext concurrency crash on quick pin/archive fixed
 
 * DONE Recursive vault scanning (all .md/.org under decks root)
+:PROPERTIES:
+:CUSTOM_ID: done-recursive-vault-scanning-all-.md.org-under-decks-root
+:END:
+*** 1. DeckFileParser.LoadDeckFromFile --- add =relativeTo= param
+:PROPERTIES:
+:CUSTOM_ID: deckfileparser.loaddeckfromfile-add-relativeto-param
+:END:
+- File: =Services/DeckFileParser.cs= (line 14)
+- Optional =string? relativeTo = null= parameter added
+- When provided: =FileName = Path.GetRelativePath(relativeTo, filePath)=
+- When null: =FileName = Path.GetFileName(filePath)= (backward compat)
+- =DeckFileIdentity.GetId(filePath)= unchanged --- still uses absolute
+  path
 
-*** 1. DeckFileParser.LoadDeckFromFile — add `relativeTo` param
-- File: ~Services/DeckFileParser.cs~ (line 14)
-- Optional ~string? relativeTo = null~ parameter added
-- When provided: ~FileName = Path.GetRelativePath(relativeTo, filePath)~
-- When null: ~FileName = Path.GetFileName(filePath)~ (backward compat)
-- ~DeckFileIdentity.GetId(filePath)~ unchanged — still uses absolute path
+*** 2. HomeViewModel --- recursive scan + pass relativeTo
+:PROPERTIES:
+:CUSTOM_ID: homeviewmodel-recursive-scan-pass-relativeto
+:END:
+- File: =ViewModels/HomeViewModel.cs=
+- =LoadDecks()=:
+  =Directory.GetFiles(decksPath, ext, SearchOption.AllDirectories)=
+- Pass =relativeTo: decksPath= to =DeckFileParser.LoadDeckFromFile=
+- =SetupFileWatcher()=: set =IncludeSubdirectories = true=
 
-*** 2. HomeViewModel — recursive scan + pass relativeTo
-- File: ~ViewModels/HomeViewModel.cs~
-- ~LoadDecks()~: ~Directory.GetFiles(decksPath, ext, SearchOption.AllDirectories)~
-- Pass ~relativeTo: decksPath~ to ~DeckFileParser.LoadDeckFromFile~
-- ~SetupFileWatcher()~: set ~IncludeSubdirectories = true~
+*** 3. LearningViewModel --- recursive scan in StartLearning
+:PROPERTIES:
+:CUSTOM_ID: learningviewmodel-recursive-scan-in-startlearning
+:END:
+- File: =ViewModels/LearningViewModel.cs= (line 206)
+- Already using =SearchOption.AllDirectories= and passing =_decksPath=
+  as =relativeTo=
 
-*** 3. LearningViewModel — recursive scan in StartLearning
-- File: ~ViewModels/LearningViewModel.cs~ (line 206)
-- Already using ~SearchOption.AllDirectories~ and passing ~_decksPath~ as ~relativeTo~
-
-*** 4. DeckFileService — subdirectory-aware pin/archive
-- ~PinDeck()~: splits ~Path.GetDirectoryName~/~GetFileName~, prepends ~+~ to filename part only
-- ~UnpinDeck()~: strips ~+~ from filename part only
-- ~ArchiveDeck()~ / ~UnarchiveDeck()~: uses ~Path.Combine~ with relative paths — correct
-- ~GetPinnedDecks()~ / ~GetArchivedDecks()~: already ~SearchOption.AllDirectories~
+*** 4. DeckFileService --- subdirectory-aware pin/archive
+:PROPERTIES:
+:CUSTOM_ID: deckfileservice-subdirectory-aware-pinarchive
+:END:
+- =PinDeck()=: splits =Path.GetDirectoryName~/~GetFileName=, prepends
+  =+= to filename part only
+- =UnpinDeck()=: strips =+= from filename part only
+- =ArchiveDeck()= / =UnarchiveDeck()=: uses =Path.Combine= with relative
+  paths --- correct
+- =GetPinnedDecks()= / =GetArchivedDecks()=: already
+  =SearchOption.AllDirectories=
 
 * DONE Wiki-link navigation to any deck under vault root
+:PROPERTIES:
+:CUSTOM_ID: done-wiki-link-navigation-to-any-deck-under-vault-root
+:END:
+*** 5. IInlineRenderer + IHtmlContentBuilder --- add =decksPath= param
+:PROPERTIES:
+:CUSTOM_ID: iinlinerenderer-ihtmlcontentbuilder-add-deckspath-param
+:END:
+- =IInlineRenderer.RenderInline=: added =string? decksPath = null=
+- =IHtmlContentBuilder.Build=: added =string? decksPath = null=
+- =HtmlContentService.Build=: passes =decksPath= through
+- =HtmlContentBuilder=: added =TryGetDeckLink()= helper; threaded
+  =decksPath= through =RenderInline=, =TryRenderTable=,
+  =TryRenderBlockquote=, =TryRenderList=, =SplitTableCell=
 
-*** 5. IInlineRenderer + IHtmlContentBuilder — add `decksPath` param
-- ~IInlineRenderer.RenderInline~: added ~string? decksPath = null~
-- ~IHtmlContentBuilder.Build~: added ~string? decksPath = null~
-- ~HtmlContentService.Build~: passes ~decksPath~ through
-- ~HtmlContentBuilder~: added ~TryGetDeckLink()~ helper; threaded ~decksPath~ through
-  ~RenderInline~, ~TryRenderTable~, ~TryRenderBlockquote~, ~TryRenderList~, ~SplitTableCell~
+*** 6. MarkdownInlineRenderer --- wiki-link detection for .md
+:PROPERTIES:
+:CUSTOM_ID: markdowninlinerenderer-wiki-link-detection-for-.md
+:END:
+- =[text](url)=: added deck-link check via =TryGetDeckLink= before
+  =return m.Value=
+- =[[text]]=: same
 
-*** 6. MarkdownInlineRenderer — wiki-link detection for .md
-- ~[text](url)~: added deck-link check via ~TryGetDeckLink~ before ~return m.Value~
-- ~[[text]]~: same
+*** 7. OrgInlineRenderer --- wiki-link detection for .org
+:PROPERTIES:
+:CUSTOM_ID: orginlinerenderer-wiki-link-detection-for-.org
+:END:
+- =[[file:path][text]]=: deck-link check added
+- =[[url][text]]=: deck-link check added (before bracketed fallback)
+- =[[url]]=: deck-link check added (before bracketed fallback)
+- =[text](url)=: deck-link check added before =return m.Value=
 
-*** 7. OrgInlineRenderer — wiki-link detection for .org
-- ~[[file:path][text]]~: deck-link check added
-- ~[[url][text]]~: deck-link check added (before bracketed fallback)
-- ~[[url]]~: deck-link check added (before bracketed fallback)
-- ~[text](url)~: deck-link check added before ~return m.Value~
+*** 8. LearningViewModel --- pass =_(decksPath)= to Build
+:PROPERTIES:
+:CUSTOM_ID: learningviewmodel-pass-_deckspath-to-build
+:END:
+- =_htmlContentBuilder.Build(..., _decksPath)= at line 376
 
-*** 8. LearningViewModel — pass `_decksPath` to Build
-- ~_htmlContentBuilder.Build(..., _decksPath)~ at line 376
+*** 9. WrapInHtml JS --- handle =data-decklink= clicks
+:PROPERTIES:
+:CUSTOM_ID: wrapinhtml-js-handle-data-decklink-clicks
+:END:
+- Click handler updated to check =data-decklink= attribute
+- Navigates to =http://decklink.local/<encoded-path>= for deck links
 
-*** 9. WrapInHtml JS — handle `data-decklink` clicks
-- Click handler updated to check ~data-decklink~ attribute
-- Navigates to ~http://decklink.local/<encoded-path>~ for deck links
+*** 10. MainWindow.axaml --- add deck-link prompt overlay
+:PROPERTIES:
+:CUSTOM_ID: mainwindow.axaml-add-deck-link-prompt-overlay
+:END:
+- =Panel= overlay at ZIndex 1501 (between ChordDisplay 1500 and Handbook
+  2000) [@2000]
 
-*** 10. MainWindow.axaml — add deck-link prompt overlay
-- ~Panel~ overlay at ZIndex 1501 (between ChordDisplay 1500 and Handbook 2000)
-- Backdrop border ~PointerPressed~ → ~CloseDeckLinkPromptOnBackdrop~
-- Centered ~Border~ with title ~TextBlock~ + "Open Deck" / Cancel ~Button~
+- Backdrop border =PointerPressed= → =CloseDeckLinkPromptOnBackdrop=
+- Centered =Border= with title =TextBlock= + "Open Deck" / Cancel
+  =Button=
 
-*** 11. MainWindowViewModel — prompt state + TryOpenDeckLink
-- ~IsDeckLinkPromptOpen~ (bool, observable)
-- ~_deckLinkTarget~ / ~_deckLinkDisplay~ (private fields)
-- ~DeckLinkPromptTitle~ (computed) / ~DeckLinkPromptActionText~ (static)
-- ~TryOpenDeckLink(string)~ — sets target, shows prompt
-- ~DismissDeckLinkPromptCommand~ — closes prompt
-- ~NavigateToDeckLinkCommand~ — loads deck via ~NavigateToLearningByDeck~
+*** 11. MainWindowViewModel --- prompt state + TryOpenDeckLink
+:PROPERTIES:
+:CUSTOM_ID: mainwindowviewmodel-prompt-state-tryopendecklink
+:END:
+- =IsDeckLinkPromptOpen= (bool, observable)
+- =_deckLinkTarget= / =_deckLinkDisplay= (private fields)
+- =DeckLinkPromptTitle= (computed) / =DeckLinkPromptActionText= (static)
+- =TryOpenDeckLink(string)= --- sets target, shows prompt
+- =DismissDeckLinkPromptCommand= --- closes prompt
+- =NavigateToDeckLinkCommand= --- loads deck via
+  =NavigateToLearningByDeck=
 
-*** 12. MainWindow.axaml.cs — catch `decklink.local` in OnWebViewNavigationStarted
-- New branch: ~uri.Scheme == "http" && uri.Host == "decklink.local"~
-- ~e.Cancel = true~ → decode path → ~Dispatcher.UIThread.Post(() => vm.TryOpenDeckLink(path))~
-- ~CloseDeckLinkPromptOnBackdrop~ handler added
+*** 12. MainWindow.axaml.cs --- catch =decklink.local= in OnWebViewNavigationStarted
+:PROPERTIES:
+:CUSTOM_ID: mainwindow.axaml.cs-catch-decklink.local-in-onwebviewnavigationstarted
+:END:
+- New branch: =uri.Scheme == "http" && uri.Host == "decklink.local"=
+- =e.Cancel = true= → decode path →
+  =Dispatcher.UIThread.Post(() => vm.TryOpenDeckLink(path))=
+- =CloseDeckLinkPromptOnBackdrop= handler added
 
 * DONE Previous features (reference)
+:PROPERTIES:
+:CUSTOM_ID: done-previous-features-reference
+:END:
 - Falcon Eye TOC plugin
 - P38: ZIndex cleanup + archive/pin support
 - YAML config migration
 - Market page, plugins, settings, sidebar, heatmap, etc.
 
 * DONE DeckFileService decoupled from AppDbContext + SyncDeckMetadata
-
+:PROPERTIES:
+:CUSTOM_ID: done-deckfileservice-decoupled-from-appdbcontext-syncdeckmetadata
+:END:
 ** What
-~DeckFileService~ no longer depends on ~AppDbContext~. Pin/archive/unpin methods
-take ~Deck~ objects directly (instead of ~Guid~) and update ~FileName~/~IsPinned~/
-~IsArchived~ in-place. Callers persist metadata via the new ~SyncDeckMetadata~.
+:PROPERTIES:
+:CUSTOM_ID: what
+:END:
+=DeckFileService= no longer depends on =AppDbContext=. Pin/archive/unpin
+methods take =Deck= objects directly (instead of =Guid=) and update
+=FileName~/~IsPinned~/ ~IsArchived= in-place. Callers persist metadata
+via the new =SyncDeckMetadata=.
 
 ** Changes
-- ~IDeckFileService~: all methods changed from ~(Guid deckId, string decksPath)~
-  to ~(Deck deck, string decksPath)~
-- ~DeckFileService~: removed constructor DI of ~AppDbContext~; added
-  ~ArgumentNullException.ThrowIfNull~ guards; ~try/catch~ with ~Log.Error~ on ~File.Move~
-- ~IDeckService~: added ~void SyncDeckMetadata(Deck deck)~
-- ~DeckService.SyncDeckMetadata~: updates only ~FileName~/~IsPinned~/~IsArchived~,
-  never touches ~Pages~ table
-- ~HomeViewModel~: ~PinDeck~/~UnpinDeck~/~ArchiveDeck~ call ~SyncDeckMetadata~ after file ops
-- ~MainWindowViewModel~: same for ~UnpinFromView~/~Unarchive~
+:PROPERTIES:
+:CUSTOM_ID: changes
+:END:
+- =IDeckFileService=: all methods changed from
+  =(Guid deckId, string decksPath)= to =(Deck deck, string decksPath)=
+- =DeckFileService=: removed constructor DI of =AppDbContext=; added
+  =ArgumentNullException.ThrowIfNull= guards; =try/catch= with
+  =Log.Error= on =File.Move=
+- =IDeckService=: added =void SyncDeckMetadata(Deck deck)=
+- =DeckService.SyncDeckMetadata=: updates only
+  =FileName~/~IsPinned~/~IsArchived=, never touches =Pages= table
+- =HomeViewModel=: =PinDeck~/~UnpinDeck~/~ArchiveDeck= call
+  =SyncDeckMetadata= after file ops
+- =MainWindowViewModel=: same for =UnpinFromView~/~Unarchive=
 
 ** Bugs fixed
-- FS1: Pinned file-only deck (+FINEmdeck1.md, no DB record) could never be
-  unpinned — ~UnpinDeck(Guid)~ returned null from DB query, skipped rename
-- FS2: SQLite unique constraint crash — ~SaveOrUpdateDeck~ deleted+reinserted
-  pages in wrong batch order → ~(DeckId, PageNumber)~ violation. ~SyncDeckMetadata~
-  avoids touching pages entirely
+:PROPERTIES:
+:CUSTOM_ID: bugs-fixed
+:END:
+- FS1: Pinned file-only deck (+FINEmdeck1.md, no DB record) could never
+  be unpinned --- =UnpinDeck(Guid)= returned null from DB query, skipped
+  rename
+- FS2: SQLite unique constraint crash --- =SaveOrUpdateDeck=
+  deleted+reinserted pages in wrong batch order → =(DeckId, PageNumber)=
+  violation. =SyncDeckMetadata= avoids touching pages entirely
 
 ** Test impact
-- ~DeckFileServiceTests~: all tests refactored from DB-dependent (InMemory EF Core)
-  to pure file-ops; 6 new tests added (idempotency, subdirectory, edge cases)
+:PROPERTIES:
+:CUSTOM_ID: test-impact
+:END:
+- =DeckFileServiceTests=: all tests refactored from DB-dependent
+  (InMemory EF Core) to pure file-ops; 6 new tests added (idempotency,
+  subdirectory, edge cases)
 
 * DONE Wiki-link + pinned/archived fallback + deck-link prompt UI
-
+:PROPERTIES:
+:CUSTOM_ID: done-wiki-link-pinnedarchived-fallback-deck-link-prompt-ui
+:END:
 ** What
-Wiki-links (~[[target]]~) now resolve pinned (~+target.md~) and archived
-(~target.md~~) files when an exact match is not found. Cross-format extension
-fallback (.md → .org) applies to all formats. All wiki-link variants work in
-both renderers. Clicking an archived deck link shows an "Unarchive and open?"
-prompt.
+:PROPERTIES:
+:CUSTOM_ID: what-1
+:END:
+Wiki-links (=[[target]]=) now resolve pinned (=+target.md=) and archived
+(=target.md~=) files when an exact match is not found. Cross-format
+extension fallback (.md → .org) applies to all formats. All wiki-link
+variants work in both renderers. Clicking an archived deck link shows an
+"Unarchive and open?" prompt.
 
 ** TryGetDeckLink fallback order
-1. Exact ~target.md~ / ~target.org~
-2. ~+target.md~ / ~+target.org~ (pinned)
-3. ~target.md~~ / ~target.org~~ (archived)
+:PROPERTIES:
+:CUSTOM_ID: trygetdecklink-fallback-order
+:END:
+1. Exact =target.md= / =target.org=
+2. =+target.md= / =+target.org= (pinned)
+3. =target.md~= / =target.org~= (archived)
 4. Cross-format: if target has no extension, try .md → .org
 
 ** Changes
-- ~HtmlContentBuilder~: added ~TryGetDeckLink()~, ~TryResolveDeckPath()~,
-  ~GetFileVariants()~; threaded ~decksPath~/~currentDir~ through all render methods
-- ~IInlineRenderer~ / ~IHtmlContentBuilder~: added ~decksPath~/~currentDir~ params
-- ~HtmlContentService~: passes params through
-- ~MarkdownInlineRenderer~: all wiki-link formats with deck-link detection,
-  ~!~ prefix suppresses deck links (not images)
-- ~OrgInlineRenderer~: same, plus org-style ~[[file:...][...]]~ and ~[[...|...]]~
-- ~LearningViewModel~: passes ~_decksPath~ + ~GetCurrentDeckDir()~ to ~Build~;
-  breadcrumb fallback "no H1 heading found yet"
-- ~WrapInHtml~ JS: click handler checks ~data-decklink~ attribute →
-  ~http://decklink.local/~ navigation
-- ~MainWindow.axaml~: deck-link prompt overlay (Panel, backdrop, title, buttons)
-- ~MainWindowViewModel~: ~IsDeckLinkPromptOpen~, ~TryOpenDeckLink~, ~NavigateToDeckLink~
-  (archived → unarchive first via ~DeckFileService.UnarchiveDeck~)
-- ~MainWindow.axaml.cs~: ~decklink.local~ URI interception, ~CloseDeckLinkPromptOnBackdrop~,
-  WebView hidden while prompt open
+:PROPERTIES:
+:CUSTOM_ID: changes-1
+:END:
+- =HtmlContentBuilder=: added =TryGetDeckLink()=,
+  =TryResolveDeckPath()=, =GetFileVariants()=; threaded
+  =decksPath~/~currentDir= through all render methods
+- =IInlineRenderer= / =IHtmlContentBuilder=: added
+  =decksPath~/~currentDir= params
+- =HtmlContentService=: passes params through
+- =MarkdownInlineRenderer=: all wiki-link formats with deck-link
+  detection, =!= prefix suppresses deck links (not images)
+- =OrgInlineRenderer=: same, plus org-style =[[file:...][...]]= and
+  =[[...|...]]=
+- =LearningViewModel=: passes =_decksPath= + =GetCurrentDeckDir()= to
+  =Build=; breadcrumb fallback "no H1 heading found yet"
+- =WrapInHtml= JS: click handler checks =data-decklink= attribute →
+  =http://decklink.local/= navigation
+- =MainWindow.axaml=: deck-link prompt overlay (Panel, backdrop, title,
+  buttons)
+- =MainWindowViewModel=: =IsDeckLinkPromptOpen=, =TryOpenDeckLink=,
+  =NavigateToDeckLink= (archived → unarchive first via
+  =DeckFileService.UnarchiveDeck=)
+- =MainWindow.axaml.cs=: =decklink.local= URI interception,
+  =CloseDeckLinkPromptOnBackdrop=, WebView hidden while prompt open
 
 ** Test impact
-- ~HtmlContentBuilderTests~: 8 new tests for TryGetDeckLink (+/~/~ fallback,
-  subdirectory, precedence)
+:PROPERTIES:
+:CUSTOM_ID: test-impact-1
+:END:
+- =HtmlContentBuilderTests=: 8 new tests for TryGetDeckLink (+/_{/}
+  fallback, subdirectory, precedence)
 
-* DONE AI Tag Inference — Google Gemini
-
+* DONE AI Tag Inference --- Google Gemini
+:PROPERTIES:
+:CUSTOM_ID: done-ai-tag-inference-google-gemini
+:END:
 ** What
+:PROPERTIES:
+:CUSTOM_ID: what-2
+:END:
 New Tag Inference page using Google Gemini (free tier) to automatically
 suggest tags for .md and .org deck files. Shows a diff preview before
-applying, supports all existing tag formats, and preserves existing tags.
+applying, supports all existing tag formats, and preserves existing
+tags.
 
 ** New files
-
+:PROPERTIES:
+:CUSTOM_ID: new-files
+:END:
 *** 1. Services/ITagInferenceService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesitaginferenceservice.cs
+:END:
 Interface for AI tag inference:
-- ~Task<TagInferenceResult> InferTagsAsync(string deckContent, string existingTags)~
-- ~TagInferenceResult~: ~List<string> SuggestedTags~ + ~bool Success~ + ~string? Error~
+
+- =Task<TagInferenceResult> InferTagsAsync(string deckContent, string existingTags)=
+- =TagInferenceResult=: =List<string> SuggestedTags= + =bool Success= +
+  =string? Error=
 
 *** 2. Services/TagInferenceService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicestaginferenceservice.cs
+:END:
 Gemini API implementation:
-- ~HttpClient~ POST to ~https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}~
-- Token estimation (~content.Length / 4~): if >900K → error "too large";
+
+- =HttpClient= POST to
+  =https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}=
+- Token estimation (=content.Length / 4=): if >900K → error "too large";
   if >700K → truncate with warning
-- Prompt: "Suggest 2–15 additional tags… return JSON array of strings"
-- ~GeminiResponse~ deserialization model classes
-- No internet → ~HttpRequestException~ → friendly error message
+- Prompt: "Suggest 2--15 additional tags... return JSON array of
+  strings"
+- =GeminiResponse= deserialization model classes
+- No internet → =HttpRequestException= → friendly error message
 
 *** 3. Services/IDeckFileWriter.cs + DeckFileWriter.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesideckfilewriter.cs-deckfilewriter.cs
+:END:
 Write updated tags back to source file, preserving original format:
-- ~WriteTags(string filePath, List<string> newTags)~
-- Detect format: inline comma-sep / quoted / inline array / block list / .org colon
+
+- =WriteTags(string filePath, List<string> newTags)=
+- Detect format: inline comma-sep / quoted / inline array / block list /
+  .org colon
 - Append new tags, dedup against existing
 - Re-read file before writing to catch external modifications
-- If ~LastWriteTimeUtc~ differs from read time → prompt user
+- If =LastWriteTimeUtc= differs from read time → prompt user
 
 *** 4. ViewModels/TagInferenceViewModel.cs
+:PROPERTIES:
+:CUSTOM_ID: viewmodelstaginferenceviewmodel.cs
+:END:
 Page ViewModel:
-- ~ObservableCollection<Deck> Decks~ — searchable deck list (no learn/pin/archive buttons)
-- ~string SearchText~ — filter decks
-- ~Deck? SelectedDeck~
-- ~string? InferenceStatus~ — current step text
-- ~double InferenceProgress~ — 0–100 for progress bar
-- ~string? ExistingTagsDisplay~
-- ~string? ProposedTagsDisplay~
-- ~bool IsPreviewVisible~ — diff view after inference
-- ~bool IsInferring~ — disables buttons during inference
-- ~bool IsApiKeyMissing~ — gate
-- Commands: ~InferTagsCommand~, ~ApplyTagsCommand~, ~CancelCommand~
+
+- =ObservableCollection<Deck> Decks= --- searchable deck list (no
+  learn/pin/archive buttons)
+- =string SearchText= --- filter decks
+- =Deck? SelectedDeck=
+- =string? InferenceStatus= --- current step text
+- =double InferenceProgress= --- 0--100 for progress bar
+- =string? ExistingTagsDisplay=
+- =string? ProposedTagsDisplay=
+- =bool IsPreviewVisible= --- diff view after inference
+- =bool IsInferring= --- disables buttons during inference
+- =bool IsApiKeyMissing= --- gate
+- Commands: =InferTagsCommand=, =ApplyTagsCommand=, =CancelCommand=
 
 *** 5. Controls/TagInferencePanel.axaml + .axaml.cs
+:PROPERTIES:
+:CUSTOM_ID: controlstaginferencepanel.axaml-.axaml.cs
+:END:
 New page view:
+
 - Search box (top)
-- Deck list (cards with title, description, current tags, "Infer Tags →" button)
+- Deck list (cards with title, description, current tags, "Infer Tags →"
+  button)
 - Progress bar + status text (visible during inference)
 - Diff panel (current tags vs proposed additions, highlighted)
 - "Apply" / "Cancel" buttons
 
 ** Modified files
-
+:PROPERTIES:
+:CUSTOM_ID: modified-files
+:END:
 *** 6. AppSettings.cs
-- Add ~string GeminiApiKey~ (default empty)
+:PROPERTIES:
+:CUSTOM_ID: appsettings.cs
+:END:
+- Add =string GeminiApiKey= (default empty)
 
 *** 7. SettingsService.cs + ISettingsService.cs
-- Expose ~string GeminiApiKey~ get/set
-- ~Load()~ / ~Save()~ handle it
+:PROPERTIES:
+:CUSTOM_ID: settingsservice.cs-isettingsservice.cs
+:END:
+- Expose =string GeminiApiKey= get/set
+- =Load()= / =Save()= handle it
 
 *** 8. SettingsPanel.axaml
+:PROPERTIES:
+:CUSTOM_ID: settingspanel.axaml
+:END:
 - Add password-style text field for API key
-- Add "Get a free Gemini API key" link button → opens ~https://aistudio.google.com/apikey~
+- Add "Get a free Gemini API key" link button → opens
+  =https://aistudio.google.com/apikey=
 - Add status indicator (configured / missing)
 
 *** 9. Sidebar.axaml
+:PROPERTIES:
+:CUSTOM_ID: sidebar.axaml
+:END:
 - Insert nav item between Falcon Eye and Streak:
-  ~<Button Command="{Binding ShowTagInferenceCommand}" ...>~
-  ~    <TextBlock Text="🏷"/> <TextBlock Text="  Tag Inference"/>~
-  ~</Button>~
+  =<Button Command="{Binding ShowTagInferenceCommand}" ...>= ~ ~
+  =</Button>=
 
 *** 10. MainWindowViewModel.cs
-- Add ~bool IsTagInferenceOpen~ (observable)
-- Add ~ShowTagInferenceCommand~ → ~[RelayCommand] void ShowTagInference()~
-  (closes other panels, sets ~IsTagInferenceOpen = true~)
-- Wire ~TagInferenceViewModel~ (manual DI)
-- Add command palette entry ~"tag-inference"~ (aliases: ~"ai-tags", "infer"~,
-  context ~"*"~, shortcut ~Ctrl+Shift+T~)
+:PROPERTIES:
+:CUSTOM_ID: mainwindowviewmodel.cs
+:END:
+- Add =bool IsTagInferenceOpen= (observable)
+- Add =ShowTagInferenceCommand= →
+  =[RelayCommand] void ShowTagInference()= (closes other panels, sets
+  =IsTagInferenceOpen = true=)
+- Wire =TagInferenceViewModel= (manual DI)
+- Add command palette entry ="tag-inference"= (aliases:
+  ="ai-tags", "infer"=, context ="*"=, shortcut =Ctrl+Shift+T=)
 
 *** 11. MainWindow.axaml
-- Add ~<ctrls:TagInferencePanel IsVisible="{Binding IsTagInferenceOpen}"/>~
+:PROPERTIES:
+:CUSTOM_ID: mainwindow.axaml
+:END:
+- Add
+  =<ctrls:TagInferencePanel IsVisible="{Binding IsTagInferenceOpen}"/>=
   in the main content panel
 
 *** 12. KeyboardActionKind.cs
-- Add ~OpenTagInference~ enum value
+:PROPERTIES:
+:CUSTOM_ID: keyboardactionkind.cs
+:END:
+- Add =OpenTagInference= enum value
 
 *** 13. KeyBindingService.cs
+:PROPERTIES:
+:CUSTOM_ID: keybindingservice.cs
+:END:
 - All 3 profiles (Vim, Emacs, VS Code):
-  ~G(null, KeyboardActionKind.OpenTagInference, "T", "Control Shift", "Open Tag Inference")~
+  =G(null, KeyboardActionKind.OpenTagInference, "T", "Control Shift", "Open Tag Inference")=
 
 *** 14. KeyboardHandler.cs + MainWindow.axaml.cs
-- ~HandleKey~: dispatch ~OpenTagInference~ → ~ShowTagInferenceCommand~
-- Ensure ~Ctrl+Shift+T~ is registered
+:PROPERTIES:
+:CUSTOM_ID: keyboardhandler.cs-mainwindow.axaml.cs
+:END:
+- =HandleKey=: dispatch =OpenTagInference= → =ShowTagInferenceCommand=
+- Ensure =Ctrl+Shift+T= is registered
 
 ** Progress UI (TagInferenceViewModel)
-
-| Step | Progress | Status text |
-|------|----------|-------------|
-| 1    | 10%      | "Parsing deck content…" |
-| 2    | 30%      | "Contacting Gemini…" |
-| 3    | 70%      | "Analyzing content…" |
-| 4    | 90%      | "Formatting results…" |
-| 5    | 100%     | "Ready" |
+:PROPERTIES:
+:CUSTOM_ID: progress-ui-taginferenceviewmodel
+:END:
+| Step | Progress | Status text               |
+|------+----------+---------------------------|
+| 1    | 10%      | "Parsing deck content..." |
+| 2    | 30%      | "Contacting Gemini..."    |
+| 3    | 70%      | "Analyzing content..."    |
+| 4    | 90%      | "Formatting results..."   |
+| 5    | 100%     | "Ready"                   |
 
 If any step fails → show error inline, reset to idle.
 
 ** Tag format detection matrix (DeckFileWriter)
-
-| Source format | Detection | Write strategy |
-|---|---|---|
-| ~tags: a, b~ | inline comma-sep | ~tags: a, b, c, d~ |
-| ~tags: "a, b"~ | double-quoted inline | ~tags: "a, b, c, d"~ |
-| ~tags: 'a, b'~ | single-quoted inline | ~tags: 'a, b, c, d'~ |
-| ~tags: [a, b]~ | YAML array | ~tags: [a, b, c, d]~ |
-| ~tags:\n  - a\n  - b~ | block list | Append ~  - c~/~  - d~ |
-| ~#+TAGS: :a:b:~ | org colon | ~#+TAGS: :a:b:c:d:~ |
-| ~#+TAGS: a, b~ | org plain | ~#+TAGS: a, b, c, d~ |
+:PROPERTIES:
+:CUSTOM_ID: tag-format-detection-matrix-deckfilewriter
+:END:
+| Source format         | Detection            | Write strategy        |
+|-----------------------+----------------------+-----------------------|
+| =tags: a, b=          | inline comma-sep     | =tags: a, b, c, d=    |
+| =tags: "a, b"=        | double-quoted inline | =tags: "a, b, c, d"=  |
+| =tags: 'a, b'=        | single-quoted inline | =tags: 'a, b, c, d'=  |
+| =tags: [a, b]=        | YAML array           | =tags: [a, b, c, d]=  |
+| =tags:\n  - a\n  - b= | block list           | Append ~ - c_{/} - d~ |
+| =#+TAGS: :a:b:=       | org colon            | =#+TAGS: :a:b:c:d:=   |
+| =#+TAGS: a, b=        | org plain            | =#+TAGS: a, b, c, d=  |
 
 ** Edge cases
-
-| Case | Behavior |
-|---|---|
-| No API key configured | Show "Configure Gemini API key in Settings" with link button |
-| No internet | ~HttpRequestException~ → "No internet connection. Check and try again." |
-| Rate limit (429) | "Rate limited by Gemini. Wait a moment and try again." |
-| Deck too large (>900K tokens) | "Deck too large (~{n} tokens, max 1M). Split into smaller files." |
-| Very large (>700K tokens) | Warning + truncate to 700K; results may miss some content |
-| Empty deck | "Deck is empty — nothing to infer." |
-| File modified during inference | On Apply: re-read file, detect ~LastWriteTimeUtc~ change → prompt user |
-| API returns empty/unexpected | "Gemini returned an unexpected response. Try again." |
-| .org hierarchy tags (~:a::b:~) | Preserve double-colon when merging |
-| API key invalid (401) | "Invalid API key. Check your Gemini API key in Settings." |
+:PROPERTIES:
+:CUSTOM_ID: edge-cases
+:END:
+| Case                           | Behavior                                                                |
+|--------------------------------+-------------------------------------------------------------------------|
+| No API key configured          | Show "Configure Gemini API key in Settings" with link button            |
+| No internet                    | =HttpRequestException= → "No internet connection. Check and try again." |
+| Rate limit (429)               | "Rate limited by Gemini. Wait a moment and try again."                  |
+| Deck too large (>900K tokens)  | "Deck too large (~{n} tokens, max 1M). Split into smaller files."       |
+| Very large (>700K tokens)      | Warning + truncate to 700K; results may miss some content               |
+| Empty deck                     | "Deck is empty --- nothing to infer."                                   |
+| File modified during inference | On Apply: re-read file, detect =LastWriteTimeUtc= change → prompt user  |
+| API returns empty/unexpected   | "Gemini returned an unexpected response. Try again."                    |
+| .org hierarchy tags (=:a::b:=) | Preserve double-colon when merging                                      |
+| API key invalid (401)          | "Invalid API key. Check your Gemini API key in Settings."               |
 
 ** Estimated inference time (Gemini 2.0 Flash)
-
-| Deck size | Example | Time |
-|---|---|---|
-| <1KB | Quick notes | 1–2s |
-| 1–10KB | Page of notes | 2–4s |
-| 10–100KB | Multiple sections | 4–8s |
-| 100–700KB | Large doc | 8–20s |
-| >700KB | Truncated | — |
+:PROPERTIES:
+:CUSTOM_ID: estimated-inference-time-gemini-2.0-flash
+:END:
+| Deck size  | Example           | Time   |
+|------------+-------------------+--------|
+| <1KB       | Quick notes       | 1--2s  |
+| 1--10KB    | Page of notes     | 2--4s  |
+| 10--100KB  | Multiple sections | 4--8s  |
+| 100--700KB | Large doc         | 8--20s |
+| >700KB     | Truncated         | ---    |
 
 ** Future reuse
-Same ~HttpClient~ + API key infra supports:
+:PROPERTIES:
+:CUSTOM_ID: future-reuse
+:END:
+Same =HttpClient= + API key infra supports:
+
 - MCQ quiz generation from deck content
 - Flashcard Q&A extraction
 - Deck summarization / description generation
 
 ** Test impact
-- ~DeckFileWriterTests~ — format detection for all tag styles,
-  dedup, merge, external-modification detection
-- ~TagInferenceServiceTests~ — mock ~HttpClient~, test prompt construction,
-  response parsing, error handling
-- ~TagInferenceViewModelTests~ — progress states, apply/cancel flow
-- Existing ~DeckFileParserTests~ — verify parser unchanged
+:PROPERTIES:
+:CUSTOM_ID: test-impact-2
+:END:
+- =DeckFileWriterTests= --- format detection for all tag styles, dedup,
+  merge, external-modification detection
+- =TagInferenceServiceTests= --- mock =HttpClient=, test prompt
+  construction, response parsing, error handling
+- =TagInferenceViewModelTests= --- progress states, apply/cancel flow
+- Existing =DeckFileParserTests= --- verify parser unchanged
 
-* DONE Anki Flashcard Generation — Google Gemini
-
+* DONE Anki Flashcard Generation --- Google Gemini
+:PROPERTIES:
+:CUSTOM_ID: done-anki-flashcard-generation-google-gemini
+:END:
 ** What
-New "Anki Flashcards" sidebar panel with two dedicated buttons: [Basic] and
-[Cloze]. Each generates one card type via a separate focused prompt. Preview
-raw output → accept saves as ~.basic.txt~ / ~.cloze.txt~ under
-~$HOME/magnus/nextlearn/flashcards~ for direct Anki import.
+:PROPERTIES:
+:CUSTOM_ID: what-3
+:END:
+New "Anki Flashcards" sidebar panel with two dedicated buttons: [Basic]
+and [Cloze]. Each generates one card type via a separate focused prompt.
+Preview raw output → accept saves as =.basic.txt= / =.cloze.txt= under
+=$HOME/magnus/nextlearn/flashcards= for direct Anki import.
 
 ** Key decisions
-- Two independent buttons instead of one mixed request: user controls type,
-  no partial-merge complexity
-- Separate ~.basic.txt~ / ~.cloze.txt~ files so Anki import maps each file to
-  correct note type (mixed types in one import file not supported by Anki)
-- Cloze format is single-line (no tabs): ~sentence with {{c1::blank}}~ —
-  Anki's Cloze note type has only one text field
-- ~_generationId~ counter discards stale responses if user clicks a new
+:PROPERTIES:
+:CUSTOM_ID: key-decisions
+:END:
+- Two independent buttons instead of one mixed request: user controls
+  type, no partial-merge complexity
+- Separate =.basic.txt= / =.cloze.txt= files so Anki import maps each
+  file to correct note type (mixed types in one import file not
+  supported by Anki)
+- Cloze format is single-line (no tabs): =sentence with {{c1::blank}}=
+  --- Anki's Cloze note type has only one text field
+- =_generationId= counter discards stale responses if user clicks a new
   generation before previous one completes
-- Each prompt says "Cover EVERY section — do not skip any part" to prevent
-  lazy/partial generation
-- Flashcards path defaults to ~$HOME/magnus/nextlearn/flashcards~ (same
+- Each prompt says "Cover EVERY section --- do not skip any part" to
+  prevent lazy/partial generation
+- Flashcards path defaults to =$HOME/magnus/nextlearn/flashcards= (same
   pattern as DecksPath: configurable in Settings with Browse button)
-- File naming: ~<deck-filename>.basic.txt~ and ~<deck-filename>.cloze.txt~
+- File naming: =<deck-filename>.basic.txt= and
+  =<deck-filename>.cloze.txt=
 
 ** Basic prompt
-- File: ~Services/FlashcardService.cs~ — ~BuildBasicPrompt~
-- Requests TSV (tab-separated) format: ~term TAB definition/answer~
+:PROPERTIES:
+:CUSTOM_ID: basic-prompt
+:END:
+- File: =Services/FlashcardService.cs= --- =BuildBasicPrompt=
+- Requests TSV (tab-separated) format: =term TAB definition/answer=
 - One card per line, no markdown, no code fences
 
 ** Cloze prompt
-- File: ~Services/FlashcardService.cs~ — ~BuildClozePrompt~
-- Requests single-line format (no tabs): ~sentence with {{c1::blank}}~
+:PROPERTIES:
+:CUSTOM_ID: cloze-prompt
+:END:
+- File: =Services/FlashcardService.cs= --- =BuildClozePrompt=
+- Requests single-line format (no tabs): =sentence with {{c1::blank}}=
 - One blank per card, no markdown, no code fences
 
 ** New files
-
+:PROPERTIES:
+:CUSTOM_ID: new-files-1
+:END:
 *** 1. Services/FlashcardGenerationMode.cs
-Enum: ~Basic~, ~Cloze~
+:PROPERTIES:
+:CUSTOM_ID: servicesflashcardgenerationmode.cs
+:END:
+Enum: =Basic=, =Cloze=
 
 *** 2. Services/FlashcardResult.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesflashcardresult.cs
+:END:
 Simple DTO:
-- ~FlashcardGenerationMode Mode~ — which mode produced the result
-- ~string Content~ — raw output text (TSV lines or cloze lines)
-- ~int Count~ — number of valid cards
-- ~bool Success~
-- ~string? Error~
+
+- =FlashcardGenerationMode Mode= --- which mode produced the result
+- =string Content= --- raw output text (TSV lines or cloze lines)
+- =int Count= --- number of valid cards
+- =bool Success=
+- =string? Error=
 
 *** 3. Services/IFlashcardService.cs
-- ~Task<FlashcardResult> GenerateFlashcardsAsync(string deckContent, string apiKey, FlashcardGenerationMode mode)~
+:PROPERTIES:
+:CUSTOM_ID: servicesiflashcardservice.cs
+:END:
+- =Task<FlashcardResult> GenerateFlashcardsAsync(string deckContent, string apiKey, FlashcardGenerationMode mode)=
 
 *** 4. Services/FlashcardService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesflashcardservice.cs
+:END:
 Gemini API implementation (same infrastructure as TagInferenceService):
-- ~HttpClient~ POST with retry/backoff, model fallback chain, model discovery
+
+- =HttpClient= POST with retry/backoff, model fallback chain, model
+  discovery
 - Token estimation + truncation at 700K
-- Two dedicated prompts: ~BuildBasicPrompt~ (TSV) / ~BuildClozePrompt~ (no tabs, {{c1::}})
-- Mode-aware response parsing: ~ParseSuccessfulResponse(responseBody, mode)~
-  - Basic: filters lines containing ~\t~
-  - Cloze: filters lines containing ~{{c1::}}~
-- Error messages include mode-specific format hint ("tab-separated" vs "cloze ({{c1::}})")
+- Two dedicated prompts: =BuildBasicPrompt= (TSV) / =BuildClozePrompt=
+  (no tabs, {{c1::}})
+- Mode-aware response parsing:
+  =ParseSuccessfulResponse(responseBody, mode)=
+  - Basic: filters lines containing =\t=
+  - Cloze: filters lines containing ={{c1::}}=
+- Error messages include mode-specific format hint ("tab-separated" vs
+  "cloze ({{c1::}})")
 
 *** 5. ViewModels/FlashcardViewModel.cs
+:PROPERTIES:
+:CUSTOM_ID: viewmodelsflashcardviewmodel.cs
+:END:
 Page ViewModel (follows TagInferenceViewModel pattern):
-- ~ObservableCollection<Deck> Decks~ — searchable deck list
-- ~string SearchText~ — filter decks (multi-token AND, #tag prefix, regex toggle)
-- ~bool UseRegex~ — regex search toggle
-- ~string? GenerationStatus~ — current step text
-- ~double GenerationProgress~ — 0–100 progress bar
-- ~string PreviewText~ — raw output preview
-- ~string PreviewHeader~ — dynamic header ("Basic Flashcards (N cards)" / "Cloze...")
-- ~string? SuccessMessage~ — shown after save
-- ~bool IsPreviewVisible~, ~IsGenerating~, ~HasError~, ~HasSuccessMessage~
-- ~int _generationId~ — anti-stale response counter
-- ~FlashcardGenerationMode? _currentMode~ — tracks which mode generated the preview
+
+- =ObservableCollection<Deck> Decks= --- searchable deck list
+- =string SearchText= --- filter decks (multi-token AND, #tag prefix,
+  regex toggle)
+- =bool UseRegex= --- regex search toggle
+- =string? GenerationStatus= --- current step text
+- =double GenerationProgress= --- 0--100 progress bar
+- =string PreviewText= --- raw output preview
+- =string PreviewHeader= --- dynamic header ("Basic Flashcards (N
+  cards)" / "Cloze...")
+- =string? SuccessMessage= --- shown after save
+- =bool IsPreviewVisible=, =IsGenerating=, =HasError=,
+  =HasSuccessMessage=
+- =int _generationId= --- anti-stale response counter
+- =FlashcardGenerationMode? _currentMode= --- tracks which mode
+  generated the preview
 
 Commands:
-- ~GenerateBasic(Deck)~ — sends to Gemini with ~Basic~ mode
-- ~GenerateCloze(Deck)~ — sends to Gemini with ~Cloze~ mode
-- ~AcceptFlashcards~ — saves ~.basic.txt~ or ~.cloze.txt~, shows success, returns to list
-- ~CancelPreview~ — same as TagInference
+
+- =GenerateBasic(Deck)= --- sends to Gemini with =Basic= mode
+- =GenerateCloze(Deck)= --- sends to Gemini with =Cloze= mode
+- =AcceptFlashcards= --- saves =.basic.txt= or =.cloze.txt=, shows
+  success, returns to list
+- =CancelPreview= --- same as TagInference
 
 State machine:
-| Step | Progress | Status text |
-|------|----------|-------------|
-| 1    | 10%      | "Parsing deck content…" |
-| 2    | 30%      | "Contacting Gemini…" |
-| 3    | 70%      | "Generating flashcards…" |
-| 4    | 90%      | "Formatting results…" |
-| 5    | 100%     | "Ready" |
+
+| Step | Progress | Status text                |
+|------+----------+----------------------------|
+| 1    | 10%      | "Parsing deck content..."  |
+| 2    | 30%      | "Contacting Gemini..."     |
+| 3    | 70%      | "Generating flashcards..." |
+| 4    | 90%      | "Formatting results..."    |
+| 5    | 100%     | "Ready"                    |
 
 After accept: show success message → auto-return to deck list after ~3s.
 
 *** 6. Controls/FlashcardPanel.axaml + .axaml.cs
+:PROPERTIES:
+:CUSTOM_ID: controlsflashcardpanel.axaml-.axaml.cs
+:END:
 New panel view:
+
 - Header: "🃏 Anki Flashcards"
 - Search box (top) with regex ☐ toggle
-- Deck list with [Basic] (blue) and [Cloze] (purple) buttons (no learn/pin/archive)
+- Deck list with [Basic] (blue) and [Cloze] (purple) buttons (no
+  learn/pin/archive)
 - Progress bar + status text during generation
-- Raw output preview in read-only ~TextBox~ (multi-line, monospace)
+- Raw output preview in read-only =TextBox= (multi-line, monospace)
 - Accept / Cancel buttons
 - Success message overlay after save
 
 ** Modified files
-
+:PROPERTIES:
+:CUSTOM_ID: modified-files-1
+:END:
 *** 7. Models/AppSettings.cs
-- Add ~string FlashcardsPath~ default ~"$HOME/magnus/nextlearn/flashcards"~
+:PROPERTIES:
+:CUSTOM_ID: modelsappsettings.cs
+:END:
+- Add =string FlashcardsPath= default
+  ="$HOME/magnus/nextlearn/flashcards"=
 
 *** 8. Services/ISettingsService.cs + SettingsService.cs
-- Add ~string FlashcardsPath~ get/set
-- Add ~string ResolvedFlashcardsPath~ (resolved via ~AppSettings.ResolvePath~)
-- ~Load()~ / ~Save()~ handle it
+:PROPERTIES:
+:CUSTOM_ID: servicesisettingsservice.cs-settingsservice.cs
+:END:
+- Add =string FlashcardsPath= get/set
+- Add =string ResolvedFlashcardsPath= (resolved via
+  =AppSettings.ResolvePath=)
+- =Load()= / =Save()= handle it
 
 *** 9. Controls/SettingsPanel.axaml
-- Add "Flashcards Path" section with Browse button (same pattern as DecksPath)
+:PROPERTIES:
+:CUSTOM_ID: controlssettingspanel.axaml
+:END:
+- Add "Flashcards Path" section with Browse button (same pattern as
+  DecksPath)
 
 *** 10. Controls/Sidebar.axaml
+:PROPERTIES:
+:CUSTOM_ID: controlssidebar.axaml
+:END:
 - Add nav item between "Falcon Eye" and "Tag Inference":
-  ~<Button Command="{Binding ShowFlashcardPanelCommand}" ...>~
-  ~    <TextBlock Text="🃏"/> <TextBlock Text="  Anki Flashcards"/>~
-  ~</Button>~
+  =<Button Command="{Binding ShowFlashcardPanelCommand}" ...>= ~ ~
+  =</Button>=
 
 *** 11. ViewModels/MainWindowViewModel.cs
-- Add ~IFlashcardService~ field (new ~FlashcardService(new HttpClient())~ in constructor)
-- Add ~FlashcardViewModel~ property
-- Add ~bool IsFlashcardOpen~ (observable)
-- Add ~string FlashcardsPath~ (observable, wired in Load/Save/Reset)
-- Add ~ShowFlashcardPanelCommand~ → ~[RelayCommand] void ShowFlashcardPanel()~
-  (closes other panels, calls ~FlashcardViewModel.LoadDecks()~, sets ~IsFlashcardOpen = true~)
-- Add ~CloseFlashcardPanelCommand~ → closes panel + cancels preview
-- Add ~BrowseFlashcardsPathCommand~ → folder picker dialog
-- Wire ~FlashcardsPath~ in ~LoadSettings()~ / ~SaveSettings()~ / ~ResetSettings()~
+:PROPERTIES:
+:CUSTOM_ID: viewmodelsmainwindowviewmodel.cs
+:END:
+- Add =IFlashcardService= field (new
+  =FlashcardService(new HttpClient())= in constructor)
+- Add =FlashcardViewModel= property
+- Add =bool IsFlashcardOpen= (observable)
+- Add =string FlashcardsPath= (observable, wired in Load/Save/Reset)
+- Add =ShowFlashcardPanelCommand= →
+  =[RelayCommand] void ShowFlashcardPanel()= (closes other panels, calls
+  =FlashcardViewModel.LoadDecks()=, sets =IsFlashcardOpen = true=)
+- Add =CloseFlashcardPanelCommand= → closes panel + cancels preview
+- Add =BrowseFlashcardsPathCommand= → folder picker dialog
+- Wire =FlashcardsPath= in =LoadSettings()= / =SaveSettings()= /
+  =ResetSettings()=
 
 *** 12. Views/MainWindow.axaml
-- Add ~<ctrls:FlashcardPanel ZIndex="500"/>~ alongside other panels
+:PROPERTIES:
+:CUSTOM_ID: viewsmainwindow.axaml
+:END:
+- Add =<ctrls:FlashcardPanel ZIndex="500"/>= alongside other panels
 
 ** Edge cases
-
-| Case | Behavior |
-|---|---|
-| No API key | "Configure Gemini API key in Settings" |
-| No internet | "No internet connection. Check and try again." |
-| Deck too large (>900K tokens) | "Deck too large. Split into smaller files." |
-| Gemini returns no valid lines | Show raw response with mode-specific format hint |
-| Output directory doesn't exist | Create it automatically |
-| File already exists | Overwrite without prompt (same pattern as TagInference Apply) |
-| Empty deck | "Deck has no content to generate flashcards from." |
-| Gemini returns malformed output | Show raw preview anyway; user can decide to accept or reject |
-| User clicks second gen before first finishes | Stale response discarded via ~_generationId~ |
+:PROPERTIES:
+:CUSTOM_ID: edge-cases-1
+:END:
+| Case                                         | Behavior                                                      |
+|----------------------------------------------+---------------------------------------------------------------|
+| No API key                                   | "Configure Gemini API key in Settings"                        |
+| No internet                                  | "No internet connection. Check and try again."                |
+| Deck too large (>900K tokens)                | "Deck too large. Split into smaller files."                   |
+| Gemini returns no valid lines                | Show raw response with mode-specific format hint              |
+| Output directory doesn't exist               | Create it automatically                                       |
+| File already exists                          | Overwrite without prompt (same pattern as TagInference Apply) |
+| Empty deck                                   | "Deck has no content to generate flashcards from."            |
+| Gemini returns malformed output              | Show raw preview anyway; user can decide to accept or reject  |
+| User clicks second gen before first finishes | Stale response discarded via =_generationId=                  |
 
 ** File naming examples
-| Deck file | Basic output | Cloze output |
-|-----------|---|----|
-| ~biology-ch2.md~ | ~biology-ch2.md.basic.txt~ | ~biology-ch2.md.cloze.txt~ |
-| ~programming/python.org~ | ~programming/python.org.basic.txt~ | ~programming/python.org.cloze.txt~ |
+:PROPERTIES:
+:CUSTOM_ID: file-naming-examples
+:END:
+| Deck file                | Basic output                       | Cloze output                       |
+|--------------------------+------------------------------------+------------------------------------|
+| =biology-ch2.md=         | =biology-ch2.md.basic.txt=         | =biology-ch2.md.cloze.txt=         |
+| =programming/python.org= | =programming/python.org.basic.txt= | =programming/python.org.cloze.txt= |
 
 ** Future reuse
-Same ~IFlashcardService~ infra can be extended for:
+:PROPERTIES:
+:CUSTOM_ID: future-reuse-1
+:END:
+Same =IFlashcardService= infra can be extended for:
+
 - True/False question generation
 - Fill-in-the-blank worksheets
 - Summary/notes extraction
+
+* TODO MCQ Quiz --- Google Gemini
+:PROPERTIES:
+:CUSTOM_ID: todo-mcq-quiz-google-gemini
+:END:
+** What
+:PROPERTIES:
+:CUSTOM_ID: what-4
+:END:
+New "MCQ Quiz" sidebar panel with three tabs: "Generate", "Take Quiz",
+and "Quiz Logs". Generate tab: select a deck → AI-generate N MCQ
+questions via Gemini → preview → save as =<deck-filename>.md.mcq= under
+=$HOME/magnus/nextlearn/mcqs/=. Take Quiz tab: pick a saved =.mcq= file
+→ one-question-at-a-time interactive quiz in a dedicated NativeWebView
+(2×2 option card grid) → n/p navigation → scored review summary at the
+end.
+
+** Key decisions
+:PROPERTIES:
+:CUSTOM_ID: key-decisions-1
+:END:
+- Single sidebar item "MCQ Quiz" → one =McqPanel= with three tabs
+  (Generate / Take Quiz / Quiz Logs), not three separate panels
+- Dedicated =NativeWebView= inside =McqPanel= for quiz rendering; main
+  ContentWebView untouched
+- =.mcq= extension (=fileName.md.mcq=) --- no conflict with =*.md= deck
+  scanner
+- Format: valid Markdown internally (=~=---=~=-separated questions with
+  =A./B./C./D.=, =**Answer:**=, =**Explanation:**=)
+- Navigation: reuse existing =NextPage~/~PreviousPage= actions; routed
+  to =McqQuizViewModel= when quiz is active
+- Open shortcut: new =OpenMcqQuiz= action → =e= (Vim) / =Ctrl+E= (Emacs)
+  / =Ctrl+Shift+E= (VS Code)
+- Timer: native =DispatcherTimer= counting up (elapsed time), displayed
+  as overlay in quiz area
+- Option selection: 2×2 card grid rendered via HTML with
+  MarkdownInlineRenderer; clicks via =http://mcq-answer.local/{letter}=
+  URI scheme
+- Review: single scrollable HTML summary page showing score,
+  per-question correct/wrong indicators, and explanations
+- Same Gemini infra as TagInference/Flashcard services (=HttpClient=,
+  API key, model fallback chain)
+
+** New files
+:PROPERTIES:
+:CUSTOM_ID: new-files-2
+:END:
+*** 1. Models/McqQuestion.cs
+:PROPERTIES:
+:CUSTOM_ID: modelsmcqquestion.cs
+:END:
+Simple DTO:
+
+- =string Question= --- question text
+- =List<string> Options= --- 4 options
+- =int CorrectIndex= --- 0--3
+- =string? Explanation= --- why correct
+- =int? SelectedIndex= --- user's answer (null until answered)
+
+*** 2. Models/McqDocument.cs
+:PROPERTIES:
+:CUSTOM_ID: modelsmcqdocument.cs
+:END:
+- =string? Title= --- from YAML frontmatter
+- =string? SourceDeck= --- source deck filename
+- =DateTime GeneratedDate=
+- =List<McqQuestion> Questions=
+
+*** 3. Services/McqFileParser.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesmcqfileparser.cs
+:END:
+Parse/write =.mcq= files:
+
+- =McqDocument Parse(string content)= --- frontmatter (YAML) +
+  =~=---=~=-separated questions
+- =string Serialize(McqDocument doc)= --- reconstruct for saving
+- Parse method: split on =^---$= → extract frontmatter → for each
+  question block read =##= heading, =A./B./C./D.= lines, =**Answer:**=,
+  =**Explanation:**=
+
+*** 4. Services/McqGenerationResult.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesmcqgenerationresult.cs
+:END:
+- =bool Success=
+- =string? Error=
+- =List<McqQuestion> Questions=
+- =int Count=
+
+*** 5. Services/IMcqGenerationService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesimcqgenerationservice.cs
+:END:
+- =Task<McqGenerationResult> GenerateMcqAsync(string deckContent, string apiKey, int questionCount)=
+
+*** 6. Services/McqGenerationService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesmcqgenerationservice.cs
+:END:
+Gemini API implementation (same infra as FlashcardService):
+
+- =HttpClient= POST, token estimation, truncation at 700K
+- Prompt: =~=---=~=-separated sections with =## Question N= heading,
+  =A./B./C./D.=, =**Answer:**= =**Explanation:**=
+- =ParseResponse(string text)= --- split on =~=---=~= → regex/line
+  matching per block
+- Strip markdown code fences before parsing
+
+*** 7. Services/McqQuizHtmlBuilder.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesmcqquizhtmlbuilder.cs
+:END:
+Generates quiz HTML for the dedicated WebView:
+
+- =BuildQuestionHtml(McqQuestion question, int index, int total, TimeSpan elapsed)=
+  --- single question with 2×2 option grid, timer overlay, progress
+  indicator
+- =BuildReviewHtml(List<McqQuestion> questions, TimeSpan elapsed)= ---
+  scrollable summary with score, correct/wrong per question, explanation
+- Uses =MarkdownInlineRenderer.RenderInline= for option text rendering
+  (LaTeX, code, quotes)
+- Option cards: clickable =<div>= with =data-answer="A"= /
+  =onclick="window.location='http://mcq-answer.local/A'"=
+
+*** 8. Services/McqFileService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesmcqfileservice.cs
+:END:
+List, read, delete =.mcq= files:
+
+- =List<McqFileInfo> ListMcqFiles(string mcqsPath)= --- scan =*.mcq= in
+  mcqs directory
+- =McqDocument LoadMcq(string filePath)=
+- =void SaveMcq(string filePath, McqDocument doc)=
+- =void DeleteMcq(string filePath)=
+
+*** 9. ViewModels/McqQuizViewModel.cs
+:PROPERTIES:
+:CUSTOM_ID: viewmodelsmcqquizviewmodel.cs
+:END:
+Quiz state machine:
+
+- =string? CurrentQuestionHtml= --- bound to WebView
+- =int CurrentIndex= --- 0-based
+- =int TotalQuestions=
+- =bool IsCompleted= --- false during quiz, true after last question
+  answered
+- =string? ReviewHtml= --- shown after completion
+- =TimeSpan Elapsed= --- updated by DispatcherTimer
+- =bool IsTimerRunning=
+- Commands: =AnswerQuestion(string letter)=, =NextQuestion= /
+  =PreviousQuestion=, =FinishQuiz=, =QuitQuiz=
+- When =NextQuestion= is pressed and current is unanswered → auto-answer
+  "skipped" (null)
+- =PreviousQuestion= allowed to go back and change answers
+- =AnswerQuestion= stores =SelectedIndex=, advances to next or shows
+  review if last
+
+*** 10. ViewModels/McqPanelViewModel.cs
+:PROPERTIES:
+:CUSTOM_ID: viewmodelsmcqpanelviewmodel.cs
+:END:
+Tab management:
+
+- =bool IsGenerateTabSelected= / =IsQuizTabSelected=
+- =McqGenerationViewModel Generation= (sub-ViewModel)
+- =McqQuizViewModel? Quiz= (null until a quiz is started)
+- =ObservableCollection<McqFileInfo> SavedMcqFiles= --- list of =.mcq=
+  files
+- =McqFileInfo? SelectedMcqFile=
+- Commands: =SelectGenerateTab=, =SelectQuizTab=, =StartQuiz=,
+  =DeleteMcqFile=
+
+*** 11. ViewModels/McqGenerationViewModel.cs
+:PROPERTIES:
+:CUSTOM_ID: viewmodelsmcqgenerationviewmodel.cs
+:END:
+Follows TagInference/Flashcard pattern:
+
+- =ObservableCollection<Deck> Decks= --- searchable deck list
+- =string SearchText=
+- =bool UseRegex=
+- =string? GenerationStatus= / =double GenerationProgress=
+- =string? PreviewText= --- parsed question preview
+- =bool IsPreviewVisible= / =bool IsGenerating=
+- Commands: =GenerateMcq(Deck)=, =AcceptMcq= (save to =.mcq= file),
+  =CancelPreview=
+
+*** 12. Controls/McqPanel.axaml + .axaml.cs
+:PROPERTIES:
+:CUSTOM_ID: controlsmcqpanel.axaml-.axaml.cs
+:END:
+Two-tab panel:
+
+- Header with two tab buttons: "Generate" / "Take Quiz"
+- Generate tab: deck search + [Generate] button → preview → [Accept] /
+  [Cancel]
+- Quiz tab: file list → [Start Quiz] → dedicated =NativeWebView= (owned
+  by panel) for quiz HTML + bottom nav bar (N/P buttons, progress text)
+- Dynamic =IsQuizActive= flag to toggle between file-list view and quiz
+  view within the tab
+- Subscribe to =mcq-answer.local= URI navigation in the panel's WebView
+
+** Modified files
+:PROPERTIES:
+:CUSTOM_ID: modified-files-2
+:END:
+*** 13. Models/AppSettings.cs
+:PROPERTIES:
+:CUSTOM_ID: modelsappsettings.cs-1
+:END:
+- Add =string McqsPath= default ="$HOME/magnus/nextlearn/mcqs"=
+
+*** 14. Services/ISettingsService.cs + SettingsService.cs
+:PROPERTIES:
+:CUSTOM_ID: servicesisettingsservice.cs-settingsservice.cs-1
+:END:
+- Add =string McqsPath= get/set
+- Add =string ResolvedMcqsPath= (resolved via =AppSettings.ResolvePath=)
+- =Load()= / =Save()= handle it
+
+*** 15. Controls/SettingsPanel.axaml
+:PROPERTIES:
+:CUSTOM_ID: controlssettingspanel.axaml-1
+:END:
+- Add "MCQs Path" section with Browse button (same pattern as DecksPath
+  / FlashcardsPath)
+
+*** 16. Controls/Sidebar.axaml
+:PROPERTIES:
+:CUSTOM_ID: controlssidebar.axaml-1
+:END:
+- Add nav item between "Anki Flashcards" and "Tag Inference": =<Button>=
+  with "MCQ Quiz"
+
+*** 17. ViewModels/MainWindowViewModel.cs
+:PROPERTIES:
+:CUSTOM_ID: viewmodelsmainwindowviewmodel.cs-1
+:END:
+- Add =IMcqGenerationService= field (new
+  =McqGenerationService(new HttpClient())=)
+- Add =McqPanelViewModel= property
+- Add =bool IsMcqOpen= (observable)
+- Add =string McqsPath= (observable, wired in Load/Save/Reset)
+- Add =ShowMcqPanelCommand= → closes other panels, loads mcq files, sets
+  =IsMcqOpen = true=
+- Add =CloseMcqPanelCommand= → closes panel + cancels any active quiz
+- Wire =McqsPath= in =LoadSettings()= / =SaveSettings()= /
+  =ResetSettings()=
+
+*** 18. Views/MainWindow.axaml
+:PROPERTIES:
+:CUSTOM_ID: viewsmainwindow.axaml-1
+:END:
+- Add =<ctrls:McqPanel IsVisible="{Binding IsMcqOpen}" ZIndex="500"/>=
+  alongside other panels
+
+*** 19. Views/MainWindow.axaml.cs
+:PROPERTIES:
+:CUSTOM_ID: viewsmainwindow.axaml.cs
+:END:
+- In keyboard handler: when =IsMcqOpen= and quiz is active and not
+  completed → route =NextPage~/~PreviousPage= to =McqQuizViewModel=
+- Register =mcq-answer.local= URI handler for the panel's dedicated
+  WebView
+- When closing panel → ensure quiz WebView is cleaned up
+
+*** 20. KeyboardActionKind.cs
+:PROPERTIES:
+:CUSTOM_ID: keyboardactionkind.cs-1
+:END:
+- Add =OpenMcqQuiz= enum value
+
+*** 21. KeyBindingService.cs
+:PROPERTIES:
+:CUSTOM_ID: keybindingservice.cs-1
+:END:
+- Vim:
+  =G(null, KeyboardActionKind.OpenMcqQuiz, "E", "", "Open MCQ Quiz")=
+- Emacs:
+  =G(null, KeyboardActionKind.OpenMcqQuiz, "E", "Control", "Open MCQ Quiz")=
+- VS Code:
+  =G(null, KeyboardActionKind.OpenMcqQuiz, "E", "Control Shift", "Open MCQ Quiz")=
+
+*** 22. KeyboardHandler.cs + MainWindow.axaml.cs
+:PROPERTIES:
+:CUSTOM_ID: keyboardhandler.cs-mainwindow.axaml.cs-1
+:END:
+- =HandleKey=: dispatch =OpenMcqQuiz= → =ShowMcqPanelCommand=
+
+** Edge cases
+:PROPERTIES:
+:CUSTOM_ID: edge-cases-2
+:END:
+| Case                                      | Behavior                                               |
+|-------------------------------------------+--------------------------------------------------------|
+| No API key                                | "Configure Gemini API key in Settings"                 |
+| No internet                               | "No internet connection. Check and try again."         |
+| Gemini returns malformed MCQ              | Show raw preview; user can reject and regenerate       |
+| Empty deck                                | "Deck has no content to generate MCQs from."           |
+| MCQ file selected but deleted externally  | Refresh list on next panel open                        |
+| User presses N on last question           | Mark as answered (or skipped) → show review            |
+| User presses P on first question          | No-op (no previous)                                    |
+| All questions skipped → 0/10 score        | Show "0% --- try again?" with regenerate option        |
+| Output dir doesn't exist                  | Create automatically                                   |
+| File overwrite                            | Overwrite without prompt (same pattern)                |
+| WebView navigation to non-mcq-answer URLs | Cancel navigation (prevent leaving quiz HTML)          |
+| Timer overflow (unlikely)                 | Format as =99:59:59= max display                       |
+| MCQ file has 0 questions                  | "No questions found in this file"                      |
+| Gemini rate limit (429)                   | "Rate limited by Gemini. Wait a moment and try again." |
+
+** Progress UI (McqGenerationViewModel)
+:PROPERTIES:
+:CUSTOM_ID: progress-ui-mcqgenerationviewmodel
+:END:
+| Step | Progress | Status text               |
+|------+----------+---------------------------|
+| 1    | 10%      | "Parsing deck content..." |
+| 2    | 30%      | "Contacting Gemini..."    |
+| 3    | 70%      | "Generating MCQs..."      |
+| 4    | 90%      | "Formatting results..."   |
+| 5    | 100%     | "Ready"                   |
+
+** =.mcq= file format example
+:PROPERTIES:
+:CUSTOM_ID: mcq-file-format-example
+:END:
+#+begin_src markdown
+---
+title: Algebra Quiz
+source: algebra.md
+generated: 2026-06-30
+---
+
+## Question 1
+What is 2 + 2?
+
+A. 3
+B. 4
+C. 5
+D. 6
+
+,**Answer:** B
+,**Explanation:** 2 + 2 = 4. Basic arithmetic.
+
+---
+
+## Question 2
+Simplify: 3x + 2x
+
+A. 5x
+B. 6x
+C. x
+D. 5x²
+
+,**Answer:** A
+,**Explanation:** 3x + 2x = (3+2)x = 5x. Combine like terms.
+#+end_src
+
+** Test impact
+:PROPERTIES:
+:CUSTOM_ID: test-impact-3
+:END:
+- =McqFileParserTests= --- parse/serialize round-trip, malformed input,
+  frontmatter variants
+- =McqGenerationServiceTests= --- mock HttpClient, prompt construction,
+  response parsing
+- =McqQuizViewModelTests= --- navigation, answer tracking, skip logic,
+  completion
+- =McqQuizHtmlBuilderTests= --- HTML output structure, option grid,
+  review summary
+
+*** Render LaTeX, code blocks, blockquotes in quiz WebView
+:PROPERTIES:
+:CUSTOM_ID: render-latex-code-blocks-blockquotes-in-quiz-webview
+:END:
+​****What****
+
+Question/explanation text containing LaTeX ($...$ /
+
+#+begin_src math
+...
+#+end_src
+
+), code fences (```), or blockquotes (>) currently renders as raw text
+instead of styled HTML. The quiz WebView lacks KaTeX, highlight.js, and
+block-level CSS.
+
+​****Root cause****
+
+- =McqQuizHtmlBuilder= pipes all text through
+  =MarkdownInlineRenderer.RenderInline= which only handles inline
+  constructs (bold, italic, code spans, inline math)
+- The quiz HTML template has no KaTeX CSS/JS injection --- math
+  delimiters show as raw =$x^2$= instead of rendered KaTeX
+- No highlight.js → code fences displayed as literal =~= ``==~` text
+- No CSS for =<pre>=, =<blockquote>=, =<table>= --- even if HTML
+  existed, it would be unstyled
+- The main ContentWebView solves all this via =WebViewBridge.LoadHtml= +
+  =HtmlContentBuilder.Build()=, but the quiz WebView bypasses both
+
+​****Changes****
+
+*** 1. HtmlContentBuilder.cs --- add static =RenderBlock(string text)= method
+:PROPERTIES:
+:CUSTOM_ID: htmlcontentbuilder.cs-add-static-renderblockstring-text-method
+:END:
+Extract the block-level processing loop from =Build()= into a new static
+method:
+
+~public static string RenderBlock(string text, bool isOrgFile = false,
+string? imageDir = null, List? imagePaths = null,
+IReadOnlyDictionary<string, string>? footnotes = null, string? decksPath
+= null, string? currentDir = null)~
+
+This splits input into lines, runs through the same handler chain as
+=Build()= (code fences → blockquotes → tables → lists → headings → math
+blocks → inline), and returns the body HTML without =WrapInHtml=
+wrapper. =Build()= delegates to it internally.
+
+*** 2. WebViewBridge.cs --- extract =EnrichHtml= static helper
+:PROPERTIES:
+:CUSTOM_ID: webviewbridge.cs-extract-enrichhtml-static-helper
+:END:
+Move the KaTeX/highlight.js/key-forwarding injection from =LoadHtml=
+into:
+
+=public static string EnrichHtml(string html)=
+
+Uses =AppContext.BaseDirectory= to locate =Assets/katex/= and
+=Assets/atom-one-dark.min.css= / =Assets/custom-highlight.js=. Replaces
+=<!--KATEX_CSS-->=, =<!--KATEX_CSS-->=, =<!--HIGHLIGHT_CSS-->=,
+=/* HIGHLIGHT_JS */= placeholders.
+
+=WebViewBridge.LoadHtml= calls =EnrichHtml(html)= then sets Source.
+
+*** 3. McqQuizHtmlBuilder.cs --- add block-level CSS + rendering
+:PROPERTIES:
+:CUSTOM_ID: mcqquizhtmlbuilder.cs-add-block-level-css-rendering
+:END:
+- Add =<!--HIGHLIGHT_CSS-->=, =<!--KATEX_CSS-->= in =<style>= block
+- Add =/* KATEX_AUTO_RENDER */= and =/* HIGHLIGHT_JS */= script
+  placeholders
+- Add full CSS for =<pre>=, =<blockquote>=, =<table>=, =<ul>=, =<ol>=,
+  =.math-display= (copy from =HtmlContentBuilder.WrapInHtml=)
+- Change question/explanation text from
+  =MarkdownRenderer.RenderInline()= to
+  =HtmlContentBuilder.RenderBlock()= (block-level processing)
+- Keep options as =MarkdownInlineRenderer.RenderInline()= (cards are
+  inline)
+- Apply same changes to =BuildReviewHtml=
+
+*** 4. McqPanel.axaml.cs --- enrich quiz HTML via =WebViewBridge.EnrichHtml=
+:PROPERTIES:
+:CUSTOM_ID: mcqpanel.axaml.cs-enrich-quiz-html-via-webviewbridge.enrichhtml
+:END:
+In =LoadQuizHtml()=, after building the raw HTML string, call:
+=html = WebViewBridge.EnrichHtml(html)= before encoding to base64 and
+setting Source.
+
+​****Files touched****
+
+| File                             | Change                                                 |
+|----------------------------------+--------------------------------------------------------|
+| =Services/HtmlContentBuilder.cs= | Extract =RenderBlock= from =Build()=                   |
+| =Services/WebViewBridge.cs=      | Extract =EnrichHtml= static helper                     |
+| =Services/McqQuizHtmlBuilder.cs= | Add CSS + placeholders; use =RenderBlock= for Q&A text |
+| =Controls/McqPanel.axaml.cs=     | Call =EnrichHtml= before loading                       |
+
+​****Rendering behavior****
+
+| Content                 | Before                                    | After                       |
+|-------------------------+-------------------------------------------+-----------------------------|
+| =$x^2 + y^2 = z^2$=     | Raw =$x^2 + y^2 = z^2$=                   | Rendered KaTeX inline math  |
+| =$$E = mc^2$$=          | Raw =$$E = mc^2$$=                        | Rendered KaTeX display math |
+| =~= =python(\\hi\)= =~= | Raw =~= ``=python=~=| Syntax-highlighted= | h1                          |
+
+​****Backward compatibility****
+
+- All existing text continues to work --- =RenderBlock= falls through to
+  inline rendering for plain text with no block constructs
+- =BuildReviewHtml= gets the same improvements (KaTeX for answers shown
+  in review)
+- No change to the =.mcq= file format or Gemini generation prompts

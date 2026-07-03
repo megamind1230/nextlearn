@@ -63,7 +63,7 @@
         </ScrollViewer>
       </Border>
 
-      <Border Grid.Row="1" Height="38" Background="#0F172A" Padding="8,0"
+      <Border Grid.Row="1" Height="30" Background="#0F172A" Padding="8,0"
               BorderThickness="0,1,0,0" BorderBrush="#334155">
         <Grid ColumnDefinitions="Auto,*">
           <TextBlock Grid.Column="0" Text=":" FontSize="16" FontWeight="Bold"

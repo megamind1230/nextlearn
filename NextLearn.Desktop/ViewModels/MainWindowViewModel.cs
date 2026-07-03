@@ -31,6 +31,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IKeyBindingService _keyBindingService;
     private readonly ITagInferenceService _tagInferenceService;
     private readonly IFlashcardService _flashcardService;
+    private readonly IMcqGenerationService _mcqGenerationService;
     private readonly IDeckFileWriter _deckFileWriter;
     private List<CommandPaletteEntry> _allCommandPaletteEntries;
 
@@ -71,6 +72,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool _isFlashcardOpen;
 
     [ObservableProperty]
+    private bool _isMcqOpen;
+
+    [ObservableProperty]
     private int _todayMinutes;
 
     [ObservableProperty]
@@ -105,6 +109,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _flashcardsPath = string.Empty;
+
+    [ObservableProperty]
+    private string _mcqsPath = string.Empty;
 
     [ObservableProperty]
     private string _keyBindingsProfile = string.Empty;
@@ -284,6 +291,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public FlashcardViewModel FlashcardViewModel { get; private set; }
 
+    public McqPanelViewModel McqPanelViewModel { get; private set; }
+
     public MainWindowViewModel()
     {
         _context = new AppDbContext();
@@ -297,6 +306,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _keyBindingService = new KeyBindingService();
         _tagInferenceService = new TagInferenceService(new HttpClient());
         _flashcardService = new FlashcardService(new HttpClient());
+        _mcqGenerationService = new McqGenerationService(new HttpClient());
         _deckFileWriter = new DeckFileWriter();
         _allCommandPaletteEntries = BuildCommandPaletteEntries();
         var htmlContentBuilder = new HtmlContentService();
@@ -328,6 +338,11 @@ public partial class MainWindowViewModel : ViewModelBase
         LearningViewModel = new LearningViewModel(_deckService, _userService, htmlContentBuilder, this, decksPath);
         TagInferenceViewModel = new TagInferenceViewModel(_settingsService, _tagInferenceService, _deckFileWriter, decksPath);
         FlashcardViewModel = new FlashcardViewModel(_settingsService, _flashcardService, decksPath);
+
+        var mcqFileService = new McqFileService();
+        var mcqGenerationVm = new McqGenerationViewModel(_settingsService, _mcqGenerationService, mcqFileService, decksPath);
+        var mcqQuizVm = new McqQuizViewModel(mcqFileService, _settingsService);
+        McqPanelViewModel = new McqPanelViewModel(_settingsService, mcqFileService, mcqGenerationVm, mcqQuizVm);
 
         CurrentView = HomeViewModel;
     }
@@ -431,6 +446,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Font = _settingsService.Font;
         DecksPath = _settingsService.DecksPath;
         FlashcardsPath = _settingsService.FlashcardsPath;
+        McqsPath = _settingsService.McqsPath;
         KeyBindingsProfile = _settingsService.KeyBindingsProfile;
         IsFalconEyeEnabled = _settingsService.FalconEyeEnabled;
         GeminiApiKey = _settingsService.GeminiApiKey;
@@ -443,6 +459,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _settingsService.Font = Font;
         _settingsService.DecksPath = DecksPath;
         _settingsService.FlashcardsPath = FlashcardsPath;
+        _settingsService.McqsPath = McqsPath;
         _settingsService.KeyBindingsProfile = KeyBindingsProfile;
         _settingsService.FalconEyeEnabled = IsFalconEyeEnabled;
         _settingsService.GeminiApiKey = GeminiApiKey;
@@ -475,6 +492,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Font = defaults.Font;
         DecksPath = defaults.DecksPath;
         FlashcardsPath = defaults.FlashcardsPath;
+        McqsPath = defaults.McqsPath;
         KeyBindingsProfile = defaults.KeyBindingsProfile;
         IsFalconEyeEnabled = defaults.FalconEyeEnabled;
         GeminiApiKey = defaults.GeminiApiKey;
@@ -506,6 +524,19 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private async Task BrowseMcqsPathAsync()
+    {
+        if (PickFolderHandler != null)
+        {
+            var result = await PickFolderHandler(McqsPath);
+            if (result != null)
+            {
+                McqsPath = result;
+            }
+        }
+    }
+
 #pragma warning disable CA1822 // Member does not access instance data
     [RelayCommand]
     private void OpenGeminiApiUrl()
@@ -528,11 +559,9 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 #pragma warning restore CA1822
 
-    [RelayCommand]
-    private void OpenDecksFolder()
+    private static void OpenDirectoryInExplorer(string path)
     {
-        var path = _settingsService.ResolvedDecksPath;
-        Log.Information("OpenDecksFolder: {Path}", path);
+        Log.Information("OpenDirectoryInExplorer: {Path}", path);
 
         if (!Directory.Exists(path))
         {
@@ -591,9 +620,104 @@ public partial class MainWindowViewModel : ViewModelBase
 #pragma warning disable CA1031
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to open decks folder: {Path}", path);
+            Log.Error(ex, "Failed to open path in file manager: {Path}", path);
         }
 #pragma warning restore CA1031
+    }
+
+    [RelayCommand]
+    private void OpenDecksFolder()
+    {
+        OpenDirectoryInExplorer(_settingsService.ResolvedDecksPath);
+    }
+
+    private static void RevealFileInExplorer(string filePath)
+    {
+        var dir = Path.GetDirectoryName(filePath);
+        if (dir == null)
+        {
+            return;
+        }
+
+        Log.Information("RevealFileInExplorer: {File}", filePath);
+
+        if (!File.Exists(filePath))
+        {
+            OpenDirectoryInExplorer(dir);
+            return;
+        }
+
+        try
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Process.Start("explorer", $"/select,\"{filePath}\"");
+                Log.Information("Revealed via explorer /select");
+                return;
+            }
+
+            if (OperatingSystem.IsMacOS())
+            {
+                Process.Start("open", $"-R \"{filePath}\"");
+                Log.Information("Revealed via open -R");
+                return;
+            }
+
+            foreach (var (fm, flag) in new[]
+            {
+                ("nautilus", "--select"),
+                ("dolphin", "--select"),
+                ("nemo", "--select"),
+                ("caja", "--select"),
+                ("thunar", string.Empty),
+                ("yazi", string.Empty),
+                ("spacefm", string.Empty),
+            })
+            {
+                try
+                {
+                    var args = string.IsNullOrEmpty(flag)
+                        ? $"\"{filePath}\""
+                        : $"{flag} \"{filePath}\"";
+                    Process.Start(fm, args);
+                    Log.Information("Revealed via {FileManager}", fm);
+                    return;
+                }
+                catch (Exception ex) when (ex is InvalidOperationException or Win32Exception)
+                {
+                    Log.Debug(ex, "{FileManager} not supported for {File}", fm, filePath);
+                }
+            }
+
+            // Fallback: just open the directory
+            OpenDirectoryInExplorer(dir);
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to reveal file: {File}", filePath);
+            OpenDirectoryInExplorer(dir);
+        }
+#pragma warning restore CA1031
+    }
+
+    [RelayCommand]
+    private void OpenCurrentDeckFolder()
+    {
+        if (!IsLearning)
+        {
+            OpenDirectoryInExplorer(_settingsService.ResolvedDecksPath);
+            return;
+        }
+
+        var deckFile = LearningViewModel.CurrentDeckFilePath;
+        if (deckFile == null)
+        {
+            OpenDirectoryInExplorer(_settingsService.ResolvedDecksPath);
+            return;
+        }
+
+        RevealFileInExplorer(deckFile);
     }
 
     [RelayCommand]
@@ -673,7 +797,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public void NavigateToDocumentation()
 #pragma warning restore CA1822
     {
-        Views.MainWindow.OpenInBrowser("https://github.com/megamind1230/side/blob/master/nextlearn/README.org");
+        Views.MainWindow.OpenInBrowser("https://github.com/megamind1230/nextlearn/blob/master/README.org");
     }
 
     [RelayCommand]
@@ -694,9 +818,13 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ToggleFalconEye()
     {
         IsFalconEyeEnabled = !IsFalconEyeEnabled;
+    }
+
+    partial void OnIsFalconEyeEnabledChanged(bool value)
+    {
         if (IsLearning)
         {
-            LearningViewModel.RebuildWithFalconEye(IsFalconEyeEnabled);
+            LearningViewModel.RebuildWithFalconEye(value);
         }
     }
 
@@ -856,6 +984,30 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    public void ShowMcqPanel()
+    {
+        IsSidebarOpen = false;
+        IsPinnedViewOpen = false;
+        IsArchivedViewOpen = false;
+        IsSettingsOpen = false;
+        IsHeatmapOpen = false;
+        IsMarketplaceOpen = false;
+        IsTagInferenceOpen = false;
+        IsFlashcardOpen = false;
+        McqPanelViewModel.Generation.LoadDecks();
+        McqPanelViewModel.QuitQuizCommand.Execute(null);
+        IsMcqOpen = true;
+    }
+
+    [RelayCommand]
+    public void CloseMcqPanel()
+    {
+        IsMcqOpen = false;
+        McqPanelViewModel.QuitQuizCommand.Execute(null);
+        McqPanelViewModel.Generation.CancelPreviewCommand.Execute(null);
+    }
+
+    [RelayCommand]
     private void ZoomHeatmapIn()
     {
         HeatmapCellScale = Math.Min(3.0, HeatmapCellScale + 0.25);
@@ -884,7 +1036,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var activity = _userService.GetActivityHistory(365);
         var activityByDate = activity.ToDictionary(a => a.Date, a => a.MinutesLearned);
 
-        var today = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
+        var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
         HeatmapCells.Clear();
 
         var year = today.Year;
@@ -1360,253 +1512,134 @@ public partial class MainWindowViewModel : ViewModelBase
         return FormatKeyForDisplay(binding.Key, binding.Modifiers);
     }
 
+    private record PaletteMeta(string Name, string[] Aliases, string Description, string[] Contexts);
+
+    private static readonly Dictionary<KeyboardActionKind, PaletteMeta> _paletteMeta = new()
+    {
+        // ── Global ─────────────────────────────────────────────
+        [KeyboardActionKind.ToggleShortcutsHandbook] = new("help", ["shortcuts", "handbook", "?"], "Toggle shortcuts handbook", ["*"]),
+        [KeyboardActionKind.OpenSettings] = new("settings", ["config", "prefs"], "Open settings", ["*"]),
+        [KeyboardActionKind.ToggleSidebar] = new("sidebar", ["menu"], "Toggle sidebar", ["*"]),
+        [KeyboardActionKind.ShowPinnedView] = new("pinned", ["pin"], "Show pinned decks", ["*"]),
+        [KeyboardActionKind.ShowArchivedView] = new("archived", ["archive"], "Show archived decks", ["*"]),
+        [KeyboardActionKind.ShowHeatmap] = new("heatmap", ["streak", "activity"], "Show study streak heatmap", ["*"]),
+        [KeyboardActionKind.OpenDocumentation] = new("docs", ["documentation"], "Open documentation", ["*"]),
+        [KeyboardActionKind.OpenTagInference] = new("tag-inference", ["ai-tags", "infer", "tag"], "Open AI tag inference page", ["*"]),
+        [KeyboardActionKind.ZoomTextIn] = new("zoom-in", ["z+", "zi"], "Zoom text in", ["*"]),
+        [KeyboardActionKind.ZoomTextOut] = new("zoom-out", ["z-", "zo"], "Zoom text out", ["*"]),
+        [KeyboardActionKind.ResetTextZoom] = new("zoom-reset", ["z0"], "Reset text zoom", ["*"]),
+        [KeyboardActionKind.OpenDecksFolder] = new("folders", ["decks", "open"], "Open decks folder in file manager", ["*"]),
+        [KeyboardActionKind.NavigateToMarketplace] = new("marketplace", ["plugins", "extensions"], "Open marketplace", ["*"]),
+        [KeyboardActionKind.OpenCurrentDeckFolder] = new("reveal-deck", ["reveal", "current-deck"], "Reveal current deck in file manager", ["*"]),
+        [KeyboardActionKind.OpenMcqQuiz] = new("mcq", ["quiz", "exam"], "Open MCQ quiz panel", ["*"]),
+        [KeyboardActionKind.OpenFlashcard] = new("flashcard", ["anki", "cards"], "Open flashcard panel", ["*"]),
+
+        // ── Home ───────────────────────────────────────────────
+        [KeyboardActionKind.FocusSearchBar] = new("search", ["find", "/"], "Focus search bar", ["Home"]),
+        [KeyboardActionKind.FocusSearchWithClear] = new("clear", ["clear-search"], "Clear and focus search bar", ["Home"]),
+
+        // ── Learning ────────────────────────────────────────────
+        [KeyboardActionKind.NextPage] = new("next", ["n", ">"], "Next page", ["Learning"]),
+        [KeyboardActionKind.PreviousPage] = new("prev", ["p", "<"], "Previous page", ["Learning"]),
+        [KeyboardActionKind.NavigateHome] = new("home", ["exit", "quit", "q"], "Exit to home", ["Learning"]),
+        [KeyboardActionKind.OpenGoToPage] = new("goto", ["go"], "Open go-to-page dialog", ["Learning"]),
+
+        // ── Image Overlay ───────────────────────────────────────
+        [KeyboardActionKind.ZoomIn] = new("img-zoom-in", ["z+"], "Zoom in on image", ["ImageOverlay"]),
+        [KeyboardActionKind.ZoomOut] = new("img-zoom-out", ["z-"], "Zoom out on image", ["ImageOverlay"]),
+        [KeyboardActionKind.ResetZoom] = new("img-zoom-reset", ["z0"], "Reset image zoom", ["ImageOverlay"]),
+        [KeyboardActionKind.NextImage] = new("next-img", ["next"], "Next image", ["ImageOverlay"]),
+        [KeyboardActionKind.PreviousImage] = new("prev-img", ["previous"], "Previous image", ["ImageOverlay"]),
+    };
+
+    private void ExecutePaletteAction(KeyboardActionKind action)
+    {
+        switch (action)
+        {
+            case KeyboardActionKind.ZoomTextIn: ZoomTextInCommand.Execute(null); break;
+            case KeyboardActionKind.ZoomTextOut: ZoomTextOutCommand.Execute(null); break;
+            case KeyboardActionKind.ResetTextZoom: ResetTextZoomCommand.Execute(null); break;
+            case KeyboardActionKind.ZoomIn: ZoomInCommand.Execute(null); break;
+            case KeyboardActionKind.ZoomOut: ZoomOutCommand.Execute(null); break;
+            case KeyboardActionKind.ResetZoom: ResetZoomCommand.Execute(null); break;
+            case KeyboardActionKind.NextImage: NextImageCommand.Execute(null); break;
+            case KeyboardActionKind.PreviousImage: PreviousImageCommand.Execute(null); break;
+            case KeyboardActionKind.OpenSettings: OpenSettingsCommand.Execute(null); break;
+            case KeyboardActionKind.ToggleShortcutsHandbook: IsShortcutsHandbookOpen = !IsShortcutsHandbookOpen; break;
+            case KeyboardActionKind.OpenDocumentation: NavigateToDocumentationCommand.Execute(null); break;
+            case KeyboardActionKind.ToggleSidebar: ToggleSidebarCommand.Execute(null); break;
+            case KeyboardActionKind.OpenDecksFolder: OpenDecksFolderCommand.Execute(null); break;
+            case KeyboardActionKind.OpenCurrentDeckFolder: OpenCurrentDeckFolderCommand.Execute(null); break;
+            case KeyboardActionKind.OpenTagInference: ShowTagInferenceCommand.Execute(null); break;
+            case KeyboardActionKind.OpenMcqQuiz: ShowMcqPanelCommand.Execute(null); break;
+            case KeyboardActionKind.OpenFlashcard: ShowFlashcardPanelCommand.Execute(null); break;
+            case KeyboardActionKind.NavigateToMarketplace: NavigateToMarketplaceCommand.Execute(null); break;
+            case KeyboardActionKind.ShowHeatmap: ShowHeatmapCommand.Execute(null); break;
+            case KeyboardActionKind.ShowArchivedView: ShowArchivedViewCommand.Execute(null); break;
+            case KeyboardActionKind.ShowPinnedView: ShowPinnedViewCommand.Execute(null); break;
+            case KeyboardActionKind.FocusSearchBar: HomeViewModel.FocusSearch(); break;
+            case KeyboardActionKind.FocusSearchWithClear:
+                HomeViewModel.SearchText = string.Empty;
+                HomeViewModel.FocusSearch();
+                break;
+            case KeyboardActionKind.NextPage: LearningViewModel.NextPageCommand.Execute(null); break;
+            case KeyboardActionKind.PreviousPage: LearningViewModel.PreviousPageCommand.Execute(null); break;
+            case KeyboardActionKind.NavigateHome: NavigateToHomeCommand.Execute(null); break;
+            case KeyboardActionKind.OpenGoToPage: LearningViewModel.IsGoToPageOpen = true; break;
+        }
+    }
+
     private List<CommandPaletteEntry> BuildCommandPaletteEntries()
     {
-        return new List<CommandPaletteEntry>
+        var seen = new HashSet<KeyboardActionKind>();
+        var entries = new List<CommandPaletteEntry>();
+
+        foreach (var binding in _keyBindingService.CurrentBindings)
         {
-            // ── Global ─────────────────────────────────────────────
-            new()
+            if (binding.Action == KeyboardActionKind.None)
             {
-                Name = "help",
-                Aliases = new[] { "shortcuts", "handbook", "?" },
-                Description = "Toggle shortcuts handbook",
-                Contexts = new[] { "*" },
-                Execute = () => IsShortcutsHandbookOpen = !IsShortcutsHandbookOpen,
-                ShortcutText = GetShortcutText(KeyboardActionKind.ToggleShortcutsHandbook),
-            },
-            new()
-            {
-                Name = "settings",
-                Aliases = new[] { "config", "prefs" },
-                Description = "Open settings",
-                Contexts = new[] { "*" },
-                Execute = () => OpenSettingsCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.OpenSettings),
-            },
-            new()
-            {
-                Name = "sidebar",
-                Aliases = new[] { "menu" },
-                Description = "Toggle sidebar",
-                Contexts = new[] { "*" },
-                Execute = () => ToggleSidebarCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ToggleSidebar),
-            },
-            new()
-            {
-                Name = "pinned",
-                Aliases = new[] { "pin" },
-                Description = "Show pinned decks",
-                Contexts = new[] { "*" },
-                Execute = () => ShowPinnedViewCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ShowPinnedView),
-            },
-            new()
-            {
-                Name = "archived",
-                Aliases = new[] { "archive" },
-                Description = "Show archived decks",
-                Contexts = new[] { "*" },
-                Execute = () => ShowArchivedViewCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ShowArchivedView),
-            },
-            new()
-            {
-                Name = "heatmap",
-                Aliases = new[] { "streak", "activity" },
-                Description = "Show study streak heatmap",
-                Contexts = new[] { "*" },
-                Execute = () => ShowHeatmapCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ShowHeatmap),
-            },
-            new()
-            {
-                Name = "docs",
-                Aliases = new[] { "documentation" },
-                Description = "Open documentation",
-                Contexts = new[] { "*" },
-                Execute = () => NavigateToDocumentationCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.OpenDocumentation),
-            },
-            new()
-            {
-                Name = "tag-inference",
-                Aliases = new[] { "ai-tags", "infer", "tag" },
-                Description = "Open AI tag inference page",
-                Contexts = new[] { "*" },
-                Execute = () => ShowTagInferenceCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.OpenTagInference),
-            },
-            new()
-            {
-                Name = "zoom-in",
-                Aliases = new[] { "z+", "zi" },
-                Description = "Zoom text in",
-                Contexts = new[] { "*" },
-                Execute = () => ZoomTextInCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ZoomTextIn),
-            },
-            new()
-            {
-                Name = "zoom-out",
-                Aliases = new[] { "z-", "zo" },
-                Description = "Zoom text out",
-                Contexts = new[] { "*" },
-                Execute = () => ZoomTextOutCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ZoomTextOut),
-            },
-            new()
-            {
-                Name = "zoom-reset",
-                Aliases = new[] { "z0" },
-                Description = "Reset text zoom",
-                Contexts = new[] { "*" },
-                Execute = () => ResetTextZoomCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ResetTextZoom),
-            },
-            new()
-            {
-                Name = "folders",
-                Aliases = new[] { "decks", "open" },
-                Description = "Open decks folder in file manager",
-                Contexts = new[] { "*" },
-                Execute = () => OpenDecksFolderCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.OpenDecksFolder),
-            },
-            new()
-            {
-                Name = "marketplace",
-                Aliases = new[] { "plugins", "extensions" },
-                Description = "Open marketplace",
-                Contexts = new[] { "*" },
-                Execute = () => NavigateToMarketplaceCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.NavigateToMarketplace),
-            },
+                continue;
+            }
 
-            // ── Home ───────────────────────────────────────────────
-            new()
+            if (!seen.Add(binding.Action))
             {
-                Name = "search",
-                Aliases = new[] { "find", "/" },
-                Description = "Focus search bar",
-                Contexts = new[] { "Home" },
-                Execute = () => HomeViewModel.FocusSearch(),
-                ShortcutText = GetShortcutText(KeyboardActionKind.FocusSearchBar),
-            },
-            new()
-            {
-                Name = "clear",
-                Aliases = new[] { "clear-search" },
-                Description = "Clear and focus search bar",
-                Contexts = new[] { "Home" },
-                Execute = () =>
-                {
-                    HomeViewModel.SearchText = string.Empty;
-                    HomeViewModel.FocusSearch();
-                },
-                ShortcutText = GetShortcutText(KeyboardActionKind.FocusSearchWithClear),
-            },
+                continue;
+            }
 
-            // ── Learning ────────────────────────────────────────────
-            new()
+            if (!_paletteMeta.TryGetValue(binding.Action, out var meta))
             {
-                Name = "next",
-                Aliases = new[] { "n", ">" },
-                Description = "Next page",
-                Contexts = new[] { "Learning" },
-                Execute = () => LearningViewModel.NextPageCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.NextPage),
-            },
-            new()
-            {
-                Name = "prev",
-                Aliases = new[] { "p", "<" },
-                Description = "Previous page",
-                Contexts = new[] { "Learning" },
-                Execute = () => LearningViewModel.PreviousPageCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.PreviousPage),
-            },
-            new()
-            {
-                Name = "home",
-                Aliases = new[] { "exit", "quit", "q" },
-                Description = "Exit to home",
-                Contexts = new[] { "Learning" },
-                Execute = () => NavigateToHomeCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.NavigateHome),
-            },
-            new()
-            {
-                Name = "goto",
-                Aliases = new[] { "go" },
-                Description = "Open go-to-page dialog",
-                Contexts = new[] { "Learning" },
-                Execute = () => LearningViewModel.IsGoToPageOpen = true,
-                ShortcutText = GetShortcutText(KeyboardActionKind.OpenGoToPage),
-            },
+                continue;
+            }
 
-            // ── Image Overlay ───────────────────────────────────────
-            new()
+            entries.Add(new CommandPaletteEntry
             {
-                Name = "img-zoom-in",
-                Aliases = new[] { "z+" },
-                Description = "Zoom in on image",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => ZoomInCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ZoomIn),
-            },
-            new()
-            {
-                Name = "img-zoom-out",
-                Aliases = new[] { "z-" },
-                Description = "Zoom out on image",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => ZoomOutCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ZoomOut),
-            },
-            new()
-            {
-                Name = "img-zoom-reset",
-                Aliases = new[] { "z0" },
-                Description = "Reset image zoom",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => ResetZoomCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.ResetZoom),
-            },
-            new()
-            {
-                Name = "next-img",
-                Aliases = new[] { "next" },
-                Description = "Next image",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => NextImageCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.NextImage),
-            },
-            new()
-            {
-                Name = "prev-img",
-                Aliases = new[] { "previous" },
-                Description = "Previous image",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => PreviousImageCommand.Execute(null),
-                ShortcutText = GetShortcutText(KeyboardActionKind.PreviousImage),
-            },
-            new()
-            {
-                Name = "invert",
-                Aliases = new[] { "inv" },
-                Description = "Toggle image color inversion",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => ToggleInvertCommand.Execute(null),
-            },
-            new()
-            {
-                Name = "open-img",
-                Aliases = new[] { "open", "view" },
-                Description = "Open image in external viewer",
-                Contexts = new[] { "ImageOverlay" },
-                Execute = () => OpenImageInViewerCommand.Execute(null),
-            },
-        };
+                Name = meta.Name,
+                Aliases = meta.Aliases,
+                Description = meta.Description,
+                Contexts = meta.Contexts,
+                Execute = () => ExecutePaletteAction(binding.Action),
+                ShortcutText = GetShortcutText(binding.Action),
+            });
+        }
+
+        // Special entries without keyboard bindings
+        entries.Add(new CommandPaletteEntry
+        {
+            Name = "invert",
+            Aliases = new[] { "inv" },
+            Description = "Toggle image color inversion",
+            Contexts = new[] { "ImageOverlay" },
+            Execute = () => ToggleInvertCommand.Execute(null),
+        });
+        entries.Add(new CommandPaletteEntry
+        {
+            Name = "open-img",
+            Aliases = new[] { "open", "view" },
+            Description = "Open image in external viewer",
+            Contexts = new[] { "ImageOverlay" },
+            Execute = () => OpenImageInViewerCommand.Execute(null),
+        });
+
+        return entries;
     }
 }

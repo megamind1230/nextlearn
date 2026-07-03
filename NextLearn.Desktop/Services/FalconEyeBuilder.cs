@@ -49,11 +49,11 @@ public static class FalconEyeBuilder
 
                 lastSection = sectionTitle;
                 body.AppendLine($"<li><span class=\"toc-section-title\">{HtmlContentBuilder.EscapeHtml(sectionTitle)}</span><ol class=\"toc-sub-list\">");
-                body.AppendLine($"<li><span class=\"toc-heading\">{HtmlContentBuilder.EscapeHtml(title)}</span> <span class=\"toc-page-num\">— Page {page.PageNumber}</span></li>");
+                body.AppendLine($"<li><a href=\"#\" data-page=\"{page.PageNumber}\" class=\"toc-heading\">{HtmlContentBuilder.EscapeHtml(title)}</a> <span class=\"toc-page-num\">— Page {page.PageNumber}</span></li>");
             }
             else if (hasSubHeading)
             {
-                body.AppendLine($"<li><span class=\"toc-heading\">{HtmlContentBuilder.EscapeHtml(title)}</span> <span class=\"toc-page-num\">— Page {page.PageNumber}</span></li>");
+                body.AppendLine($"<li><a href=\"#\" data-page=\"{page.PageNumber}\" class=\"toc-heading\">{HtmlContentBuilder.EscapeHtml(title)}</a> <span class=\"toc-page-num\">— Page {page.PageNumber}</span></li>");
             }
             else
             {
@@ -63,7 +63,7 @@ public static class FalconEyeBuilder
                     lastSection = null;
                 }
 
-                body.AppendLine($"<li><span class=\"toc-heading\">{HtmlContentBuilder.EscapeHtml(title)}</span> <span class=\"toc-page-num\">— Page {page.PageNumber}</span></li>");
+                body.AppendLine($"<li><a href=\"#\" data-page=\"{page.PageNumber}\" class=\"toc-heading\">{HtmlContentBuilder.EscapeHtml(title)}</a> <span class=\"toc-page-num\">— Page {page.PageNumber}</span></li>");
             }
         }
 
@@ -101,6 +101,8 @@ public static class FalconEyeBuilder
     .toc-section-title { font-weight: 600; color: #F59E0B; font-size: 1.1em; }
     .toc-sub-list { padding-left: 24px; }
     .toc-heading { color: #E2E8F0; }
+    a, a:visited { text-decoration: none; color: inherit; }
+    a:hover .toc-heading { color: #60A5FA; }
     .toc-page-num { color: #94A3B8; font-size: 0.85em; }
     li { margin: 4px 0; }
 </style>
@@ -109,6 +111,7 @@ public static class FalconEyeBuilder
 {{bodyContent}}
 <script>(function(){var kr=document.createElement('iframe');kr.style.cssText='display:none!important;width:0!important;height:0!important;border:none!important;position:fixed!important';document.body.appendChild(kr);document.addEventListener('keydown',function(e){var k=e.key,m='',h=false;if(e.ctrlKey)m+='C';if(e.shiftKey)m+='S';if(e.altKey)m+='A';switch(k){case'a':case'A':case'b':case'B':case'c':case'C':case'd':case'D':case'e':case'E':case'f':case'F':case'g':case'G':case'h':case'H':case'i':case'I':case'j':case'J':case'k':case'K':case'l':case'L':case'm':case'M':case'n':case'N':case'o':case'O':case'p':case'P':case'q':case'Q':case'r':case'R':case's':case'S':case't':case'T':case'u':case'U':case'v':case'V':case'w':case'W':case'x':case'X':case'y':case'Y':case'z':case'Z':case'Escape':case'?':case'/':case'Enter':h=true;break;case'ArrowUp':case'ArrowDown':case'ArrowLeft':case'ArrowRight':h=true;break;case',':case'=':case'-':case'+':case'_':case'0':case')':if(e.ctrlKey)h=true;break;}if(!h)return;e.preventDefault();e.stopPropagation();kr.src='http://key.local/'+encodeURIComponent(k)+'/'+m+'/'+Date.now();},true);})();</script>
 <script>(function(){var lr=document.createElement('iframe');lr.style.cssText='display:none!important;width:0!important;height:0!important;border:none!important;position:fixed!important';document.body.appendChild(lr);document.addEventListener('click',function(e){var t=e.target.closest('a');if(!t)return;var h=t.getAttribute('data-href');if(!h)return;e.preventDefault();e.stopPropagation();lr.src='http://openurl.local/'+encodeURIComponent(h)+'/'+Date.now();},true);})();</script>
+<script>(function(){var fr=document.createElement('iframe');fr.style.cssText='display:none!important;width:0!important;height:0!important;border:none!important;position:fixed!important';document.body.appendChild(fr);document.addEventListener('click',function(e){var t=e.target.closest('a');if(!t)return;var p=t.getAttribute('data-page');if(!p)return;e.preventDefault();e.stopPropagation();fr.src='http://falconeye.local/'+encodeURIComponent(p)+'/'+Date.now();},true);})();</script>
 </body>
 </html>
 """;

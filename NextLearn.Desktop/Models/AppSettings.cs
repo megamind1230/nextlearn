@@ -23,6 +23,9 @@ public class AppSettings
     [YamlMember(Alias = "flashcardsPath")]
     public string FlashcardsPath { get; set; } = "$HOME/magnus/nextlearn/flashcards";
 
+    [YamlMember(Alias = "mcqsPath")]
+    public string McqsPath { get; set; } = "$HOME/magnus/nextlearn/mcqs";
+
     [YamlMember(Alias = "geminiApiKey")]
     public string GeminiApiKey { get; set; } = string.Empty;
 

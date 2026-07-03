@@ -72,7 +72,7 @@ public partial class HeatmapPanel : UserControl
         var cellGap = BaseCellGap * _cellScale;
         var step = cellSize + cellGap;
 
-        var today = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
+        var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
         var maxCol = 0;
         var maxRow = 0;
 

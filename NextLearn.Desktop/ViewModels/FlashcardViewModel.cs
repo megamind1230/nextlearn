@@ -353,4 +353,9 @@ public partial class FlashcardViewModel : ViewModelBase
         HasError = false;
         ErrorMessage = null;
     }
+
+    public void FocusSearch()
+    {
+        SearchText = string.Empty;
+    }
 }

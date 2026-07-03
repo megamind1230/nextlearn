@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Input;
 using NextLearn.Desktop.ViewModels;
+using Serilog;
 
 namespace NextLearn.Desktop.Services;
 
@@ -86,6 +87,8 @@ public class KeyboardHandler
 
     public KeyboardActionKind HandleKey(Key key, KeyModifiers modifiers, bool isTextBox)
     {
+        Log.Debug("MCQDBG: HandleKey key={Key} mods={Mods} isTextBox={Tb} IsMcqOpen={Mcq} IsQuizActive={Quiz}", key, modifiers, isTextBox, _vm.IsMcqOpen, _vm.McqPanelViewModel?.IsQuizActive);
+
         if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift
             or Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin)
         {
@@ -148,14 +151,41 @@ public class KeyboardHandler
 
         contexts.Insert(0, _vm.IsLearning ? "Learning" : "Home");
 
+        if (_vm.IsMcqOpen)
+        {
+            if (_vm.McqPanelViewModel?.IsQuizActive == true)
+            {
+                contexts.Insert(0, "McqQuiz");
+            }
+            else
+            {
+                contexts.Insert(0, "McqTabPanel");
+            }
+        }
+
+        if (_vm.IsFlashcardOpen)
+        {
+            contexts.Insert(0, "Flashcard");
+        }
+
+        if (_vm.IsTagInferenceOpen)
+        {
+            contexts.Insert(0, "TagInference");
+        }
+
+        Log.Debug("MCQDBG: contexts={Ctx}", string.Join(", ", contexts.Select(c => c ?? "null")));
+
         foreach (var ctx in contexts)
         {
             if (_lookup.TryGetValue((key, modifiers, ctx), out var action))
             {
                 if (isTextBox && !_textBoxAllowed.Contains((key, modifiers)))
                 {
+                    Log.Debug("MCQDBG: ctx={Ctx} found {Action} but blocked by isTextBox", ctx, action);
                     continue;
                 }
+
+                Log.Debug("MCQDBG: ctx={Ctx} found action={Action} -> returning", ctx, action);
 
                 CancelChord();
 
@@ -202,6 +232,7 @@ public class KeyboardHandler
             }
         }
 
+        Log.Debug("MCQDBG: no match, returning None key={Key} mods={Mods}", key, modifiers);
         return KeyboardActionKind.None;
     }
 
@@ -241,7 +272,27 @@ public class KeyboardHandler
 
         if (_vm.IsTagInferenceOpen)
         {
+            if (isTextBox)
+            {
+                return KeyboardActionKind.ClearFocus;
+            }
+
             return KeyboardActionKind.CloseTagInference;
+        }
+
+        if (_vm.IsMcqOpen)
+        {
+            if (_vm.McqPanelViewModel?.IsQuizActive == true)
+            {
+                return KeyboardActionKind.QuitMcqQuiz;
+            }
+
+            if (isTextBox)
+            {
+                return KeyboardActionKind.ClearFocus;
+            }
+
+            return KeyboardActionKind.CloseMcqQuiz;
         }
 
         if (_vm.IsHeatmapOpen)
@@ -262,6 +313,21 @@ public class KeyboardHandler
         if (_vm.IsSidebarOpen)
         {
             return KeyboardActionKind.CloseSidebar;
+        }
+
+        if (_vm.IsLearning)
+        {
+            return KeyboardActionKind.NavigateHome;
+        }
+
+        if (_vm.IsFlashcardOpen)
+        {
+            if (isTextBox)
+            {
+                return KeyboardActionKind.ClearFocus;
+            }
+
+            return KeyboardActionKind.CloseFlashcardPanel;
         }
 
         if (isTextBox)

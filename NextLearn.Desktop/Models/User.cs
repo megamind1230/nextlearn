@@ -17,7 +17,7 @@ public class User
 
     public int CurrentStreak { get; set; }
 
-    public DateTime LastActiveDate { get; set; } = DateTime.UtcNow.Date;
+    public DateTime LastActiveDate { get; set; } = DateTime.Now.Date;
 
     public bool IsGuest { get; set; } = true;
 }

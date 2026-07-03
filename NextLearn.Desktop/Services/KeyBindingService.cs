@@ -31,17 +31,22 @@ public class KeyBindingService : IKeyBindingService
 #   _comment  — description shown in the shortcuts handbook
 #
 # Available actions:
-#   NextPage, PreviousPage, ScrollDown, ScrollUp, ScrollLeft, ScrollRight,
-#   NavigateHome, OpenSettings, ToggleShortcutsHandbook, OpenGoToPage,
-#   ZoomTextIn, ZoomTextOut, ResetTextZoom, ZoomIn, ZoomOut, ResetZoom,
-#   NextImage, PreviousImage, FocusSearchBar, FocusSearchWithClear,
-#   ScrollDeckListDown, ScrollDeckListUp,
-#   ZoomHeatmapIn, ZoomHeatmapOut, ZoomHeatmapReset,
-#   OpenDocumentation, OpenCommandPalette, CloseCommandPalette,
-#   OpenDecksFolder, ToggleSidebar,
-#   ShowPinnedView, ShowArchivedView, ShowHeatmap, OpenTagInference,
-#   NavigateToMarketplace,
-#   CloseSettings, ExitSettingsHome
+#   ClearFocus, CloseArchivedView, CloseCommandPalette, CloseFlashcardPanel,
+#   CloseGoToPage, CloseHeatmap, CloseImageOverlay, CloseMarketplace,
+#   CloseMcqQuiz, ClosePinnedView, CloseSettings, CloseShortcutsHandbook,
+#   CloseSidebar, CloseTagInference, ExitSettingsHome, FocusSearchBar,
+#   FocusSearchWithClear, NavigateHome, NavigateToMarketplace, NextImage,
+#   NextPage, OpenCommandPalette, OpenCurrentDeckFolder, OpenDecksFolder,
+#   OpenDocumentation, OpenFlashcard, OpenGoToPage, OpenMcqQuiz,
+#   OpenSettings, OpenTagInference, PreviousImage, PreviousPage,
+#   QuitMcqQuiz, ResetTextZoom, ResetZoom, ScrollDeckListDown,
+#   ScrollDeckListUp, ScrollDown, ScrollFlashcardListDown,
+#   ScrollFlashcardListUp, ScrollLeft, ScrollMcqTabPanelListDown,
+#   ScrollMcqTabPanelListUp, ScrollRight, ScrollTagInferenceListDown,
+#   ScrollTagInferenceListUp, ScrollUp, ShowArchivedView, ShowHeatmap,
+#   ShowPinnedView, ToggleSidebar, ToggleShortcutsHandbook, ZoomHeatmapIn,
+#   ZoomHeatmapOut, ZoomHeatmapReset, ZoomIn, ZoomOut, ZoomTextIn,
+#   ZoomTextOut
 #
 # Multi-key chords: use the "chords" field instead of "key" + "modifiers"
 #   Example — g then i to focus and clear search:
@@ -423,13 +428,17 @@ bindings:
 
             // ── Learning ──────────────────────────────────────────────
             G("Learning", KeyboardActionKind.NextPage, "N", string.Empty, "Next page"),
-            G("Learning", KeyboardActionKind.NextPage, "Right", string.Empty, "Next page"),
+            G("Learning", KeyboardActionKind.NextPage, "Right", "Alt", "Next page (Alt+Right)"),
             G("Learning", KeyboardActionKind.PreviousPage, "P", string.Empty, "Previous page"),
-            G("Learning", KeyboardActionKind.PreviousPage, "Left", string.Empty, "Previous page"),
+            G("Learning", KeyboardActionKind.PreviousPage, "Left", "Alt", "Previous page (Alt+Left)"),
             G("Learning", KeyboardActionKind.ScrollDown, "J", string.Empty, "Scroll content down"),
+            G("Learning", KeyboardActionKind.ScrollDown, "Down", string.Empty, "Scroll content down"),
             G("Learning", KeyboardActionKind.ScrollUp, "K", string.Empty, "Scroll content up"),
+            G("Learning", KeyboardActionKind.ScrollUp, "Up", string.Empty, "Scroll content up"),
             G("Learning", KeyboardActionKind.ScrollLeft, "H", string.Empty, "Scroll content left"),
+            G("Learning", KeyboardActionKind.ScrollLeft, "Left", string.Empty, "Scroll content left"),
             G("Learning", KeyboardActionKind.ScrollRight, "L", string.Empty, "Scroll content right"),
+            G("Learning", KeyboardActionKind.ScrollRight, "Right", string.Empty, "Scroll content right"),
             G("Learning", KeyboardActionKind.NavigateHome, "Q", string.Empty, "Exit to home"),
             G("Learning", KeyboardActionKind.NavigateHome, "D", string.Empty, "Exit to home"),
             G("Learning", KeyboardActionKind.OpenGoToPage, "G", "Control", "Open go-to-page dialog", true),
@@ -446,7 +455,9 @@ bindings:
             G("Home", KeyboardActionKind.NavigateHome, "Q", string.Empty, "Go home"),
             G("Home", KeyboardActionKind.NavigateHome, "D", string.Empty, "Go home"),
             G("Home", KeyboardActionKind.ScrollDeckListDown, "J", string.Empty, "Scroll deck list down"),
+            G("Home", KeyboardActionKind.ScrollDeckListDown, "Down", string.Empty, "Scroll deck list down"),
             G("Home", KeyboardActionKind.ScrollDeckListUp, "K", string.Empty, "Scroll deck list up"),
+            G("Home", KeyboardActionKind.ScrollDeckListUp, "Up", string.Empty, "Scroll deck list up"),
             G("Home", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
 
             // ── Global ────────────────────────────────────────────────
@@ -458,8 +469,61 @@ bindings:
             G(null, KeyboardActionKind.ToggleShortcutsHandbook, "Oem2", "Shift", "Toggle shortcuts handbook (? or Shift+/)"),
             G(null, KeyboardActionKind.OpenDocumentation, "F1", string.Empty, "Open documentation"),
             G(null, KeyboardActionKind.ToggleSidebar, "S", string.Empty, "Toggle sidebar"),
-            G(null, KeyboardActionKind.OpenDecksFolder, "O", string.Empty, "Open decks folder"),
+            G(null, KeyboardActionKind.OpenDecksFolder, "O", "Control", "Open decks folder (Ctrl+O)"),
+            G(null, KeyboardActionKind.OpenCurrentDeckFolder, "O", "Control+Shift+Alt", "Reveal current deck in file manager"),
             G(null, KeyboardActionKind.OpenTagInference, "T", string.Empty, "Open tag inference (T)"),
+            G(null, KeyboardActionKind.OpenMcqQuiz, "E", string.Empty, "Open MCQ quiz (E)"),
+            G(null, KeyboardActionKind.OpenMcqQuiz, "Q", "Control", "Open MCQ quiz (Ctrl+Q)"),
+            G(null, KeyboardActionKind.NavigateToMarketplace, "M", "Control", "Open marketplace (Ctrl+M)"),
+            G(null, KeyboardActionKind.OpenTagInference, "T", "Control", "Open tag inference (Ctrl+T)"),
+            G(null, KeyboardActionKind.ShowHeatmap, "H", "Control", "Show heatmap (Ctrl+H)"),
+            G(null, KeyboardActionKind.ShowArchivedView, "A", "Control", "Show archive (Ctrl+A)"),
+            G(null, KeyboardActionKind.OpenFlashcard, "F", "Control", "Open flashcard panel (Ctrl+F)"),
+            G(null, KeyboardActionKind.ShowPinnedView, "P", "Control", "Show pinned (Ctrl+P)"),
+
+            // ── MCQ Quiz ──────────────────────────────────────────────
+            G("McqQuiz", KeyboardActionKind.NextPage, "N", string.Empty, "Next question"),
+            G("McqQuiz", KeyboardActionKind.PreviousPage, "P", string.Empty, "Previous question"),
+            G("McqQuiz", KeyboardActionKind.QuitMcqQuiz, "Q", string.Empty, "Quit quiz to tabs"),
+            G("McqQuiz", KeyboardActionKind.QuitMcqQuiz, "D", string.Empty, "Quit quiz to tabs"),
+            G("McqQuiz", KeyboardActionKind.NextPage, "Right", "Alt", "Next question (Alt+Right)"),
+            G("McqQuiz", KeyboardActionKind.PreviousPage, "Left", "Alt", "Previous question (Alt+Left)"),
+
+            // ── MCQ Tab Panel ──────────────────────────────────────────
+            G("McqTabPanel", KeyboardActionKind.None, "H", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.None, "L", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListDown, "J", string.Empty, "Scroll tab panel list down"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListUp, "K", string.Empty, "Scroll tab panel list up"),
+            G("McqTabPanel", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
+            M("McqTabPanel", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (g then i)", "G", string.Empty, "I", string.Empty),
+
+            // ── Flashcard Panel ────────────────────────────────────────
+            G("Flashcard", KeyboardActionKind.None, "H", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.None, "L", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListDown, "J", string.Empty, "Scroll flashcard list down"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListUp, "K", string.Empty, "Scroll flashcard list up"),
+            G("Flashcard", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
+            M("Flashcard", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (g then i)", "G", string.Empty, "I", string.Empty),
+
+            // ── Tag Inference Panel ─────────────────────────────────────
+            G("TagInference", KeyboardActionKind.None, "H", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.None, "L", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListDown, "J", string.Empty, "Scroll tag inference list down"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListUp, "K", string.Empty, "Scroll tag inference list up"),
+            G("TagInference", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
+            G("McqTabPanel", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListDown, "Down", string.Empty, "Scroll tab panel list down"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListUp, "Up", string.Empty, "Scroll tab panel list up"),
+            G("Flashcard", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListDown, "Down", string.Empty, "Scroll flashcard list down"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListUp, "Up", string.Empty, "Scroll flashcard list up"),
+            G("TagInference", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListDown, "Down", string.Empty, "Scroll tag inference list down"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListUp, "Up", string.Empty, "Scroll tag inference list up"),
+            M("TagInference", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (g then i)", "G", string.Empty, "I", string.Empty),
         };
     }
 
@@ -477,13 +541,17 @@ bindings:
 
             // ── Learning ──────────────────────────────────────────────
             G("Learning", KeyboardActionKind.NextPage, "N", "Control", "Next page (C-n)", true),
-            G("Learning", KeyboardActionKind.NextPage, "Right", string.Empty, "Next page"),
+            G("Learning", KeyboardActionKind.NextPage, "Right", "Alt", "Next page (Alt+Right)"),
             G("Learning", KeyboardActionKind.PreviousPage, "P", "Control", "Previous page (C-p)", true),
-            G("Learning", KeyboardActionKind.PreviousPage, "Left", string.Empty, "Previous page"),
+            G("Learning", KeyboardActionKind.PreviousPage, "Left", "Alt", "Previous page (Alt+Left)"),
             G("Learning", KeyboardActionKind.ScrollDown, "V", "Control", "Scroll down (C-v)", true),
+            G("Learning", KeyboardActionKind.ScrollDown, "Down", string.Empty, "Scroll content down"),
             G("Learning", KeyboardActionKind.ScrollUp, "V", "Alt", "Scroll up (M-v)", true),
+            G("Learning", KeyboardActionKind.ScrollUp, "Up", string.Empty, "Scroll content up"),
             G("Learning", KeyboardActionKind.ScrollLeft, "B", "Control", "Scroll left (C-b)", true),
+            G("Learning", KeyboardActionKind.ScrollLeft, "Left", string.Empty, "Scroll content left"),
             G("Learning", KeyboardActionKind.ScrollRight, "F", "Control", "Scroll right (C-f)", true),
+            G("Learning", KeyboardActionKind.ScrollRight, "Right", string.Empty, "Scroll content right"),
             M("Learning", KeyboardActionKind.NavigateHome, "Exit to home (C-x q)", "X", "Control", "Q"),
             M("Learning", KeyboardActionKind.NavigateHome, "Exit to home (C-x q)", "X", "Control", "D"),
             M("Learning", KeyboardActionKind.OpenGoToPage, "Go to page (C-x g)", "X", "Control", "G", txt: true),
@@ -493,13 +561,36 @@ bindings:
             M("Home", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (C-x i)", "X", "Control", "I"),
             M("Home", KeyboardActionKind.NavigateHome, "Go home (C-x q)", "X", "Control", "Q"),
             M("Home", KeyboardActionKind.NavigateHome, "Go home (C-x q)", "X", "Control", "D"),
-            M("Home", KeyboardActionKind.ShowPinnedView, "Show pinned (C-x p)", "X", "Control", "P"),
-            M("Home", KeyboardActionKind.ShowArchivedView, "Show archived (C-x a)", "X", "Control", "A"),
-            M("Home", KeyboardActionKind.ShowHeatmap, "Show heatmap (C-x h)", "X", "Control", "H"),
             M("Home", KeyboardActionKind.OpenDecksFolder, "Open decks folder (C-c o)", "C", "Control", "O"),
             M("Home", KeyboardActionKind.NavigateToMarketplace, "Open marketplace (C-c m)", "C", "Control", "M"),
             G("Home", KeyboardActionKind.ScrollDeckListDown, "V", "Control", "Scroll deck list down (C-v)", true),
+            G("Home", KeyboardActionKind.ScrollDeckListDown, "Down", string.Empty, "Scroll deck list down"),
             G("Home", KeyboardActionKind.ScrollDeckListUp, "V", "Alt", "Scroll deck list up (M-v)", true),
+            G("Home", KeyboardActionKind.ScrollDeckListUp, "Up", string.Empty, "Scroll deck list up"),
+
+            // ── MCQ Tab Panel ──────────────────────────────────────────
+            G("McqTabPanel", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListDown, "Down", string.Empty, "Scroll tab panel list down"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListUp, "Up", string.Empty, "Scroll tab panel list up"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListDown, "V", "Control", "Scroll tab panel list down (C-v)"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListUp, "V", "Alt", "Scroll tab panel list up (M-v)"),
+
+            // ── Flashcard Panel ────────────────────────────────────────
+            G("Flashcard", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListDown, "Down", string.Empty, "Scroll flashcard list down"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListUp, "Up", string.Empty, "Scroll flashcard list up"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListDown, "V", "Control", "Scroll flashcard list down (C-v)"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListUp, "V", "Alt", "Scroll flashcard list up (M-v)"),
+
+            // ── Tag Inference Panel ─────────────────────────────────────
+            G("TagInference", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListDown, "Down", string.Empty, "Scroll tag inference list down"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListUp, "Up", string.Empty, "Scroll tag inference list up"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListDown, "V", "Control", "Scroll tag inference list down (C-v)"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListUp, "V", "Alt", "Scroll tag inference list up (M-v)"),
 
             // ── Global ────────────────────────────────────────────────
             G(null, KeyboardActionKind.ZoomTextIn, "OemPlus", "Control+Shift", "Zoom text in (also heatmap in)", true),
@@ -508,9 +599,24 @@ bindings:
             G(null, KeyboardActionKind.ResetTextZoom, "NumPad0", "Control+Shift", "Reset text zoom (also heatmap reset)", true),
             M(null, KeyboardActionKind.OpenSettings, "Open settings (C-c C-s)", "C", "Control", "S", "Control", txt: true),
             M(null, KeyboardActionKind.ToggleShortcutsHandbook, "Toggle handbook (C-h ?)", "H", "Control", "Oem2", "Shift"),
-            M(null, KeyboardActionKind.OpenDocumentation, "Open docs (C-h d)", "H", "Control", "D"),
+            G(null, KeyboardActionKind.OpenDocumentation, "F1", string.Empty, "Open documentation"),
             M(null, KeyboardActionKind.ToggleSidebar, "Toggle sidebar (C-c s)", "C", "Control", "S"),
             M(null, KeyboardActionKind.OpenTagInference, "Open tag inference (C-c t)", "C", "Control", "T"),
+            M(null, KeyboardActionKind.OpenMcqQuiz, "Open MCQ quiz (C-c q)", "C", "Control", "Q"),
+            M(null, KeyboardActionKind.NavigateToMarketplace, "Open marketplace (C-c m)", "C", "Control", "M"),
+            M(null, KeyboardActionKind.ShowHeatmap, "Show heatmap (C-c h)", "C", "Control", "H"),
+            M(null, KeyboardActionKind.ShowArchivedView, "Show archived (C-c a)", "C", "Control", "A"),
+            M(null, KeyboardActionKind.OpenFlashcard, "Open flashcard panel (C-c f)", "C", "Control", "F"),
+            M(null, KeyboardActionKind.ShowPinnedView, "Show pinned (C-c p)", "C", "Control", "P"),
+            M(null, KeyboardActionKind.OpenDecksFolder, "Open decks folder (C-c o)", "C", "Control", "O"),
+            G(null, KeyboardActionKind.OpenCurrentDeckFolder, "O", "Control+Shift+Alt", "Reveal current deck in file manager"),
+            G(null, KeyboardActionKind.OpenMcqQuiz, "E", "Control", "Open MCQ quiz (C-e)", true),
+
+            // ── MCQ Quiz ──────────────────────────────────────────────
+            G("McqQuiz", KeyboardActionKind.NextPage, "N", "Control", "Next question (C-n)", true),
+            G("McqQuiz", KeyboardActionKind.PreviousPage, "P", "Control", "Previous question (C-p)", true),
+            G("McqQuiz", KeyboardActionKind.NextPage, "Right", "Alt", "Next question (Alt+Right)"),
+            G("McqQuiz", KeyboardActionKind.PreviousPage, "Left", "Alt", "Previous question (Alt+Left)"),
         };
     }
 
@@ -528,15 +634,17 @@ bindings:
 
             // ── Learning ──────────────────────────────────────────────
             G("Learning", KeyboardActionKind.NextPage, "N", string.Empty, "Next page"),
-            G("Learning", KeyboardActionKind.NextPage, "Right", string.Empty, "Next page"),
             G("Learning", KeyboardActionKind.NextPage, "Right", "Alt", "Next page (Alt+Right)"),
             G("Learning", KeyboardActionKind.PreviousPage, "P", string.Empty, "Previous page"),
-            G("Learning", KeyboardActionKind.PreviousPage, "Left", string.Empty, "Previous page"),
             G("Learning", KeyboardActionKind.PreviousPage, "Left", "Alt", "Previous page (Alt+Left)"),
             G("Learning", KeyboardActionKind.ScrollDown, "J", string.Empty, "Scroll content down"),
+            G("Learning", KeyboardActionKind.ScrollDown, "Down", string.Empty, "Scroll content down"),
             G("Learning", KeyboardActionKind.ScrollUp, "K", string.Empty, "Scroll content up"),
+            G("Learning", KeyboardActionKind.ScrollUp, "Up", string.Empty, "Scroll content up"),
             G("Learning", KeyboardActionKind.ScrollLeft, "H", string.Empty, "Scroll content left"),
+            G("Learning", KeyboardActionKind.ScrollLeft, "Left", string.Empty, "Scroll content left"),
             G("Learning", KeyboardActionKind.ScrollRight, "L", string.Empty, "Scroll content right"),
+            G("Learning", KeyboardActionKind.ScrollRight, "Right", string.Empty, "Scroll content right"),
             G("Learning", KeyboardActionKind.NavigateHome, "W", "Control", "Close deck / go home (Ctrl+W)"),
             G("Learning", KeyboardActionKind.NavigateHome, "Q", string.Empty, "Exit to home"),
             G("Learning", KeyboardActionKind.NavigateHome, "D", string.Empty, "Exit to home"),
@@ -547,7 +655,9 @@ bindings:
             G("Home", KeyboardActionKind.NavigateHome, "Q", string.Empty, "Go home"),
             G("Home", KeyboardActionKind.NavigateHome, "D", string.Empty, "Go home"),
             G("Home", KeyboardActionKind.ScrollDeckListDown, "J", string.Empty, "Scroll deck list down"),
+            G("Home", KeyboardActionKind.ScrollDeckListDown, "Down", string.Empty, "Scroll deck list down"),
             G("Home", KeyboardActionKind.ScrollDeckListUp, "K", string.Empty, "Scroll deck list up"),
+            G("Home", KeyboardActionKind.ScrollDeckListUp, "Up", string.Empty, "Scroll deck list up"),
             G("Home", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
             G("Home", KeyboardActionKind.FocusSearchBar, "F", "Control", "Focus search bar (Ctrl+F)"),
 
@@ -558,6 +668,7 @@ bindings:
             G(null, KeyboardActionKind.ShowHeatmap, "H", "Control+Shift", "Show heatmap (Ctrl+Shift+H)"),
             G(null, KeyboardActionKind.NavigateToMarketplace, "M", "Control+Shift", "Open marketplace (Ctrl+Shift+M)"),
             G(null, KeyboardActionKind.OpenDecksFolder, "O", "Control", "Open decks folder (Ctrl+O)"),
+            G(null, KeyboardActionKind.OpenCurrentDeckFolder, "O", "Control+Shift+Alt", "Reveal current deck in file manager"),
             G(null, KeyboardActionKind.ToggleSidebar, "B", "Control", "Toggle sidebar (Ctrl+B)"),
             G(null, KeyboardActionKind.OpenSettings, "OemComma", "Control", "Open settings (Ctrl+,)", true),
             G(null, KeyboardActionKind.ToggleShortcutsHandbook, "Oem2", "Shift", "Toggle shortcuts handbook (? or Shift+/)"),
@@ -568,6 +679,54 @@ bindings:
             G(null, KeyboardActionKind.ResetTextZoom, "D0", "Control+Shift", "Reset text zoom (also heatmap reset)", true),
             G(null, KeyboardActionKind.ResetTextZoom, "NumPad0", "Control+Shift", "Reset text zoom (also heatmap reset)", true),
             G(null, KeyboardActionKind.OpenTagInference, "T", "Control+Shift", "Open tag inference (Ctrl+Shift+T)", true),
+            G(null, KeyboardActionKind.OpenMcqQuiz, "Q", "Control+Shift", "Open MCQ quiz (Ctrl+Shift+Q)", true),
+            G(null, KeyboardActionKind.OpenFlashcard, "F", "Control+Shift", "Open flashcard panel (Ctrl+Shift+F)"),
+            G(null, KeyboardActionKind.NavigateHome, "W", "Control", "Close panel / go home (Ctrl+W)"),
+
+            // ── MCQ Quiz ──────────────────────────────────────────────
+            G("McqQuiz", KeyboardActionKind.NextPage, "N", string.Empty, "Next question"),
+            G("McqQuiz", KeyboardActionKind.PreviousPage, "P", string.Empty, "Previous question"),
+            G("McqQuiz", KeyboardActionKind.QuitMcqQuiz, "Q", string.Empty, "Quit quiz to tabs"),
+            G("McqQuiz", KeyboardActionKind.QuitMcqQuiz, "D", string.Empty, "Quit quiz to tabs"),
+            G("McqQuiz", KeyboardActionKind.NextPage, "Right", "Alt", "Next question (Alt+Right)"),
+            G("McqQuiz", KeyboardActionKind.PreviousPage, "Left", "Alt", "Previous question (Alt+Left)"),
+            G("McqQuiz", KeyboardActionKind.QuitMcqQuiz, "W", "Control", "Quit quiz to tabs (Ctrl+W)"),
+
+            // ── MCQ Tab Panel ──────────────────────────────────────────
+            G("McqTabPanel", KeyboardActionKind.None, "H", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.None, "L", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListDown, "J", string.Empty, "Scroll tab panel list down"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListUp, "K", string.Empty, "Scroll tab panel list up"),
+            G("McqTabPanel", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
+            M("McqTabPanel", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (g then i)", "G", string.Empty, "I", string.Empty),
+
+            // ── Flashcard Panel ────────────────────────────────────────
+            G("Flashcard", KeyboardActionKind.None, "H", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.None, "L", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListDown, "J", string.Empty, "Scroll flashcard list down"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListUp, "K", string.Empty, "Scroll flashcard list up"),
+            G("Flashcard", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
+            M("Flashcard", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (g then i)", "G", string.Empty, "I", string.Empty),
+
+            // ── Tag Inference Panel ─────────────────────────────────────
+            G("TagInference", KeyboardActionKind.None, "H", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.None, "L", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListDown, "J", string.Empty, "Scroll tag inference list down"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListUp, "K", string.Empty, "Scroll tag inference list up"),
+            G("TagInference", KeyboardActionKind.FocusSearchBar, "Oem2", string.Empty, "Focus search bar (/)"),
+            G("McqTabPanel", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListDown, "Down", string.Empty, "Scroll tab panel list down"),
+            G("McqTabPanel", KeyboardActionKind.ScrollMcqTabPanelListUp, "Up", string.Empty, "Scroll tab panel list up"),
+            G("Flashcard", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListDown, "Down", string.Empty, "Scroll flashcard list down"),
+            G("Flashcard", KeyboardActionKind.ScrollFlashcardListUp, "Up", string.Empty, "Scroll flashcard list up"),
+            G("TagInference", KeyboardActionKind.None, "Left", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.None, "Right", string.Empty, string.Empty),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListDown, "Down", string.Empty, "Scroll tag inference list down"),
+            G("TagInference", KeyboardActionKind.ScrollTagInferenceListUp, "Up", string.Empty, "Scroll tag inference list up"),
+            M("TagInference", KeyboardActionKind.FocusSearchWithClear, "Focus and clear search (g then i)", "G", string.Empty, "I", string.Empty),
         };
     }
 }

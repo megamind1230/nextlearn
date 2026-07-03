@@ -484,6 +484,16 @@ public partial class LearningViewModel : ViewModelBase
         IsGoToPageOpen = false;
     }
 
+    public void NavigateToPage(int pageNumber)
+    {
+        var idx = _pages.FindIndex(p => p.PageNumber == pageNumber);
+        if (idx >= 0)
+        {
+            CurrentPageIndex = idx;
+            UpdateCurrentPage();
+        }
+    }
+
     private string? GetCurrentImageDir()
     {
         if (_currentDeck == null || string.IsNullOrEmpty(_currentDeck.FileName))
@@ -505,12 +515,25 @@ public partial class LearningViewModel : ViewModelBase
         return Path.GetDirectoryName(fullPath);
     }
 
+    public string? CurrentDeckFilePath
+    {
+        get
+        {
+            if (_currentDeck == null || string.IsNullOrEmpty(_currentDeck.FileName))
+            {
+                return null;
+            }
+
+            return Path.GetFullPath(Path.Combine(_decksPath, _currentDeck.FileName));
+        }
+    }
+
     public void RebuildWithFalconEye(bool enabled)
     {
         if (enabled && _pages.Count > 0 && !_pages[0].IsTocPage)
         {
             InsertTocPage();
-            CurrentPageIndex = 0;
+            CurrentPageIndex++;
             UpdateCurrentPage();
         }
         else if (!enabled && _pages.Count > 0 && _pages[0].IsTocPage)

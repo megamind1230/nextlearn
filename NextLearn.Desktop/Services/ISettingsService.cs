@@ -29,6 +29,12 @@ public interface ISettingsService
     /// <summary>Gets the resolved flashcards path with $HOME expanded.</summary>
     string ResolvedFlashcardsPath { get; }
 
+    /// <summary>Gets or sets the MCQs export path (may contain $HOME).</summary>
+    string McqsPath { get; set; }
+
+    /// <summary>Gets the resolved MCQs path with $HOME expanded.</summary>
+    string ResolvedMcqsPath { get; }
+
     /// <summary>Gets or sets the Gemini API key for AI tag inference.</summary>
     string GeminiApiKey { get; set; }
 

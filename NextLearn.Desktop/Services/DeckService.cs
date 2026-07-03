@@ -155,7 +155,7 @@ public class DeckService : IDeckService
             progress.CurrentPage = currentPage;
         }
 
-        progress.LastAccessedAt = DateTime.UtcNow;
+        progress.LastAccessedAt = DateTime.Now;
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 

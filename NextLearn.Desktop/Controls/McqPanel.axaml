@@ -1,0 +1,259 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NextLearn.Desktop.ViewModels"
+             xmlns:models="using:NextLearn.Desktop.Models"
+             xmlns:services="using:NextLearn.Desktop.Services"
+             xmlns:nwv="using:NativeWebView.Controls"
+             x:Class="NextLearn.Desktop.Controls.McqPanel"
+             x:DataType="vm:MainWindowViewModel">
+    <Panel IsVisible="{Binding IsMcqOpen}" ZIndex="400">
+        <DockPanel Background="#1E293B">
+
+            <!-- Header -->
+            <Border DockPanel.Dock="Top" Padding="16,12" Background="#1E293B">
+                <StackPanel Spacing="8">
+                    <DockPanel>
+<Button Command="{Binding CloseMcqPanelCommand}"
+        Background="Transparent" Padding="12,8">
+    <TextBlock Text="← Back" FontSize="16" Foreground="#94A3B8"/>
+</Button>
+                        <TextBlock Text="MCQ Quiz" FontSize="20" FontWeight="Bold"
+                                   Foreground="#E2E8F0" VerticalAlignment="Center"
+                                   Margin="16,0,0,0"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4"
+                                HorizontalAlignment="Center"
+                                IsVisible="{Binding McqPanelViewModel.IsNotQuizActive}">
+                        <Button Command="{Binding McqPanelViewModel.SelectGenerateTabCommand}"
+                                Background="#2563EB" Foreground="White"
+                                Padding="16,8" FontSize="13" Content="Generate"/>
+                        <Button Command="{Binding McqPanelViewModel.SelectQuizTabCommand}"
+                                Background="#334155" Foreground="#94A3B8"
+                                Padding="16,8" FontSize="13" Content="Take Quiz"/>
+                        <Button Command="{Binding McqPanelViewModel.SelectLogTabCommand}"
+                                Background="#334155" Foreground="#94A3B8"
+                                Padding="16,8" FontSize="13" Content="Quiz Logs"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Progress bar during generation -->
+            <Border DockPanel.Dock="Top" Height="4"
+                    IsVisible="{Binding McqPanelViewModel.Generation.IsGenerating}">
+                <ProgressBar Value="{Binding McqPanelViewModel.Generation.GenerationProgress}"
+                             Minimum="0" Maximum="100"
+                             Foreground="#2563EB" Background="#334155" Height="4"/>
+            </Border>
+
+            <Grid>
+                <!-- ========== QUIZ ACTIVE VIEW ========== -->
+                <DockPanel IsVisible="{Binding McqPanelViewModel.IsQuizActive}">
+                    <Border DockPanel.Dock="Bottom" Padding="24,12" Background="#1E293B">
+                        <DockPanel>
+                            <!-- Error text -->
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="{Binding McqPanelViewModel.Quiz.ErrorText}"
+                                       IsVisible="{Binding McqPanelViewModel.Quiz.HasError}"
+                                       Foreground="#EF4444" FontSize="13"
+                                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Button Grid.Column="0" Content="← Previous"
+                                        Command="{Binding McqPanelViewModel.Quiz.PreviousQuestionCommand}"
+                                        IsEnabled="{Binding McqPanelViewModel.Quiz.CanGoPrev}"
+                                        Padding="20,12" Background="#334155" Foreground="#94A3B8"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding McqPanelViewModel.Quiz.ElapsedDisplay}"
+                                           FontSize="14" Foreground="#FBBF24"
+                                           FontFamily="monospace"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                    <Button Content="Next →"
+                                            Command="{Binding McqPanelViewModel.Quiz.NextQuestionCommand}"
+                                            IsVisible="{Binding McqPanelViewModel.Quiz.CanGoNext}"
+                                            Padding="20,12" Background="#334155" Foreground="#94A3B8"/>
+                                    <Button Content="See Results"
+                                            Command="{Binding McqPanelViewModel.Quiz.SeeResultsCommand}"
+                                            IsVisible="{Binding McqPanelViewModel.Quiz.ShowSeeResults}"
+                                            Padding="20,12" Background="#10B981" Foreground="White"/>
+                                    <Button Content="Quit"
+                                            Command="{Binding McqPanelViewModel.QuitQuizCommand}"
+                                            Padding="12,12" Background="#EF4444" Foreground="White"/>
+                                </StackPanel>
+                            </Grid>
+                        </DockPanel>
+                    </Border>
+                    <nwv:NativeWebView x:Name="McqQuizWebView"
+                        Focusable="False"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        NavigationStarted="OnMcqQuizWebViewNavigationStarted" />
+                </DockPanel>
+
+                <!-- ========== NON-QUIZ VIEW ========== -->
+                <ScrollViewer x:Name="McqTabPanelScrollViewer" Margin="24"
+                              IsVisible="{Binding McqPanelViewModel.IsNotQuizActive}">
+                <StackPanel Spacing="16">
+
+                    <!-- ===== GENERATE TAB ===== -->
+                    <StackPanel Spacing="16"
+                                IsVisible="{Binding McqPanelViewModel.IsGenerateTabSelected}">
+
+                        <TextBlock Text="{Binding McqPanelViewModel.Generation.GenerationStatus}"
+                                   IsVisible="{Binding McqPanelViewModel.Generation.IsGenerating}"
+                                   Foreground="#94A3B8" FontSize="14"/>
+
+                        <TextBox Text="{Binding McqPanelViewModel.Generation.ErrorMessage}"
+                                 IsVisible="{Binding McqPanelViewModel.Generation.HasError}"
+                                 IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" Padding="8"
+                                 FontSize="13" Foreground="#EF4444"
+                                 Background="#1E293B" BorderBrush="#EF4444"
+                                 MinHeight="40" MaxHeight="300"/>
+
+                        <Grid ColumnDefinitions="*,Auto"
+                              IsVisible="{Binding McqPanelViewModel.Generation.ShowDeckList}">
+                            <TextBox x:Name="McqTabPanelSearchBox"
+                                     Text="{Binding McqPanelViewModel.Generation.SearchText}"
+                                     Watermark="Search by title, description, #tag, or regex…"
+                                     Padding="12" FontSize="14"
+                                     Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155"/>
+                            <CheckBox Grid.Column="1"
+                                      IsChecked="{Binding McqPanelViewModel.Generation.UseRegex}"
+                                      Content="Regex" VerticalAlignment="Center"
+                                      Margin="8,0,0,0" Foreground="#94A3B8"/>
+                        </Grid>
+
+                        <Border IsVisible="{Binding McqPanelViewModel.Generation.IsPreviewVisible}"
+                                Background="#1E293B" CornerRadius="12" Padding="20"
+                                BorderBrush="#334155" BorderThickness="1">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="{Binding McqPanelViewModel.Generation.PreviewHeader}"
+                                           FontSize="16" FontWeight="Bold" Foreground="#E2E8F0"/>
+                                <TextBlock Text="Review the generated MCQs. Accept to save or Cancel to discard."
+                                           Foreground="#FBBF24" FontSize="12" TextWrapping="Wrap"/>
+                                <Border Background="#0F172A" CornerRadius="8" Padding="16"
+                                        BorderBrush="#334155" BorderThickness="1">
+                                    <TextBox Text="{Binding McqPanelViewModel.Generation.PreviewText}"
+                                             IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                                             FontFamily="Consolas, Courier New, monospace" FontSize="12"
+                                             Foreground="#E2E8F0" Background="#0F172A"
+                                             BorderThickness="0" MinHeight="200" MaxHeight="400"/>
+                                </Border>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                                    <Button Command="{Binding McqPanelViewModel.Generation.CancelPreviewCommand}"
+                                            Background="#334155" Foreground="#94A3B8"
+                                            Padding="24,10" FontSize="14" Content="Cancel"/>
+                                    <Button Command="{Binding McqPanelViewModel.Generation.AcceptMcqCommand}"
+                                            Background="#0D9488" Foreground="White"
+                                            Padding="24,10" FontSize="14" Content="Accept &amp; Save"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <ItemsControl ItemsSource="{Binding McqPanelViewModel.Generation.Decks}"
+                                      IsVisible="{Binding McqPanelViewModel.Generation.ShowDeckList}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:Deck">
+                                    <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="0,0,0,16"
+                                            BorderBrush="#334155" BorderThickness="1">
+                                        <DockPanel>
+                                            <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center">
+                                                <Button Content="Generate MCQ"
+                                                        Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).McqPanelViewModel.Generation.GenerateMcqCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#2563EB" Foreground="White" Padding="16,8"/>
+                                            </StackPanel>
+                                            <StackPanel Margin="0,0,24,0">
+                                                <DockPanel>
+                                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Title}" FontSize="14"
+                                                               Foreground="#E2E8F0" FontWeight="SemiBold"
+                                                               TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                                                    <TextBlock FontSize="13" Foreground="#FBBF24"
+                                                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                                                        <Run Text="Name: "/><Run Text="{Binding FileName}"/>
+                                                    </TextBlock>
+                                                </DockPanel>
+                                                <TextBlock Text="{Binding Description}" Foreground="#94A3B8" TextWrapping="Wrap"/>
+                                                <TextBlock Foreground="#94A3B8" FontSize="13">
+                                                    <Run Text="{Binding PageCount, StringFormat='{}{0} pages'}"/>
+                                                    <Run Text=" | "/><Run Text="{Binding Tags}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <!-- ===== QUIZ TAB (file list) ===== -->
+                    <StackPanel Spacing="16"
+                                IsVisible="{Binding McqPanelViewModel.IsQuizTabSelected}">
+
+                        <TextBlock Text="{Binding McqPanelViewModel.ErrorMessage}"
+                                   IsVisible="{Binding McqPanelViewModel.HasError}"
+                                   Foreground="#EF4444" FontSize="13"/>
+
+                        <TextBlock Text="Select a saved MCQ file to start a quiz:"
+                                   FontSize="14" Foreground="#94A3B8"/>
+
+                        <ItemsControl ItemsSource="{Binding McqPanelViewModel.SavedMcqFiles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:McqFileInfo">
+                                    <Border Background="#1E293B" CornerRadius="12" Padding="16" Margin="0,0,0,8"
+                                            BorderBrush="#334155" BorderThickness="1">
+                                        <DockPanel>
+                                            <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                        Orientation="Horizontal" Spacing="8">
+                                                <Button Content="Start Quiz"
+                                                        Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).McqPanelViewModel.StartQuizCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#2563EB" Foreground="White" Padding="16,8"/>
+                                            </StackPanel>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding DisplayName}" FontSize="14"
+                                                           Foreground="#E2E8F0" FontWeight="SemiBold"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
+                                                    <TextBlock Foreground="#94A3B8" FontSize="12"
+                                                               Text="{Binding QuestionCount, StringFormat='{}{0} questions'}"/>
+                                                    <TextBlock Foreground="#94A3B8" FontSize="12"
+                                                               Text="{Binding GeneratedDateDisplay}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="No MCQ files found. Generate some from the Generate tab!"
+                                   IsVisible="{Binding McqPanelViewModel.HasNoSavedFiles}"
+                                   Foreground="#64748B" FontSize="13" HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- ===== LOG TAB ===== -->
+                    <StackPanel Spacing="16"
+                                IsVisible="{Binding McqPanelViewModel.IsLogTabSelected}">
+
+                        <TextBlock Text="Quiz History"
+                                   FontSize="16" FontWeight="Bold" Foreground="#E2E8F0"/>
+
+                        <Border Background="#0F172A" CornerRadius="8" Padding="16"
+                                BorderBrush="#334155" BorderThickness="1">
+                            <ScrollViewer>
+                                <TextBox Text="{Binding McqPanelViewModel.LogContent}"
+                                         IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
+                                         FontFamily="Consolas, Courier New, monospace" FontSize="12"
+                                         Foreground="#E2E8F0" Background="#0F172A"
+                                         BorderThickness="0" MinHeight="200" MaxHeight="500"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+    </DockPanel>
+    </Panel>
+</UserControl>

@@ -26,5 +26,5 @@ public class UserProgress
 
     public bool IsCompleted { get; set; }
 
-    public DateTime LastAccessedAt { get; set; } = DateTime.UtcNow;
+    public DateTime LastAccessedAt { get; set; } = DateTime.Now;
 }

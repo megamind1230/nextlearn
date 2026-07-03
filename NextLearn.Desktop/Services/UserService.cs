@@ -70,7 +70,7 @@ public class UserService : IUserService
         return streak;
     }
 
-    private static DateTime Today() => new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
+    private static DateTime Today() => new(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
 
     public async Task RecordTimeAsync(int minutes)
     {

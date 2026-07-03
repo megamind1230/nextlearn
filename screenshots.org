@@ -1,0 +1,104 @@
+#+TITLE: Screenshots Gallery
+
+* Home & Navigation
+:PROPERTIES:
+:CUSTOM_ID: home-navigation
+:END:
+[[file:screenshots/home-search-page.png]] Home page with search bar,
+showing filtered deck list.
+
+[[file:screenshots/sidebar-panel.png]] Sidebar panel with navigation
+links and settings.
+
+[[file:screenshots/settings-panel.png]] Settings page --- theme, font,
+decks/MCQ/flashcards path, keybinding profile, Gemini API key.
+
+[[file:screenshots/pinned-panel.png]] Pinned decks overlay for quick
+access to favorite decks.
+
+[[file:screenshots/archived-panel.png]] Archived decks overlay
+
+[[file:screenshots/open-decks-directory-feature.png]] Open decks folder
+in system file manager via =Ctrl+O= (Vim / VSCode) or =C-c o= (Emacs).
+
+[[file:screenshots/reveal-deck-feature.png]] Reveal current deck file in
+file manager via =Ctrl+Alt+Shift+O=.
+
+* Study Page
+:PROPERTIES:
+:CUSTOM_ID: study-page
+:END:
+[[file:screenshots/study-page.png]] Main study view with a deck loaded
+--- page content, page counter and section breadcrumbs.
+
+[[file:screenshots/zoom-in-text.png]] Text zoomed in via =Ctrl+Shift++=.
+
+[[file:screenshots/zoom-out-text.png]] Text zoomed out via
+=Ctrl+Shift+-=.
+
+* Command Palette & Handbook
+:PROPERTIES:
+:CUSTOM_ID: command-palette-handbook
+:END:
+[[file:screenshots/cmd-palette-feature.png]] Command palette (=:= Vim,
+=alt x= aka =M-x= Emacs, =Ctrl+P= VSCode) for quick action lookup.
+
+[[file:screenshots/shortcuts-handbook-feature.png]] Shortcuts handbook
+(=?= or =Shift+/=) --- auto-generated from current keybinding profile.
+
+* Falcon Eye (Built-in TOC)
+:PROPERTIES:
+:CUSTOM_ID: falcon-eye-built-in-toc
+:END:
+[[file:screenshots/falcon-eye-feature.png]] Falcon Eye table of
+contents(TOC) page at the start of each deck; clickable entries navigate
+to exact page.
+
+* Image Overlay
+:PROPERTIES:
+:CUSTOM_ID: image-overlay
+:END:
+[[file:screenshots/image-overlay-feature.png]] Image overlay with
+navigation, zoom slider, and toolbar.
+
+[[file:screenshots/image-overlay-invert-colors.png]] Image overlay with
+inverted colors for better readability in dark mode.
+
+* Heatmap & Streaks
+:PROPERTIES:
+:CUSTOM_ID: heatmap-streaks
+:END:
+[[file:screenshots/heatmap-streak-panel.png]] Study streak heatmap ---
+snake layout, 6-level orange scale, green for today.
+
+* Tag Inference
+:PROPERTIES:
+:CUSTOM_ID: tag-inference
+:END:
+[[file:screenshots/tags-inferencing-panel.png]] AI tag inference panel
+using Google Gemini --- select a deck, diff preview, apply with one
+click.
+
+* Flashcard Generation
+:PROPERTIES:
+:CUSTOM_ID: flashcard-generation
+:END:
+[[file:screenshots/anki-flashcards-generation-panel.png]] Anki flashcard
+generation panel --- Basic and Cloze mode, saves as =.basic.txt= /
+=.cloze.txt= for Anki import.
+
+* MCQ Quiz
+:PROPERTIES:
+:CUSTOM_ID: mcq-quiz
+:END:
+[[file:screenshots/mcq-generate-tab.png]] MCQ quiz generate tab ---
+configure and generate =.mcq= files via Gemini.
+
+[[file:screenshots/mcq-take-quiz-tab.png]] MCQ quiz take tab --- select
+a quiz and start interactive session.
+
+[[file:screenshots/mcq-interactive-quiz-ui.png]] Interactive MCQ quiz
+WebView --- 2×2 option grid, scoring, timer.
+
+[[file:screenshots/mcq-quiz-logs-tab.png]] MCQ quiz logs tab --- review
+past quiz results and performance.

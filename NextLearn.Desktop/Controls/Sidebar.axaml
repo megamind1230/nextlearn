@@ -7,17 +7,9 @@
         <Border Background="#80000000" PointerPressed="CloseOnBackdrop">
             <Border Background="#1E293B" Width="280" HorizontalAlignment="Right"
                     BorderBrush="#334155" BorderThickness="1,0,0,0">
-                <DockPanel Margin="20">
-                    <Border DockPanel.Dock="Bottom" Height="1" Background="#334155" Margin="0,0,0,12"/>
-                    <Button DockPanel.Dock="Bottom" Command="{Binding OpenSettingsCommand}"
-                            Background="#334155" Foreground="#E2E8F0" Padding="12,8"
-                            HorizontalAlignment="Stretch">
-                        <DockPanel>
-                            <TextBlock Text="⚙" FontSize="18" Foreground="#94A3B8" VerticalAlignment="Center"/>
-                            <TextBlock Text="  Settings" FontSize="14" VerticalAlignment="Center"/>
-                        </DockPanel>
-                    </Button>
-                    <StackPanel Spacing="16">
+                <Grid RowDefinitions="*,Auto,Auto" Margin="20">
+                    <ScrollViewer Grid.Row="0">
+                        <StackPanel Spacing="16">
                         <DockPanel>
                             <Button DockPanel.Dock="Left" Command="{Binding ToggleSidebarCommand}"
                                     Background="Transparent" Padding="6">
@@ -50,20 +42,20 @@
                                 <TextBlock Text="  Archived" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
-                        <Button Command="{Binding ToggleFalconEyeCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
-                                HorizontalAlignment="Stretch">
-                            <DockPanel>
-                                <TextBlock Text="🦅" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
-                                <TextBlock Text="  Falcon Eye" FontSize="14" VerticalAlignment="Center"/>
-                            </DockPanel>
-                        </Button>
                         <Button Command="{Binding ShowFlashcardPanelCommand}"
                                 Background="#334155" Foreground="#E2E8F0" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
                                 <TextBlock Text="🃏" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Anki Flashcards" FontSize="14" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Button>
+                        <Button Command="{Binding ShowMcqPanelCommand}"
+                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                HorizontalAlignment="Stretch">
+                            <DockPanel>
+                                <TextBlock Text="📝" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="  MCQ Quiz" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowTagInferenceCommand}"
@@ -91,7 +83,17 @@
                             </DockPanel>
                         </Button>
                     </StackPanel>
-                </DockPanel>
+                    </ScrollViewer>
+                    <Border Grid.Row="1" Height="1" Background="#334155" Margin="0,0,0,12"/>
+                    <Button Grid.Row="2" Command="{Binding OpenSettingsCommand}"
+                            Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                            HorizontalAlignment="Stretch">
+                        <DockPanel>
+                            <TextBlock Text="⚙" FontSize="18" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                            <TextBlock Text="  Settings" FontSize="14" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Button>
+                </Grid>
             </Border>
         </Border>
     </Panel>

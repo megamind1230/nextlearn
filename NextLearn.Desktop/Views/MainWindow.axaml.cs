@@ -83,6 +83,7 @@ public partial class MainWindow : Window
                 if (!e.Handled && _keyboardHandler != null)
                 {
                     var isTextBox = this.FocusManager?.GetFocusedElement() is TextBox;
+                    Serilog.Log.Debug("MCQDBG: Tunnel key={Key} mods={Mods} isTextBox={Tb}", e.Key, e.KeyModifiers, isTextBox);
                     if (HandleKey(e.Key, e.KeyModifiers, isTextBox))
                     {
                         e.Handled = true;
@@ -155,11 +156,15 @@ public partial class MainWindow : Window
             or nameof(MainWindowViewModel.IsArchivedViewOpen)
             or nameof(MainWindowViewModel.IsHeatmapOpen)
             or nameof(MainWindowViewModel.IsMarketplaceOpen)
+            or nameof(MainWindowViewModel.IsTagInferenceOpen)
+            or nameof(MainWindowViewModel.IsFlashcardOpen)
+            or nameof(MainWindowViewModel.IsMcqOpen)
             or nameof(MainWindowViewModel.IsCommandPaletteOpen))
         {
             _webViewBridge.SetVisible(!(vm.IsImageOverlayOpen || vm.IsSidebarOpen || vm.IsSettingsOpen
                 || vm.IsShortcutsHandbookOpen || vm.IsPinnedViewOpen || vm.IsArchivedViewOpen
-                || vm.IsHeatmapOpen || vm.IsMarketplaceOpen || vm.IsCommandPaletteOpen));
+                || vm.IsHeatmapOpen || vm.IsMarketplaceOpen || vm.IsTagInferenceOpen
+                || vm.IsFlashcardOpen || vm.IsMcqOpen || vm.IsCommandPaletteOpen));
         }
     }
 
@@ -259,6 +264,30 @@ public partial class MainWindow : Window
 
             var (key, mods) = keyResult.Value;
             Dispatcher.UIThread.Post(() => HandleKey(key, mods, false));
+            return;
+        }
+
+        if (uri.Scheme == "http" && uri.Host == "falconeye.local")
+        {
+            e.Cancel = true;
+            var pageStr = uri.AbsolutePath.TrimStart('/');
+            var lastSlash = pageStr.LastIndexOf('/');
+            if (lastSlash >= 0)
+            {
+                pageStr = pageStr[..lastSlash];
+            }
+
+            if (int.TryParse(Uri.UnescapeDataString(pageStr), out var pageNum))
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (DataContext is MainWindowViewModel vm)
+                    {
+                        vm.LearningViewModel.NavigateToPage(pageNum);
+                    }
+                });
+            }
+
             return;
         }
 
@@ -476,7 +505,7 @@ public partial class MainWindow : Window
                 vm.PreviousImageCommand.Execute(null);
                 return true;
 
-            // Esc context chain: GoToPage → Handbook → ImageOverlay → Archived → Pinned → Heatmap → Settings → Sidebar
+            // Esc context chain: GoToPage → Handbook → ImageOverlay → Archived → Pinned → Heatmap → Marketplace → Settings → Sidebar → CommandPalette → TagInference → McqQuiz → FlashcardPanel
             case KeyboardActionKind.CloseGoToPage:
                 vm.LearningViewModel.CancelGoToPageCommand.Execute(null);
                 return true;
@@ -562,11 +591,29 @@ public partial class MainWindow : Window
 
             // N / Right arrow — next page; P / Left arrow — previous page
             case KeyboardActionKind.NextPage:
-                vm.LearningViewModel.NextPageCommand.Execute(null);
+                Serilog.Log.Debug("MCQDBG: NextPage IsMcqOpen={Mcq} IsQuizActive={Quiz} IsCompleted={Done}", vm.IsMcqOpen, vm.McqPanelViewModel?.IsQuizActive, vm.McqPanelViewModel?.Quiz?.IsCompleted);
+                if (vm.IsMcqOpen && vm.McqPanelViewModel?.IsQuizActive == true && vm.McqPanelViewModel?.Quiz?.IsCompleted == false)
+                {
+                    vm.McqPanelViewModel?.Quiz?.NextQuestionCommand.Execute(null);
+                }
+                else
+                {
+                    vm.LearningViewModel.NextPageCommand.Execute(null);
+                }
+
                 return true;
 
             case KeyboardActionKind.PreviousPage:
-                vm.LearningViewModel.PreviousPageCommand.Execute(null);
+                Serilog.Log.Debug("MCQDBG: PrevPage IsMcqOpen={Mcq} IsQuizActive={Quiz} IsCompleted={Done}", vm.IsMcqOpen, vm.McqPanelViewModel?.IsQuizActive, vm.McqPanelViewModel?.Quiz?.IsCompleted);
+                if (vm.IsMcqOpen && vm.McqPanelViewModel?.IsQuizActive == true && vm.McqPanelViewModel?.Quiz?.IsCompleted == false)
+                {
+                    vm.McqPanelViewModel?.Quiz?.PreviousQuestionCommand.Execute(null);
+                }
+                else
+                {
+                    vm.LearningViewModel.PreviousPageCommand.Execute(null);
+                }
+
                 return true;
 
             // J / K / H / L — scroll WebView content in study view
@@ -588,6 +635,9 @@ public partial class MainWindow : Window
 
             // Q / D / C-x q / C-x d — navigate home and close any open overlay
             case KeyboardActionKind.NavigateHome:
+                vm.IsMcqOpen = false;
+                vm.IsFlashcardOpen = false;
+                vm.IsTagInferenceOpen = false;
                 vm.IsHeatmapOpen = false;
                 vm.IsPinnedViewOpen = false;
                 vm.IsArchivedViewOpen = false;
@@ -611,13 +661,48 @@ public partial class MainWindow : Window
 
             // g then i — focus search bar and clear current text
             case KeyboardActionKind.FocusSearchWithClear:
-                vm.HomeViewModel.FocusSearch();
-                DispatcherTimer.RunOnce(() => this.FindControl<TextBox>("HomeSearchBox")?.Focus(), TimeSpan.FromMilliseconds(50));
+                if (vm.IsFlashcardOpen)
+                {
+                    vm.FlashcardViewModel.FocusSearch();
+                    FlashcardPanelControl.FocusSearch();
+                }
+                else if (vm.IsTagInferenceOpen)
+                {
+                    vm.TagInferenceViewModel.FocusSearch();
+                    TagInferencePanelControl.FocusSearch();
+                }
+                else if (vm.IsMcqOpen && !vm.McqPanelViewModel.IsQuizActive)
+                {
+                    vm.McqPanelViewModel.Generation.FocusSearch();
+                    McqPanelControl.FocusSearch();
+                }
+                else
+                {
+                    vm.HomeViewModel.FocusSearch();
+                    DispatcherTimer.RunOnce(() => this.FindControl<TextBox>("HomeSearchBox")?.Focus(), TimeSpan.FromMilliseconds(50));
+                }
+
                 return true;
 
             // / — focus search bar without clearing
             case KeyboardActionKind.FocusSearchBar:
-                DispatcherTimer.RunOnce(() => this.FindControl<TextBox>("HomeSearchBox")?.Focus(), TimeSpan.FromMilliseconds(50));
+                if (vm.IsFlashcardOpen)
+                {
+                    FlashcardPanelControl.FocusSearch();
+                }
+                else if (vm.IsTagInferenceOpen)
+                {
+                    TagInferencePanelControl.FocusSearch();
+                }
+                else if (vm.IsMcqOpen && !vm.McqPanelViewModel.IsQuizActive)
+                {
+                    McqPanelControl.FocusSearch();
+                }
+                else
+                {
+                    DispatcherTimer.RunOnce(() => this.FindControl<TextBox>("HomeSearchBox")?.Focus(), TimeSpan.FromMilliseconds(50));
+                }
+
                 return true;
 
             // J / K — scroll deck list on home view
@@ -643,6 +728,33 @@ public partial class MainWindow : Window
                 return true;
             }
 
+            // J / K — scroll flashcard list on flashcard panel (anki page)
+            case KeyboardActionKind.ScrollFlashcardListDown:
+                FlashcardPanelControl.ScrollBy(0, 40);
+                return true;
+
+            case KeyboardActionKind.ScrollFlashcardListUp:
+                FlashcardPanelControl.ScrollBy(0, -40);
+                return true;
+
+            // J / K — scroll tag inference list on tags page
+            case KeyboardActionKind.ScrollTagInferenceListDown:
+                TagInferencePanelControl.ScrollBy(0, 40);
+                return true;
+
+            case KeyboardActionKind.ScrollTagInferenceListUp:
+                TagInferencePanelControl.ScrollBy(0, -40);
+                return true;
+
+            // J / K — scroll MCQ tab panel list
+            case KeyboardActionKind.ScrollMcqTabPanelListDown:
+                McqPanelControl.ScrollBy(0, 40);
+                return true;
+
+            case KeyboardActionKind.ScrollMcqTabPanelListUp:
+                McqPanelControl.ScrollBy(0, -40);
+                return true;
+
             // Esc — clear keyboard focus
             case KeyboardActionKind.ClearFocus:
                 FocusManager?.ClearFocus();
@@ -656,6 +768,11 @@ public partial class MainWindow : Window
             // C-c o / O — open decks folder
             case KeyboardActionKind.OpenDecksFolder:
                 vm.OpenDecksFolderCommand.Execute(null);
+                return true;
+
+            // Ctrl+Alt+Shift+O — reveal current deck in file manager
+            case KeyboardActionKind.OpenCurrentDeckFolder:
+                vm.OpenCurrentDeckFolderCommand.Execute(null);
                 return true;
 
             // C-x p — show pinned view
@@ -673,6 +790,11 @@ public partial class MainWindow : Window
                 vm.ShowHeatmapCommand.Execute(null);
                 return true;
 
+            // Ctrl+F — open flashcard panel
+            case KeyboardActionKind.OpenFlashcard:
+                vm.ShowFlashcardPanelCommand.Execute(null);
+                return true;
+
             // Ctrl+Shift+T — open tag inference page
             case KeyboardActionKind.OpenTagInference:
                 vm.ShowTagInferenceCommand.Execute(null);
@@ -683,6 +805,26 @@ public partial class MainWindow : Window
                 vm.CloseTagInferenceCommand.Execute(null);
                 return true;
 
+            // E / C-e / C-S-e — open MCQ quiz
+            case KeyboardActionKind.OpenMcqQuiz:
+                vm.ShowMcqPanelCommand.Execute(null);
+                return true;
+
+            // Esc — close MCQ quiz
+            case KeyboardActionKind.CloseMcqQuiz:
+                vm.CloseMcqPanelCommand.Execute(null);
+                return true;
+
+            // Q / D — quit MCQ quiz back to tabs
+            case KeyboardActionKind.QuitMcqQuiz:
+                vm.McqPanelViewModel.QuitQuizCommand.Execute(null);
+                return true;
+
+            // Esc — close flashcard panel
+            case KeyboardActionKind.CloseFlashcardPanel:
+                vm.CloseFlashcardPanelCommand.Execute(null);
+                return true;
+
             // C-c m — navigate to marketplace
             case KeyboardActionKind.NavigateToMarketplace:
                 vm.NavigateToMarketplaceCommand.Execute(null);
@@ -690,7 +832,7 @@ public partial class MainWindow : Window
 
             // F1 — open documentation
             case KeyboardActionKind.OpenDocumentation:
-                OpenInBrowser("https://github.com/megamind1230/side/blob/master/nextlearn/README.org");
+                OpenInBrowser("https://github.com/megamind1230/nextlearn/blob/master/README.org");
                 return true;
 
             default:

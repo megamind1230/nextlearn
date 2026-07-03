@@ -24,7 +24,7 @@
                              Foreground="#2563EB" Background="#334155" Height="4"/>
             </Border>
 
-            <ScrollViewer Margin="24">
+            <ScrollViewer x:Name="FlashcardScrollViewer" Margin="24">
                 <StackPanel Spacing="16">
 
                     <TextBlock Text="{Binding FlashcardViewModel.GenerationStatus}"
@@ -59,7 +59,8 @@
 
                     <Grid ColumnDefinitions="*,Auto"
                           IsVisible="{Binding FlashcardViewModel.ShowDeckList}">
-                        <TextBox Text="{Binding FlashcardViewModel.SearchText}"
+                        <TextBox x:Name="FlashcardSearchBox"
+                                 Text="{Binding FlashcardViewModel.SearchText}"
                                  Watermark="Search by title, description, #tag, or regex…"
                                  Padding="12" FontSize="14"
                                  Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155"/>

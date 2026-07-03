@@ -75,6 +75,14 @@ public class SettingsService : ISettingsService
 
     public string ResolvedFlashcardsPath => AppSettings.ResolvePath(FlashcardsPath);
 
+    public string McqsPath
+    {
+        get => _settings.McqsPath;
+        set => _settings.McqsPath = value;
+    }
+
+    public string ResolvedMcqsPath => AppSettings.ResolvePath(McqsPath);
+
     public string GeminiApiKey
     {
         get => _settings.GeminiApiKey;
