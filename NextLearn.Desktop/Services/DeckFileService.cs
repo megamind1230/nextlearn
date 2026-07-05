@@ -81,7 +81,7 @@ public class DeckFileService : IDeckFileService
         var dir = Path.GetDirectoryName(deck.FileName);
         var oldPath = Path.Combine(decksPath, deck.FileName);
         var newName = "+" + name;
-        var newFileName = string.IsNullOrEmpty(dir) ? newName : Path.Combine(dir, newName);
+        var newFileName = string.IsNullOrEmpty(dir) ? newName : dir + "/" + newName;
         var newPath = Path.Combine(decksPath, newFileName);
         if (File.Exists(oldPath))
         {
@@ -119,7 +119,7 @@ public class DeckFileService : IDeckFileService
         var dir = Path.GetDirectoryName(deck.FileName);
         var oldPath = Path.Combine(decksPath, deck.FileName);
         var newName = name[1..];
-        var newFileName = string.IsNullOrEmpty(dir) ? newName : Path.Combine(dir, newName);
+        var newFileName = string.IsNullOrEmpty(dir) ? newName : dir + "/" + newName;
         var newPath = Path.Combine(decksPath, newFileName);
         if (File.Exists(oldPath))
         {

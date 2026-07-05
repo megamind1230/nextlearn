@@ -18,7 +18,7 @@ public static class DeckFileParser
             var content = File.ReadAllText(filePath);
             var lines = File.ReadAllLines(filePath);
             var fileName = relativeTo != null
-                ? Path.GetRelativePath(relativeTo, filePath)
+                ? Path.GetRelativePath(relativeTo, filePath).Replace('\\', '/')
                 : Path.GetFileName(filePath);
             bool isOrg = fileName.EndsWith(".org", StringComparison.OrdinalIgnoreCase);
 
@@ -83,7 +83,7 @@ public static class DeckFileParser
                 IsPublished = true,
                 IsReviewed = true,
                 IsArchived = fileName.EndsWith('~'),
-                IsPinned = fileName.StartsWith('+'),
+                IsPinned = Path.GetFileName(fileName).StartsWith('+'),
                 CreatedAt = File.GetCreationTime(filePath),
                 PageCount = pages.Count,
                 Pages = pages,

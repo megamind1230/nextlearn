@@ -1,0 +1,30 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            runtime: linux-x64
+            artifact: NextLearn-Linux
+          - os: windows-latest
+            runtime: win-x64
+            artifact: NextLearn-Windows
+          - os: macos-latest
+            runtime: osx-arm64
+            artifact: NextLearn-macOS
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet build NextLearn.Desktop/NextLearn.Desktop.csproj -c Release
+      - run: dotnet test tests/NextLearn.Desktop.Tests -c Release
+      - run: dotnet publish NextLearn.Desktop/NextLearn.Desktop.csproj -c Release -r ${{ matrix.runtime }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false -o publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: publish/

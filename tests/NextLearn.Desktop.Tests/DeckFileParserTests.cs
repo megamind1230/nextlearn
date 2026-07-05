@@ -327,4 +327,73 @@ Content
         deck.Should().NotBeNull();
         deck!.Tags.Should().BeEmpty();
     }
+
+    [Fact]
+    public void LoadDeckFromFile_Subdirectory_ReturnsForwardSlashRelativePath()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "NextLearnTests", Guid.NewGuid().ToString());
+        var subdir = Path.Combine(dir, "sub");
+        Directory.CreateDirectory(subdir);
+        var path = Path.Combine(subdir, "deck.md");
+        File.WriteAllText(path, "---\ntitle: Sub Deck\n---\n# Section\nContent");
+        _filesToCleanup.Add(path);
+
+        var deck = DeckFileParser.LoadDeckFromFile(path, dir);
+
+        deck.Should().NotBeNull();
+        deck!.FileName.Should().Be("sub/deck.md");
+    }
+
+    [Fact]
+    public void LoadDeckFromFile_SubdirectoryPinned_DetectsIsPinnedWithForwardSlash()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "NextLearnTests", Guid.NewGuid().ToString());
+        var subdir = Path.Combine(dir, "sub");
+        Directory.CreateDirectory(subdir);
+        var path = Path.Combine(subdir, "+deck.md");
+        File.WriteAllText(path, "---\ntitle: Pinned Sub Deck\n---\n# Section\nContent");
+        _filesToCleanup.Add(path);
+
+        var deck = DeckFileParser.LoadDeckFromFile(path, dir);
+
+        deck.Should().NotBeNull();
+        deck!.FileName.Should().Be("sub/+deck.md");
+        deck.IsPinned.Should().BeTrue();
+    }
+
+    [Fact]
+    public void LoadDeckFromFile_SubdirectoryArchived_DetectsIsArchivedWithForwardSlash()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "NextLearnTests", Guid.NewGuid().ToString());
+        var subdir = Path.Combine(dir, "sub");
+        Directory.CreateDirectory(subdir);
+        var path = Path.Combine(subdir, "deck.md~");
+        File.WriteAllText(path, "---\ntitle: Archived Sub Deck\n---\n# Section\nContent");
+        _filesToCleanup.Add(path);
+
+        var deck = DeckFileParser.LoadDeckFromFile(path, dir);
+
+        deck.Should().NotBeNull();
+        deck!.FileName.Should().Be("sub/deck.md~");
+        deck.IsArchived.Should().BeTrue();
+    }
+
+    [Fact]
+    public void LoadDeckFromFile_SubdirectoryOrg_ReturnsCorrectExtensionWithForwardSlash()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "NextLearnTests", Guid.NewGuid().ToString());
+        var subdir = Path.Combine(dir, "sub");
+        Directory.CreateDirectory(subdir);
+        var path = Path.Combine(subdir, "deck.org");
+        File.WriteAllText(path, @"#+TITLE: Org Sub Deck
+* Section
+Content");
+        _filesToCleanup.Add(path);
+
+        var deck = DeckFileParser.LoadDeckFromFile(path, dir);
+
+        deck.Should().NotBeNull();
+        deck!.FileName.Should().Be("sub/deck.org");
+        deck.Title.Should().Be("Org Sub Deck");
+    }
 }

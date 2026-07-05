@@ -49,6 +49,44 @@ separate project.
 For visual walkthroughs of features, see the
 [[file:screenshots.org][Screenshots Gallery]].
 
+* Installation
+
+** Download pre-built binary
+
+Every CI run builds single-file executables for Windows, Linux, and macOS.
+Download from the [[https://github.com/megamind1230/testing-nextlearn/actions][Actions tab]] → click the latest green run → scroll to "Artifacts":
+
+- =NextLearn-Windows= → =NextLearn.Desktop.exe= (double-click, no .NET needed)
+- =NextLearn-Linux= → =NextLearn.Desktop= (=chmod +x=, then =./NextLearn.Desktop=)
+- =NextLearn-macOS= → =NextLearn.Desktop= (Apple Silicon)
+
+Requires glibc ≥ 2.39 (Ubuntu 24.04+, Debian 12+, Fedora 39+).
+Older distros or Having issues? → build from source below.
+
+** Build from source
+
+Prerequisites: [[https://dotnet.microsoft.com/en-us/download/dotnet/10.0][.NET 10.0 SDK]]
+
+#+begin_src sh
+git clone https://github.com/megamind1230/testing-nextlearn
+cd testing-nextlearn
+dotnet build NextLearn.Desktop/NextLearn.Desktop.csproj -c Release
+dotnet run --project NextLearn.Desktop
+#+end_src
+
+To produce a portable single-file binary:
+
+#+begin_src sh
+dotnet publish NextLearn.Desktop/NextLearn.Desktop.csproj \
+  -c Release \
+  -r win-x64        # or linux-x64 / osx-arm64 / osx-x64 \
+  --self-contained true \
+  -p:PublishSingleFile=true \
+  -o publish
+#+end_src
+
+The =publish/= folder contains the executable. Copy and run anywhere.
+
 * Features
 :PROPERTIES:
 :CUSTOM_ID: features

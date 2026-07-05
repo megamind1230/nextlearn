@@ -651,7 +651,10 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (OperatingSystem.IsWindows())
             {
-                Process.Start("explorer", $"/select,\"{filePath}\"");
+                Process.Start(new ProcessStartInfo("explorer")
+                {
+                    ArgumentList = { $"/select,{filePath}" },
+                });
                 Log.Information("Revealed via explorer /select");
                 return;
             }
