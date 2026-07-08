@@ -1005,9 +1005,16 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void CloseMcqPanel()
     {
-        IsMcqOpen = false;
-        McqPanelViewModel.QuitQuizCommand.Execute(null);
-        McqPanelViewModel.Generation.CancelPreviewCommand.Execute(null);
+        if (McqPanelViewModel.IsQuizActive)
+        {
+            McqPanelViewModel.QuitQuizCommand.Execute(null);
+        }
+        else
+        {
+            IsMcqOpen = false;
+            McqPanelViewModel.QuitQuizCommand.Execute(null);
+            McqPanelViewModel.Generation.CancelPreviewCommand.Execute(null);
+        }
     }
 
     [RelayCommand]

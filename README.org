@@ -7,19 +7,21 @@
 - [[#features][Features]]
 - [[#tech-stack][Tech Stack]]
 - [[#architecture][Architecture]]
-  - [[#design-philosophy--mostly-offline][Design philosophy --- mostly
-    offline]]
+  - [[#design-philosophy-mostly-offline][Design philosophy mostly offline]]
   - [[#data-sources][Data Sources]]
-  - [[#clean-code-initiative][Clean Code Initiative]]
   - [[#project-structure][Project Structure]]
   - [[#key-services][Key Services]]
 - [[#deck-file-format][Deck File Format]]
 - [[#how-to-use][How to Use]]
 - [[#link--image-syntax-reference][Link & Image Syntax Reference]]
 - [[#quote--block-rendering][Quote & Block Rendering]]
-- [[#keyboard-shortcuts--key-bindings][Keyboard Shortcuts / Key
-  Bindings]]
-- [[#latex--math-rendering][LaTeX / Math Rendering]]
+- [[#keyboard-shortcuts-or-key-bindings][Keyboard Shortcuts or Key Bindings]]
+- [[#gemini-prompts][Gemini Prompts]]
+  - [[#tag-inference-prompt][Tag Inference Prompt]]
+  - [[#mcq-generation-prompt][MCQ Generation Prompt]]
+  - [[#basic-flashcard-prompt][Basic Flashcard Prompt]]
+  - [[#cloze-flashcard-prompt][Cloze Flashcard Prompt]]
+- [[#latex-and-math-rendering][LaTeX and Math Rendering]]
 
 * Description
 :PROPERTIES:
@@ -35,8 +37,7 @@ UI + EF Core SQLite.
 nextlearn is a keyboard-centric complete study gear for =.md= and =.org=
 files --- not just a flashcard app. Create decks manually or with AI,
 study in a minimal distraction-free UI, search decks instantly, export
-to Anki, and more. Future features include AI-powered MCQ tests with
-local storage, information snipping, and more.
+to Anki, and more.
 
 This repo contains only =~nextlearn.Desktop= --- the offline Avalonia UI
 desktop app. The companion website (for browsing/downloading decks) is a
@@ -51,12 +52,15 @@ For visual walkthroughs of features, see the
 
 * Installation
 
-** Download pre-built binary
+** Download pre-built binary (Linux & macOS only)
 
-Every CI run builds single-file executables for Windows, Linux, and macOS.
+CI builds single-file executables for Linux and macOS. Windows is not
+currently supported (Windows requires WebView2 while nextlearn uses the
+system WebView engine available on Linux; the author lacks a Windows
+machine to consistently test).
+
 Download from the [[https://github.com/megamind1230/testing-nextlearn/actions][Actions tab]] → click the latest green run → scroll to "Artifacts":
 
-- =NextLearn-Windows= → =NextLearn.Desktop.exe= (double-click, no .NET needed)
 - =NextLearn-Linux= → =NextLearn.Desktop= (=chmod +x=, then =./NextLearn.Desktop=)
 - =NextLearn-macOS= → =NextLearn.Desktop= (Apple Silicon)
 
@@ -79,7 +83,7 @@ To produce a portable single-file binary:
 #+begin_src sh
 dotnet publish NextLearn.Desktop/NextLearn.Desktop.csproj \
   -c Release \
-  -r win-x64        # or linux-x64 / osx-arm64 / osx-x64 \
+  -r linux-x64      # or osx-arm64 / osx-x64 \
   --self-contained true \
   -p:PublishSingleFile=true \
   -o publish
@@ -101,6 +105,7 @@ The =publish/= folder contains the executable. Copy and run anywhere.
 | ​#tag search (incremental)           | ✅ Done    | =#st= matches =study= (prefix match)                                                                                                                                                                                                                                                                    |
 | Regex search toggle                  | ✅ Done    | Regex checkbox switches title/desc/name + tags to regex                                                                                                                                                                                                                                                 |
 | Search by title/desc/filename        | ✅ Done    | Plain text tokens search all three                                                                                                                                                                                                                                                                      |
+| file:/title:/desc:/tags: search prefixes | ✅ Done | =file:baka= → FileName only; =tags:new, math= → multi-tag; =""= for phrase matching in =file:/title:/desc:=                                                                                                                                                                                         |
 | Page-by-page learning                | ✅ Done    | Prev/Next with keyboard shortcuts                                                                                                                                                                                                                                                                       |
 | Section breadcrumb                   | ✅ Done    | Shows =# Section → ## Page= with heading markers                                                                                                                                                                                                                                                        |
 | Rendered markdown content            | ✅ Done    | NativeWebView (HTML rendering via data URI)                                                                                                                                                                                                                                                             |
@@ -184,7 +189,7 @@ format, you should be fine 😉.
 :PROPERTIES:
 :CUSTOM_ID: architecture
 :END:
-** Design philosophy --- mostly offline
+** Design philosophy mostly offline
 :PROPERTIES:
 :CUSTOM_ID: design-philosophy-mostly-offline
 :END:
@@ -201,21 +206,7 @@ heatmap, export) work completely offline with no network calls.
 - =~/nextlearn/decks/*.md or *.org= --- deck content with YAML
   frontmatter (recursive --- all subdirectories scanned)
 
-** Clean Code Initiative
-:PROPERTIES:
-:CUSTOM_ID: clean-code-initiative
-:END:
-Phase 5 of the clean code initiative is complete:
-
-- 5a: Naming conventions (async suffix, private field style)
-- 5b: Dead code removal (flashcard, feedback, editor, search)
-- 5c: Split MainWindow.axaml/.cs (~700 lines extracted into 8
-  UserControls, KeyboardHandler, WebViewBridge)
-- 5d: Split service files (HtmlContentBuilder → strategy pattern;
-  DeckService → DB + file layers)
-- 5e: Service interfaces + DI preparation (IDeckService, IUserService,
-  IDeckFileService, ISettingsService, IHtmlContentBuilder)
-
+  
 ** Project Structure
 :PROPERTIES:
 :CUSTOM_ID: project-structure
@@ -273,7 +264,7 @@ are first-class decks. FileName includes the relative subdirectory path
 rename, and search. The parser reads YAML frontmatter and section
 headings:
 
-** With frontmatter (recommended)
+** With .md frontmatter (recommended)
 :PROPERTIES:
 :CUSTOM_ID: with-frontmatter-recommended
 :END:
@@ -318,7 +309,7 @@ tags:
 - sleep
 #+end_src
 
-** .org file metadata
+** .org file metadata (recommended)
 :PROPERTIES:
 :CUSTOM_ID: org-file-metadata
 :END:
@@ -445,8 +436,25 @@ enrichment.
 
 3. Run the app --- decks appear on the home view
 
-4. Search by title, description, filename, or =#tag= (prefix matching;
-   enable ☐ Regex for regex patterns)
+4. Search decks using space-separated tokens (AND logic --- all must match):
+
+   =baka=           → search across Title + Description + FileName (any field)
+   =file:baka=      → FileName only
+   =title:chapter=  → Title only
+   =desc:derivative= → Description only
+   =#math=          → tag prefix match (=#ma= matches =math=)
+   =tags:math, phys= → tag match with comma-separated values (trimmed, both required)
+
+   🔑 The filter prefix (=file:=, =title:=, =desc:=, =description:=,
+   =tags:=) must be directly followed by the search term with **no space**
+   after the colon. =file:calc= works; =file: calc= treats =file:= as an
+   empty filter and =calc= as a separate generic token.
+
+   Use =""= for phrase matching in =file:=, =title:=, =desc:=,
+   =description:=: =file:"calc notes"= matches filenames containing =calc
+   notes= as one phrase.
+
+   Enable ☐ Regex for regex patterns across all matching.
 
 5. Click a deck or press N to start learning
 
@@ -635,9 +643,9 @@ It renders as monospace with a dark background.
 Supported block types: =QUOTE=, =EXAMPLE=, =VERSE=, =CENTER=, and any
 other =#+BEGIN_<type> / #+END_<type>= pair.
 
-* Keyboard Shortcuts / Key Bindings
+* Keyboard Shortcuts or Key Bindings
 :PROPERTIES:
-:CUSTOM_ID: keyboard-shortcuts-key-bindings
+:CUSTOM_ID: keyboard-shortcuts-or-key-bindings
 :END:
 nextlearn supports four keybinding profiles: =Vim= (default), =Emacs=,
 =VS Code=, and =Custom=. Switch between them in Settings → Key Bindings.
@@ -903,7 +911,7 @@ Available =action= values:
 - =FocusSearchBar= --- focus the search bar on home screen
 - =FocusSearchWithClear= --- focus and clear search bar (g then i chord)
 - =ScrollDeckListDown= / =ScrollDeckListUp= --- scroll the deck list
-- =ToggleShortcutsHandbook= --- show/hide this handbook
+- =ToggleShortcutsHandbook= --- show/hide this handbook (auto-synced from KeyBindingService, stays up to date with new bindings)
 - =OpenGoToPage= --- jump to a page number during study
 - =OpenDocumentation= --- open GitHub README in browser
 - =ZoomHeatmapIn= / =ZoomHeatmapOut= / =ZoomHeatmapReset= --- heatmap
@@ -950,9 +958,154 @@ cuz the quiz UI prioritizes the =d= for option selection, NOT urgent,
 but we can solve later
 #+end_quote
 
-* LaTeX / Math Rendering
+* Gemini Prompts
 :PROPERTIES:
-:CUSTOM_ID: latex-math-rendering
+:CUSTOM_ID: gemini-prompts
+:END:
+
+The prompts below are copied directly from the app's source code. If you
+are having issues with the Gemini API (rate limits, model availability,
+cost), you can paste them into any Gemini-compatible client (=google-gemini=
+CLI, AI Studio, etc.) with your deck content to get the same output.
+
+** Tag Inference Prompt
+:PROPERTIES:
+:CUSTOM_ID: tag-inference-prompt
+:END:
+
+Source: =Services/TagInferenceService.cs= (method =InferTagsAsync=)
+
+#+begin_src text
+You are a tag inference AI. Given this deck content and its existing tags, suggest 2-15 additional tags that capture the core concepts, topics, semantics, mnemonics, and potential aliases.
+
+Existing tags: {existingTags}
+
+Deck content:
+{content}
+
+Return a JSON array of strings only, e.g. ["tag1", "tag2"].
+#+end_src
+
+Replace ={existingTags}= with the deck's current comma-separated tags (or
+"none") and ={content}= with the full deck text.
+
+** MCQ Generation Prompt
+:PROPERTIES:
+:CUSTOM_ID: mcq-generation-prompt
+:END:
+
+Source: =Services/McqGenerationService.cs= (method =BuildPrompt=)
+
+#+begin_src text
+You are an educator creating multiple-choice questions from study material.
+Given the deck content below, create {questionCount} questions.
+
+Format each question EXACTLY like this:
+
+## Question 1
+{question text}
+
+A. {option A}
+B. {option B}
+C. {option C}
+D. {option D}
+
+**Answer:** A
+**Explanation:** {why this is correct}
+
+---
+
+## Question 2
+...
+
+Rules:
+- Each question must have exactly 4 options (A, B, C, D)
+- Make sure exactly one answer is correct
+- Distractors should be plausible but clearly wrong
+- Use --- on its own line as a separator between questions
+- Do NOT use any markdown code fences
+- Cover EVERY section of the content --- do not skip any part
+- Generate exactly {questionCount} questions
+
+Deck content:
+---
+{content}
+---
+#+end_src
+
+Replace ={questionCount}= with the desired number of questions and
+={content}= with the deck text.
+
+** Basic Flashcard Prompt
+:PROPERTIES:
+:CUSTOM_ID: basic-flashcard-prompt
+:END:
+
+Source: =Services/FlashcardService.cs= (method =BuildBasicPrompt=)
+
+#+begin_src text
+You are an Anki flashcard generator. Convert the following study material into BASIC flashcards in TSV format.
+
+BASIC flashcards are simple question -> answer pairs (one per line, tab-separated).
+
+Use these for:
+- Vocabulary: term TAB translation (e.g. "hello	bonjour")
+- Definitions: term TAB definition (e.g. "Function	A reusable block of code that performs a specific task")
+- Q&A: question TAB answer
+
+Rules:
+- One card per line, tab-separated (term TAB definition/answer)
+- Return ONLY the TSV lines --- no markdown, no code fences, no explanations
+- Cover EVERY section of the content --- do not skip any part
+- Generate as many cards as needed to cover all material
+
+Deck content:
+---
+{content}
+---
+#+end_src
+
+Replace ={content}= with the deck text. Save the output to a =.basic.txt=
+file and import into Anki as "Basic" note type.
+
+** Cloze Flashcard Prompt
+:PROPERTIES:
+:CUSTOM_ID: cloze-flashcard-prompt
+:END:
+
+Source: =Services/FlashcardService.cs= (method =BuildClozePrompt=)
+
+#+begin_src text
+You are an Anki flashcard generator. Convert the following study material into CLOZE deletion flashcards.
+
+CLOZE cards use {{c1::term}} to create fill-in-the-blank sentences.
+
+Use these for:
+- Definitions: "A {{c1::function}} is a reusable block of code that performs a specific task."
+- Key concepts: "Binary search has a time complexity of {{c1::O(log n)}}."
+- Fill-in-the-blank for any term, definition, or concept being explained
+
+Format: One sentence per line, each sentence containing exactly one {{c1::term}} blank.
+
+Rules:
+- Every line MUST contain {{c1::}} syntax --- one blank per card
+- Do NOT use tab characters --- the entire line is the cloze text
+- Return ONLY the cloze lines --- no markdown, no code fences, no explanations
+- Cover EVERY section of the content --- do not skip any part
+- Generate as many cards as needed to cover all material
+
+Deck content:
+---
+{content}
+---
+#+end_src
+
+Replace ={content}= with the deck text. Save the output to a =.cloze.txt=
+file and import into Anki as "Cloze" note type.
+
+* LaTeX and Math Rendering
+:PROPERTIES:
+:CUSTOM_ID: latex-and-math-rendering
 :END:
 nextlearn renders LaTeX math expressions using KaTeX (bundled offline,
 no CDN). Math is always-on --- no frontmatter toggle needed.

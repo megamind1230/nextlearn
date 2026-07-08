@@ -121,7 +121,7 @@ FontSize="20" Foreground="White"
                             </StackPanel>
 
                             <Grid ColumnDefinitions="*,Auto">
-                                <TextBox x:Name="HomeSearchBox" Text="{Binding HomeViewModel.SearchText}" Watermark="Search by title, description, #tag, or regex..." Padding="12" FontSize="16"/>
+                                <TextBox x:Name="HomeSearchBox" Text="{Binding HomeViewModel.SearchText}" Watermark="🔍 Search by title, description, #tag, or regex..." Padding="12" FontSize="16"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding HomeViewModel.UseRegex}"
                                           Content="Regex" VerticalAlignment="Center" Margin="8,0,0,0"
                                           Foreground="#94A3B8"/>

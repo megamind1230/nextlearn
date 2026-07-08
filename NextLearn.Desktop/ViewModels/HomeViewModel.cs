@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
@@ -130,58 +128,12 @@ public partial class HomeViewModel : ViewModelBase
             return;
         }
 
-        var tokens = SearchText.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var tokens = DeckFilter.Tokenize(SearchText);
         var toRemove = new List<Deck>();
 
         foreach (var deck in _allDecks)
         {
-            var deckTags = (deck.Tags ?? string.Empty)
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(t => t.ToLowerInvariant())
-                .ToHashSet();
-
-            var matched = true;
-
-            foreach (var token in tokens)
-            {
-                if (token.StartsWith('#'))
-                {
-                    var tag = token[1..].ToLowerInvariant();
-                    bool tagMatched;
-
-                    if (UseRegex)
-                    {
-                        try
-                        {
-                            tagMatched = deckTags.Any(t => Regex.IsMatch(t, tag, RegexOptions.IgnoreCase));
-                        }
-                        catch (ArgumentException)
-                        {
-                            tagMatched = false;
-                        }
-                    }
-                    else
-                    {
-                        tagMatched = deckTags.Any(t => t.StartsWith(tag));
-                    }
-
-                    if (!tagMatched)
-                    {
-                        matched = false;
-                        break;
-                    }
-                }
-                else
-                {
-                    if (!TokenMatches(deck, token))
-                    {
-                        matched = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!matched)
+            if (!tokens.All(token => DeckFilter.TokenMatch(deck, token, UseRegex)))
             {
                 toRemove.Add(deck);
             }
@@ -191,27 +143,6 @@ public partial class HomeViewModel : ViewModelBase
         {
             Decks.Remove(deck);
         }
-    }
-
-    private bool TokenMatches(Deck deck, string token)
-    {
-        if (UseRegex)
-        {
-            try
-            {
-                return Regex.IsMatch(deck.Title, token, RegexOptions.IgnoreCase) ||
-                       Regex.IsMatch(deck.Description, token, RegexOptions.IgnoreCase) ||
-                       Regex.IsMatch(deck.FileName, token, RegexOptions.IgnoreCase);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
-
-        return deck.Title.Contains(token, StringComparison.OrdinalIgnoreCase) ||
-               deck.Description.Contains(token, StringComparison.OrdinalIgnoreCase) ||
-               deck.FileName.Contains(token, StringComparison.OrdinalIgnoreCase);
     }
 
     partial void OnSearchTextChanged(string value)

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -127,58 +126,12 @@ public partial class TagInferenceViewModel : ViewModelBase
             return;
         }
 
-        var tokens = SearchText.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var filtered = _allDecks.Where(deck =>
-        {
-            var deckTags = (deck.Tags ?? string.Empty)
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(t => t.ToLowerInvariant())
-                .ToHashSet();
-
-            return tokens.All(token => TokenMatchesDeck(deck, deckTags, token));
-        }).ToList();
+        var tokens = DeckFilter.Tokenize(SearchText);
+        var filtered = _allDecks
+            .Where(deck => tokens.All(token => DeckFilter.TokenMatch(deck, token, UseRegex)))
+            .ToList();
 
         Decks = new ObservableCollection<Deck>(filtered.OrderBy(d => d.FileName));
-    }
-
-    private bool TokenMatchesDeck(Deck deck, HashSet<string> deckTags, string token)
-    {
-        if (token.StartsWith('#'))
-        {
-            var tag = token[1..].ToLowerInvariant();
-
-            if (UseRegex)
-            {
-                try
-                {
-                    return deckTags.Any(t => Regex.IsMatch(t, tag, RegexOptions.IgnoreCase));
-                }
-                catch (ArgumentException)
-                {
-                    return false;
-                }
-            }
-
-            return deckTags.Any(t => t.StartsWith(tag));
-        }
-
-        if (UseRegex)
-        {
-            try
-            {
-                return Regex.IsMatch(deck.Title, token, RegexOptions.IgnoreCase) ||
-                       Regex.IsMatch(deck.Description, token, RegexOptions.IgnoreCase) ||
-                       Regex.IsMatch(deck.FileName, token, RegexOptions.IgnoreCase);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
-
-        return deck.Title.Contains(token, StringComparison.OrdinalIgnoreCase) ||
-               deck.Description.Contains(token, StringComparison.OrdinalIgnoreCase) ||
-               deck.FileName.Contains(token, StringComparison.OrdinalIgnoreCase);
     }
 
     [RelayCommand]

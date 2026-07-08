@@ -48,7 +48,7 @@
                           IsVisible="{Binding TagInferenceViewModel.ShowDeckList}">
                         <TextBox x:Name="TagInferenceSearchBox"
                                  Text="{Binding TagInferenceViewModel.SearchText}"
-                                 Watermark="Search by title, description, #tag, or regex…"
+                                 Watermark="🔍 Search by title, description, #tag, or regex…"
                                  Padding="12" FontSize="14"
                                  Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155"/>
                         <CheckBox Grid.Column="1"

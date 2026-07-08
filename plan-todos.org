@@ -1,5 +1,16 @@
 #+TITLE: NextLearn — Plan & Todos
 
+* DONE Clean Code Initiative
+Phase 5 of the clean code initiative is complete:
+
+- 5a: Naming conventions (async suffix, private field style)
+- 5b: Dead code removal (flashcard, feedback, editor, search)
+- 5c: Split MainWindow.axaml/.cs (~700 lines extracted into 8
+  UserControls, KeyboardHandler, WebViewBridge)
+- 5d: Split service files (HtmlContentBuilder → strategy pattern;
+  DeckService → DB + file layers)
+- 5e: Service interfaces + DI preparation (IDeckService, IUserService,
+  IDeckFileService, ISettingsService, IHtmlContentBuilder)
 * DONE Sort deck lists by FileName + debounce FS watcher + fix DbContext race
 :PROPERTIES:
 :CUSTOM_ID: done-sort-deck-lists-by-filename-debounce-fs-watcher-fix-dbcontext-race
@@ -731,7 +742,7 @@ Same =IFlashcardService= infra can be extended for:
 - Fill-in-the-blank worksheets
 - Summary/notes extraction
 
-* TODO MCQ Quiz --- Google Gemini
+* DONE MCQ Quiz --- Google Gemini
 :PROPERTIES:
 :CUSTOM_ID: todo-mcq-quiz-google-gemini
 :END:
@@ -1215,3 +1226,44 @@ setting Source.
 - =BuildReviewHtml= gets the same improvements (KaTeX for answers shown
   in review)
 - No change to the =.mcq= file format or Gemini generation prompts
+
+* DONE Search prefixes: file:/title:/desc:/description:/tags: + quote-aware tokenizer
+:PROPERTIES:
+:CUSTOM_ID: in-progress-search-prefixes-file-title-desc-description-tags-quote-aware-tokenizer
+:END:
+** What
+:PROPERTIES:
+:CUSTOM_ID: what-5
+:END:
+Add =file:=, =title:=, =desc:= / =description:=, =tags:= search prefixes to all 4 search bars,
+plus double-quote support for phrase matching in =file:=, =title:=, =desc:= / =description:=.
+
+=tags:= value splits on comma (trimmed) for multi-tag matching (equivalent to =#tag1 #tag2=).
+
+** Tokenizer behavior
+:PROPERTIES:
+:CUSTOM_ID: tokenizer-behavior
+:END:
+| Query                               | Tokens                              | Effect                                                   |
+|-------------------------------------+-------------------------------------+----------------------------------------------------------|
+| =file:"calc notes" #math=           | =["file:calc notes", "#math"]=      | FileName phrase AND tag prefix                           |
+| =title:"chain rule"=                | =["title:chain rule"]=              | Title phrase match                                       |
+| =desc:"section 4.2" tags:homework=  | =["desc:section 4.2", "tags:homework"]= | Desc phrase AND tag match                            |
+| =tags:new, parent/child=            | =["tags:new, parent/child"]=        | Both tags required (split on comma, trimmed)             |
+| =file:baka #new=                    | =["file:baka", "#new"]=             | FileName substring AND tag prefix                        |
+| =chapter 5=                         | =["chapter", "5"]=                  | Both must appear somewhere in Title/Desc/FileName (AND)  |
+
+** New file
+:PROPERTIES:
+:CUSTOM_ID: new-file
+:END:
+- =Services/DeckFilter.cs= --- static helper: =Tokenize()= + =TokenMatch()=
+
+** Modified files
+:PROPERTIES:
+:CUSTOM_ID: modified-files-3
+:END:
+- =ViewModels/HomeViewModel.cs= --- use =DeckFilter.Tokenize= + =TokenMatch=; remove private =TokenMatches=
+- =ViewModels/FlashcardViewModel.cs= --- same
+- =ViewModels/McqGenerationViewModel.cs= --- same
+- =ViewModels/TagInferenceViewModel.cs= --- same
