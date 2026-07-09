@@ -115,3 +115,10 @@ past quiz results and performance.
 [[file:screenshots/default-light-theme-sidebar.png]] sidebar in light theme
 
 [[file:screenshots/default-light-theme-heatmap.png]] heatmap in light theme
+
+* pomodoro timer and tasks panel
+:PROPERTIES:
+:CUSTOM_ID: timer-panel
+:END:
+
+[[file:screenshots/focus-timer-panel.png]] cutomizable pomodoro, tasks CRUD and tasks history logs
