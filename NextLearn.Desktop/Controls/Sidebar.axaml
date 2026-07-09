@@ -66,6 +66,14 @@
                                 <TextBlock Text="  Tag Inference" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
+                        <Button Command="{Binding OpenFocusTimerCommand}"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
+                                HorizontalAlignment="Stretch">
+                            <DockPanel>
+                                <TextBlock Text="⏱" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Text="  Focus Timer" FontSize="14" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Button>
                         <Button Command="{Binding ShowHeatmapCommand}"
                                 Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">

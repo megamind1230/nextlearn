@@ -156,6 +156,7 @@ The =publish/= folder contains the executable. Copy and run anywhere.
 | AI Tag Inference (Google Gemini)     | ✅ Done    | Open side bar → Tag Inference panel (or profile shortcut: =T= Vim, =C-c t= Emacs, =Ctrl+Shift+T= VS Code). Select a deck → auto-suggest 2--15 tags via Gemini API (free tier). Diff preview before applying. Supports 7 tag formats. Frontmatter health check auto-fills missing =title=/=desc=/=tags=. |
 | Anki Flashcard Generation (Gemini)   | ✅ Done    | Two buttons (Basic/Cloze), dedicated prompts, mode-aware parsing (tab-separated vs {{c1::}}), saves as .basic.txt / .cloze.txt for Anki import                                                                                                                                                          |
 | MCQ Quiz (Google Gemini)             | ✅ Done    | Three-tab panel (Generate / Take Quiz / Quiz Logs). AI-generate =.mcq= files via Gemini, interactive quiz in dedicated WebView (2×2 option grid), scored review. Open shortcut: =E= / =Ctrl+Q= Vim, =C-c q= Emacs, =Ctrl+Shift+Q= VS Code                                                               |
+| Focus Timer (Pomodoro)               | ✅ Done    | Sidebar panel with three tabs (Timer / Tasks / Log). Pomodoro-style work/break timer with configurable durations, persistent todo list (`focus-timer.yaml`), session history (YAML). Sound notification at session end. Todos support add/edit/delete/toggle.                                                    |
 
 Make sure to review the AI-generated contents, shape it and edit it the
 way you like. Sometimes you would be limited by the free AI API limits,
@@ -205,6 +206,8 @@ heatmap, export) work completely offline with no network calls.
 - ~/.config/nextlearn/nextlearn.db --- users, progress, activity
 - =~/nextlearn/decks/*.md, *.org, or *.txt= --- deck content with YAML
   frontmatter (.md/.org) or as plain text (.txt); recursive --- all subdirectories scanned
+- =~/.config/nextlearn/focus-timer.yaml= --- Focus Timer persistent data
+  (todos + session log)
 
   
 ** Project Structure
@@ -214,12 +217,12 @@ heatmap, export) work completely offline with no network calls.
 | Path                            | Purpose                               |
 |---------------------------------+---------------------------------------|
 | =nextlearn.Desktop/=            | Avalonia UI desktop app (C#, .NET 10) |
-| =nextlearn.Desktop/Models/=     | Deck, Page, Flashcard, User, etc.     |
+| =nextlearn.Desktop/Models/=     | Deck, Page, Flashcard, User, FocusTimerData, etc.     |
 | =nextlearn.Desktop/Data/=       | AppDbContext (SQLite)                 |
 | =nextlearn.Desktop/Services/=   | Business logic layer                  |
-| =nextlearn.Desktop/ViewModels/= | MVVM view models                      |
+| =nextlearn.Desktop/ViewModels/= | MVVM view models (incl. FocusTimer)   |
 | =nextlearn.Desktop/Views/=      | MainWindow.axaml (single window)      |
-| =nextlearn.Desktop/Controls/=   | TagInferencePanel, Sidebar, Settings  |
+| =nextlearn.Desktop/Controls/=   | FocusTimerPanel, TagInferencePanel, Sidebar, Settings  |
 
 ** Key Services
 :PROPERTIES:
@@ -254,6 +257,7 @@ heatmap, export) work completely offline with no network calls.
 | KeyboardActionKind      | Enum of all keyboard actions                                                 |
 | WebViewBridge           | WebView↔native communication (key bridge, URL clicks, image overlay)         |
 | HtmlContentService      | HTML enrichment service (KaTeX, highlight.js, copy buttons)                  |
+| FocusTimerViewModel     | Pomodoro timer logic, todo CRUD, YAML persistence (focus-timer.yaml)         |
 
 * Deck File Format
 :PROPERTIES:

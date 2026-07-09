@@ -21,6 +21,7 @@ public enum KeyboardActionKind
     CloseSettings,
     CloseSidebar,
     CloseFlashcardPanel,
+    CloseFocusTimer,
     CloseCommandPalette,
     OpenSettings,
     ExitSettingsHome,

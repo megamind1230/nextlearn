@@ -85,7 +85,7 @@ public static partial class McqFileParser
             sb.AppendLine($"source: {doc.SourceDeck}");
         }
 
-        sb.AppendLine($"generated: {doc.GeneratedDate:yyyy-MM-dd}");
+        sb.AppendLine($"generated: {doc.GeneratedDate:yyyy-MM-dd HH:mm}");
         sb.AppendLine("---");
         sb.AppendLine();
 

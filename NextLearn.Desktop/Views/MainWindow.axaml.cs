@@ -637,6 +637,7 @@ public partial class MainWindow : Window
             case KeyboardActionKind.NavigateHome:
                 vm.IsMcqOpen = false;
                 vm.IsFlashcardOpen = false;
+                vm.IsFocusTimerOpen = false;
                 vm.IsTagInferenceOpen = false;
                 vm.IsHeatmapOpen = false;
                 vm.IsPinnedViewOpen = false;
@@ -823,6 +824,11 @@ public partial class MainWindow : Window
             // Esc — close flashcard panel
             case KeyboardActionKind.CloseFlashcardPanel:
                 vm.CloseFlashcardPanelCommand.Execute(null);
+                return true;
+
+            // Esc — close focus timer panel
+            case KeyboardActionKind.CloseFocusTimer:
+                vm.CloseFocusTimerCommand.Execute(null);
                 return true;
 
             // C-c m — navigate to marketplace

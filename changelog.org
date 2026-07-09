@@ -109,6 +109,20 @@ buttons. Two dedicated prompts (tab-separated Q&A vs single-line
 .basic.txt / .cloze.txt for direct Anki import. Model fallback chain,
 exponential retry. 6 new files, 7 modified.
 
+** 2026-07-09 --- Focus Timer (Pomodoro)
+:PROPERTIES:
+:CUSTOM_ID: focus-timer-pomodoro
+:END:
+- New sidebar panel with three tabs: Timer (work/break countdown), Tasks
+  (persistent todo list with add/edit/delete/toggle), Log (YAML-persisted
+  session history)
+- Configurable work/break durations in Settings
+- Sound notification at session end (=timer-sound.mp3=)
+- Command palette entry (focus-timer / timer / pomodoro, no shortcut)
+- Study box hidden while timer panel is open, restored on close
+- Removed always-visible mini timer bar (was causing accent color column
+  bug)
+
 ** 2026-07-09 --- Search prefixes, dark/light theme, .txt support
 :PROPERTIES:
 :CUSTOM_ID: search-prefixes-darklight-theme-txt-support

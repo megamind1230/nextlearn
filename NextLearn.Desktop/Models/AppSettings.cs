@@ -26,6 +26,12 @@ public class AppSettings
     [YamlMember(Alias = "mcqsPath")]
     public string McqsPath { get; set; } = "$HOME/magnus/nextlearn/mcqs";
 
+    [YamlMember(Alias = "focusWorkDuration")]
+    public int FocusWorkDuration { get; set; } = 25;
+
+    [YamlMember(Alias = "focusBreakDuration")]
+    public int FocusBreakDuration { get; set; } = 5;
+
     [YamlMember(Alias = "geminiApiKey")]
     public string GeminiApiKey { get; set; } = string.Empty;
 

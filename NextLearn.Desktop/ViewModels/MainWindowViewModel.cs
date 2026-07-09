@@ -75,6 +75,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool _isMcqOpen;
 
     [ObservableProperty]
+    private bool _isFocusTimerOpen;
+
+    [ObservableProperty]
     private int _todayMinutes;
 
     [ObservableProperty]
@@ -120,6 +123,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _geminiApiKey = string.Empty;
 
     [ObservableProperty]
+    private int _focusWorkDuration = 25;
+
+    [ObservableProperty]
+    private int _focusBreakDuration = 5;
+
+    [ObservableProperty]
     private string _settingsStatus = string.Empty;
 
     [ObservableProperty]
@@ -161,6 +170,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private string _deckLinkTarget = string.Empty;
     private string _deckLinkDisplay = string.Empty;
+
+    private bool _wasLearningBeforeFocusTimer;
 
     private bool IsArchivedDeckLink => _deckLinkTarget.EndsWith('~');
 
@@ -293,6 +304,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public McqPanelViewModel McqPanelViewModel { get; private set; }
 
+    public FocusTimerViewModel FocusTimerViewModel { get; }
+
     public MainWindowViewModel()
     {
         _context = new AppDbContext();
@@ -343,6 +356,9 @@ public partial class MainWindowViewModel : ViewModelBase
         var mcqGenerationVm = new McqGenerationViewModel(_settingsService, _mcqGenerationService, mcqFileService, decksPath);
         var mcqQuizVm = new McqQuizViewModel(mcqFileService, _settingsService);
         McqPanelViewModel = new McqPanelViewModel(_settingsService, mcqFileService, mcqGenerationVm, mcqQuizVm);
+
+        FocusTimerViewModel = new FocusTimerViewModel();
+        FocusTimerViewModel.SetDefaults(_settingsService.Settings.FocusWorkDuration, _settingsService.Settings.FocusBreakDuration);
 
         CurrentView = HomeViewModel;
     }
@@ -450,6 +466,8 @@ public partial class MainWindowViewModel : ViewModelBase
         KeyBindingsProfile = _settingsService.KeyBindingsProfile;
         IsFalconEyeEnabled = _settingsService.FalconEyeEnabled;
         GeminiApiKey = _settingsService.GeminiApiKey;
+        FocusWorkDuration = _settingsService.Settings.FocusWorkDuration;
+        FocusBreakDuration = _settingsService.Settings.FocusBreakDuration;
     }
 
     [RelayCommand]
@@ -462,6 +480,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _settingsService.McqsPath = McqsPath;
         _settingsService.KeyBindingsProfile = KeyBindingsProfile;
         _settingsService.FalconEyeEnabled = IsFalconEyeEnabled;
+        _settingsService.Settings.FocusWorkDuration = FocusWorkDuration;
+        _settingsService.Settings.FocusBreakDuration = FocusBreakDuration;
         _settingsService.GeminiApiKey = GeminiApiKey;
         _keyBindingService.SwitchProfile(KeyBindingsProfile);
         KeyBindingsChanged?.Invoke();
@@ -495,6 +515,8 @@ public partial class MainWindowViewModel : ViewModelBase
         McqsPath = defaults.McqsPath;
         KeyBindingsProfile = defaults.KeyBindingsProfile;
         IsFalconEyeEnabled = defaults.FalconEyeEnabled;
+        FocusWorkDuration = defaults.FocusWorkDuration;
+        FocusBreakDuration = defaults.FocusBreakDuration;
         GeminiApiKey = defaults.GeminiApiKey;
     }
 
@@ -1019,6 +1041,34 @@ public partial class MainWindowViewModel : ViewModelBase
             IsMcqOpen = false;
             McqPanelViewModel.QuitQuizCommand.Execute(null);
             McqPanelViewModel.Generation.CancelPreviewCommand.Execute(null);
+        }
+    }
+
+    [RelayCommand]
+    public void OpenFocusTimer()
+    {
+        IsSidebarOpen = false;
+        IsPinnedViewOpen = false;
+        IsArchivedViewOpen = false;
+        IsSettingsOpen = false;
+        IsHeatmapOpen = false;
+        IsMarketplaceOpen = false;
+        IsTagInferenceOpen = false;
+        IsFlashcardOpen = false;
+        IsMcqOpen = false;
+        _wasLearningBeforeFocusTimer = IsLearning;
+        IsLearning = false;
+        FocusTimerViewModel.SetDefaults(_settingsService.Settings.FocusWorkDuration, _settingsService.Settings.FocusBreakDuration);
+        IsFocusTimerOpen = true;
+    }
+
+    [RelayCommand]
+    public void CloseFocusTimer()
+    {
+        IsFocusTimerOpen = false;
+        if (_wasLearningBeforeFocusTimer)
+        {
+            IsLearning = true;
         }
     }
 
@@ -1638,6 +1688,14 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         // Special entries without keyboard bindings
+        entries.Add(new CommandPaletteEntry
+        {
+            Name = "focus-timer",
+            Aliases = new[] { "timer", "pomodoro" },
+            Description = "Open focus timer panel",
+            Contexts = new[] { "*" },
+            Execute = () => OpenFocusTimerCommand.Execute(null),
+        });
         entries.Add(new CommandPaletteEntry
         {
             Name = "invert",

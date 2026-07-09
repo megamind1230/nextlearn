@@ -1,0 +1,193 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NextLearn.Desktop.ViewModels"
+             xmlns:models="using:NextLearn.Desktop.Models"
+             x:Class="NextLearn.Desktop.Controls.FocusTimerPanel"
+             x:DataType="vm:MainWindowViewModel">
+    <Panel IsVisible="{Binding IsFocusTimerOpen}" ZIndex="400">
+        <DockPanel Background="{StaticResource PanelBgBrush}">
+
+            <!-- Header -->
+            <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource PanelBgBrush}">
+                <StackPanel Spacing="8">
+                    <DockPanel>
+                        <Button Command="{Binding CloseFocusTimerCommand}"
+                                Background="Transparent" Padding="12,8">
+                            <TextBlock Text="← Back" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </Button>
+                        <TextBlock Text="Focus Timer" FontSize="20" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"
+                                   Margin="16,0,0,0"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                        <Button Command="{Binding FocusTimerViewModel.SelectTimerTabCommand}"
+                                Background="{StaticResource AccentBlueBrush}" Foreground="White"
+                                Padding="16,8" FontSize="13" Content="Timer"/>
+                        <Button Command="{Binding FocusTimerViewModel.SelectTasksTabCommand}"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}"
+                                Padding="16,8" FontSize="13" Content="Tasks"/>
+                        <Button Command="{Binding FocusTimerViewModel.SelectLogTabCommand}"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}"
+                                Padding="16,8" FontSize="13" Content="Log"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer Margin="24">
+                <StackPanel Spacing="16">
+
+                    <!-- ===== TIMER TAB ===== -->
+                    <StackPanel Spacing="16"
+                                IsVisible="{Binding FocusTimerViewModel.IsTimerTabSelected}">
+                        <Border Background="{StaticResource AccentTealBrush}" CornerRadius="16" Padding="32"
+                                HorizontalAlignment="Center">
+                            <StackPanel Spacing="8" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding FocusTimerViewModel.Phase}" FontSize="16"
+                                           FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding FocusTimerViewModel.RemainingDisplay}"
+                                           FontSize="48" FontWeight="Bold" Foreground="White"
+                                           HorizontalAlignment="Center" FontFamily="Consolas, monospace"/>
+                                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                                    <Button Command="{Binding FocusTimerViewModel.StartTimerCommand}"
+                                            IsVisible="{Binding FocusTimerViewModel.IsNotRunning}"
+                                            Background="White" Foreground="{StaticResource AccentTealBrush}"
+                                            Padding="20,8" FontSize="14" Content="Start"/>
+                                    <Button Command="{Binding FocusTimerViewModel.PauseTimerCommand}"
+                                            IsVisible="{Binding FocusTimerViewModel.IsRunning}"
+                                            Background="{StaticResource AccentTealDarkBrush}" Foreground="White"
+                                            Padding="20,8" FontSize="14" Content="Pause"/>
+                                    <Button Command="{Binding FocusTimerViewModel.ResetTimerCommand}"
+                                            Background="Transparent" Foreground="White"
+                                            Padding="12,8" FontSize="12" Content="Reset"
+                                            BorderBrush="White" BorderThickness="1"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Session Settings" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                                <TextBlock Text="Work (minutes)" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                                <TextBox Grid.Column="1" Text="{Binding FocusTimerViewModel.WorkDuration}"
+                                         Padding="6" FontSize="13" Width="80" HorizontalAlignment="Left"
+                                         Foreground="{StaticResource TextPrimaryBrush}"
+                                         Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
+                                <TextBlock Grid.Row="1" Text="Break (minutes)" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding FocusTimerViewModel.BreakDuration}"
+                                         Padding="6" FontSize="13" Width="80" HorizontalAlignment="Left"
+                                         Foreground="{StaticResource TextPrimaryBrush}"
+                                         Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
+                            </Grid>
+                            <TextBlock Text="Changes apply to next session. Set defaults in Settings." FontSize="11"
+                                       Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- ===== TASKS TAB ===== -->
+                    <StackPanel Spacing="12"
+                                IsVisible="{Binding FocusTimerViewModel.IsTasksTabSelected}">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Command="{Binding FocusTimerViewModel.AddTodoCommand}"
+                                    Background="{StaticResource AccentTealBrush}" Foreground="White"
+                                    Padding="12,6" FontSize="13"
+                                    Content="{Binding FocusTimerViewModel.AddButtonText}"/>
+                            <Button DockPanel.Dock="Right" Command="{Binding FocusTimerViewModel.CancelEditCommand}"
+                                    Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}"
+                                    Padding="8,6" FontSize="12" Content="Cancel"
+                                    IsVisible="{Binding FocusTimerViewModel.IsEditing}"
+                                    Margin="0,0,6,0"/>
+                            <TextBox Text="{Binding FocusTimerViewModel.NewTodoText, UpdateSourceTrigger=PropertyChanged}"
+                                     Watermark="Add a task…"
+                                     Padding="8" FontSize="13"
+                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                     Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"
+                                     KeyDown="OnTodoTextBoxKeyDown"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Active Tasks" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   IsVisible="{Binding FocusTimerViewModel.HasActiveTodos}"/>
+                        <ItemsControl ItemsSource="{Binding FocusTimerViewModel.ActiveTodos}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:TodoItem">
+                                    <Border Padding="8,4">
+                                        <DockPanel>
+                                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Done, Mode=OneWay}"
+                                                      Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FocusTimerViewModel.ToggleTodoCommand}"
+                                                      CommandParameter="{Binding}" VerticalAlignment="Center"/>
+                                            <Button DockPanel.Dock="Right" Content="✕" Background="Transparent"
+                                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FocusTimerViewModel.DeleteTodoCommand}"
+                                                    CommandParameter="{Binding}" Padding="4" FontSize="12"/>
+                                            <Button DockPanel.Dock="Right" Content="✏️" Background="Transparent"
+                                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FocusTimerViewModel.StartEditTodoCommand}"
+                                                    CommandParameter="{Binding}" Padding="4" FontSize="12"/>
+                                            <TextBlock Text="{Binding Text}" VerticalAlignment="Center" Margin="8,0"
+                                                       Foreground="{StaticResource TextPrimaryBrush}" FontSize="13"/>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        
+                        <TextBlock Text="Completed" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   IsVisible="{Binding FocusTimerViewModel.HasCompletedTodos}"/>
+                        <ItemsControl ItemsSource="{Binding FocusTimerViewModel.CompletedTodos}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:TodoItem">
+                                    <Border Padding="8,4">
+                                        <DockPanel>
+                                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Done, Mode=OneWay}"
+                                                      Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FocusTimerViewModel.ToggleTodoCommand}"
+                                                      CommandParameter="{Binding}" VerticalAlignment="Center"/>
+                                            <Button DockPanel.Dock="Right" Content="✕" Background="Transparent"
+                                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FocusTimerViewModel.DeleteTodoCommand}"
+                                                    CommandParameter="{Binding}" Padding="4" FontSize="12"/>
+                                            <Button DockPanel.Dock="Right" Content="✏️" Background="Transparent"
+                                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FocusTimerViewModel.StartEditTodoCommand}"
+                                                    CommandParameter="{Binding}" Padding="4" FontSize="12"/>
+                                            <TextBlock Text="{Binding Text}" VerticalAlignment="Center" Margin="8,0"
+                                                       Foreground="{StaticResource TextMutedBrush}" FontSize="13"
+                                                       TextDecorations="Strikethrough"/>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="No tasks yet. Add one above!"
+                                   IsVisible="{Binding FocusTimerViewModel.HasNoTodos}"
+                                   Foreground="{StaticResource TextMutedBrush}" FontSize="13" HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- ===== LOG TAB ===== -->
+                    <StackPanel Spacing="12"
+                                IsVisible="{Binding FocusTimerViewModel.IsLogTabSelected}">
+                        <TextBlock Text="Session History" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <Border Background="{StaticResource PageBgBrush}" CornerRadius="8" Padding="16"
+                                BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
+                            <ScrollViewer>
+                                <TextBox Text="{Binding FocusTimerViewModel.LogContent}"
+                                         IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
+                                         FontFamily="Consolas, Courier New, monospace" FontSize="12"
+                                         Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource PageBgBrush}"
+                                         BorderThickness="0" MinHeight="200" MaxHeight="500"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Panel>
+</UserControl>

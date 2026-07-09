@@ -196,6 +196,7 @@ FontSize="20" Foreground="White"
         <ctrls:FlashcardPanel x:Name="FlashcardPanelControl" ZIndex="500"/>
         <ctrls:TagInferencePanel x:Name="TagInferencePanelControl" ZIndex="500"/>
         <ctrls:McqPanel x:Name="McqPanelControl" ZIndex="500"/>
+        <ctrls:FocusTimerPanel ZIndex="500"/>
         <ctrls:CommandPalette ZIndex="1000"/>
 
         <!-- Chord display — shows pending/completed multi-key sequences -->

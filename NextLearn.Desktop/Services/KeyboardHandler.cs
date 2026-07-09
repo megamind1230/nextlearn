@@ -330,6 +330,16 @@ public class KeyboardHandler
             return KeyboardActionKind.CloseFlashcardPanel;
         }
 
+        if (_vm.IsFocusTimerOpen)
+        {
+            if (isTextBox)
+            {
+                return KeyboardActionKind.ClearFocus;
+            }
+
+            return KeyboardActionKind.CloseFocusTimer;
+        }
+
         if (isTextBox)
         {
             return KeyboardActionKind.ClearFocus;
