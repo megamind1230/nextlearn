@@ -29,15 +29,15 @@
 :END:
 nextlearn is a distraction-free desktop app for learning anything
 through bite-sized decks. You write decks as =.md= files with YAML
-frontmatter or =.org= frontmatter / inline metadata in
-=~/nextlearn/decks/= (and subdirectories) by default, the app reads
-them, and you flip through pages like a slideshow. Built with Avalonia
-UI + EF Core SQLite.
+frontmatter, =.org= frontmatter / inline metadata, or plain =.txt=
+files in =~/nextlearn/decks/= (and subdirectories) by default, the app
+reads them, and you flip through pages like a slideshow. Built with
+Avalonia UI + EF Core SQLite.
 
-nextlearn is a keyboard-centric complete study gear for =.md= and =.org=
-files --- not just a flashcard app. Create decks manually or with AI,
-study in a minimal distraction-free UI, search decks instantly, export
-to Anki, and more.
+nextlearn is a keyboard-centric complete study gear for =.md=, =.org=,
+and =.txt= files --- not just a flashcard app. Create decks manually or
+with AI, study in a minimal distraction-free UI, search decks instantly,
+export to Anki, and more.
 
 This repo contains only =~nextlearn.Desktop= --- the offline Avalonia UI
 desktop app. The companion website (for browsing/downloading decks) is a
@@ -98,7 +98,7 @@ The =publish/= folder contains the executable. Copy and run anywhere.
 | Feature                              | Status      | Note                                                                                                                                                                                                                                                                                                    |
 |--------------------------------------+-------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Fully offline                        | ✅ Done    | No network calls ever                                                                                                                                                                                                                                                                                   |
-| File-based decks (.md / .org)        | ✅ Done    | YAML frontmatter + =#= / =##= headings; Obsidian-style vault: all files under decks root (recursive). FileName = relative vault path (=subdir/deck.md=), =[[]]= wiki links resolves across subdirectories                                                                                               |
+| File-based decks (.md / .org / .txt) | ✅ Done    | YAML frontmatter + =#= / =##= headings for .md/.org; 25-line chunk pages for .txt. Obsidian-style vault: all files under decks root (recursive). FileName = relative vault path (=subdir/deck.md=), =[[]]= wiki links resolves across subdirectories                                                                                               |
 | Frontmatter metadata                 | ✅ Done    | =title:=, =description:=, =tags:= in --- block                                                                                                                                                                                                                                                          |
 | Org #+TITLE:/#+DESCRIPTION:          | ✅ Done    | =#+TITLE: / #+DESCRIPTION: / #+TAGS:= in .org                                                                                                                                                                                                                                                           |
 | Tag system from frontmatter          | ✅ Done    | =tags: health, morning, sleep=                                                                                                                                                                                                                                                                          |
@@ -116,7 +116,7 @@ The =publish/= folder contains the executable. Copy and run anywhere.
 | Inline code protection               | ✅ Done    | =[text](url)= inside backticks renders literally                                                                                                                                                                                                                                                        |
 | Code-block-aware page splits         | ✅ Done    | =#= inside code blocks don't trigger page breaks                                                                                                                                                                                                                                                        |
 | Deterministic deck identity          | ✅ Done    | SHA256 of file path → stable GUID                                                                                                                                                                                                                                                                       |
-| Dark mode theming                    | ✅ Done    | ​#1E293B cards, amber Name: line                                                                                                                                                                                                                                                                        |
+| Dark/light theme                     | ✅ Done    | Live switch in Settings → Theme; dark/light color dictionaries via ThemeHelper.cs                                                                                                                                                                                                                        |
 | Selection color                      | ✅ Done    | Blue bg (#2563EB) + white text in WebView                                                                                                                                                                                                                                                               |
 | vim-style j/k scroll                 | ✅ Done    | J/K scrolls home deck list, study box content                                                                                                                                                                                                                                                           |
 | h/l horizontal scroll                | ✅ Done    | H/L scrolls study box content left/right                                                                                                                                                                                                                                                                |
@@ -131,7 +131,7 @@ The =publish/= folder contains the executable. Copy and run anywhere.
 | Heatmap overlay (full-page)          | ✅ Done    | Snake layout 90° CCW, 6-level orange, green today                                                                                                                                                                                                                                                       |
 | Keyboard shortcuts                   | ✅ Done    | Vim / Emacs / Custom profiles, multi-key chords, command palette                                                                                                                                                                                                                                        |
 | Settings (sidebar → ⚙)              | ✅ Done    | Theme, font, decks/mcqs/flashcards path, keybindings profile, free Gemini API key, save/reset                                                                                                                                                                                                           |
-| Theme switching                      | ❌ Not yet | Setting saved but not applied yet. Light theme + theme presets + custom themes coming in future updates                                                                                                                                                                                                 |
+| Theme presets / custom themes        | ❌ Not yet | Planned for future updates                                                                                                                                                                                                                                                                              |
 | Tag cloud / tag filter               | ❌ Not yet | Planned (P27)                                                                                                                                                                                                                                                                                           |
 | Spaced repetition algorithm          | ❌ Not yet | Basic 24h review only                                                                                                                                                                                                                                                                                   |
 | Image rendering (markdown)           | ✅ Done    | =![]()= and =![[path]]= → inline image in WebView                                                                                                                                                                                                                                                       |
@@ -203,8 +203,8 @@ heatmap, export) work completely offline with no network calls.
 :CUSTOM_ID: data-sources
 :END:
 - ~/.config/nextlearn/nextlearn.db --- users, progress, activity
-- =~/nextlearn/decks/*.md or *.org= --- deck content with YAML
-  frontmatter (recursive --- all subdirectories scanned)
+- =~/nextlearn/decks/*.md, *.org, or *.txt= --- deck content with YAML
+  frontmatter (.md/.org) or as plain text (.txt); recursive --- all subdirectories scanned
 
   
 ** Project Structure
@@ -227,7 +227,8 @@ heatmap, export) work completely offline with no network calls.
 :END:
 | Service                 | Role                                                                         |
 |-------------------------+------------------------------------------------------------------------------|
-| DeckFileParser          | Static parser: frontmatter + heading → Deck                                  |
+| ThemeHelper             | Runtime dark/light color dictionaries, ApplyTheme() for live switching       |
+| DeckFileParser          | Static parser: frontmatter + heading (.md/.org) or line-chunk (.txt) → Deck  |
 | DeckFileIdentity        | SHA256 of path → deterministic GUID                                          |
 | DeckService             | DB layer: decks, pages, progress tracking                                    |
 | DeckFileService         | File ops: archive/pin/rename decks                                           |
@@ -258,11 +259,12 @@ heatmap, export) work completely offline with no network calls.
 :PROPERTIES:
 :CUSTOM_ID: deck-file-format
 :END:
-All =.md / .org= files under =~/nextlearn/decks/= (and any subdirectory)
-are first-class decks. FileName includes the relative subdirectory path
-(e.g. =science/physics.md=), used for stable identity, archive/pin
-rename, and search. The parser reads YAML frontmatter and section
-headings:
+All =.md=, =.org=, and =.txt= files under =~/nextlearn/decks/= (and any
+subdirectory) are first-class decks. FileName includes the relative
+subdirectory path (e.g. =science/physics.md=), used for stable identity,
+archive/pin rename, and search. The parser reads YAML frontmatter and
+section headings for =.md= / =.org=, or splits on line count for
+=.txt=:
 
 ** With .md frontmatter (recommended)
 :PROPERTIES:
@@ -308,6 +310,36 @@ tags:
 - morning
 - sleep
 #+end_src
+
+** .txt file support
+:PROPERTIES:
+:CUSTOM_ID: txt-file-support
+:END:
+Plain =.txt= files are read as decks without any frontmatter or heading
+parsing:
+
+| Property      | Behaviour                                           |
+|---------------+-----------------------------------------------------|
+| Title         | First non-empty line of the file                    |
+| Description   | Second non-empty line (truncated to 200 chars)      |
+| Tags          | Empty (no frontmatter) — excluded from tag inference|
+| Page splitting| 25 lines per page, each page ≈ 25 readable lines   |
+| Page title    | First non-empty line of that 25-line chunk          |
+| Readability   | Sentences auto-split onto separate lines after . ? !|
+| Rendering     | Plain text (no markdown/org syntax parsing)         |
+
+#+begin_src text
+Introduction to Machine Learning
+
+Machine learning is a subset of artificial intelligence.
+
+There are three main types of machine learning.
+...
+#+end_src
+
+Each =.txt= file is split into pages of 25 lines. Sentences are
+automatically broken onto separate lines after terminal punctuation
+(=.=, =?=, =!=) to improve readability per page.
 
 ** .org file metadata (recommended)
 :PROPERTIES:

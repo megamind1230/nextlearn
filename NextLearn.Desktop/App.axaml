@@ -1,14 +1,88 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="NextLearn.Desktop.App"
-             xmlns:local="using:NextLearn.Desktop"
-             RequestedThemeVariant="Dark">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             xmlns:local="using:NextLearn.Desktop">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <!-- Backgrounds -->
+                    <SolidColorBrush x:Key="PageBgBrush" Color="#0F172A" />
+                    <SolidColorBrush x:Key="PanelBgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="SurfaceBgBrush" Color="#334155" />
+                    <SolidColorBrush x:Key="CardBgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="SearchBoxBgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="PathFieldBgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="SelectorBgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="CheckboxBgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="CheckmarkFgBrush" Color="#3B82F6" />
+                    <SolidColorBrush x:Key="CardSelectedBgBrush" Color="#1E3A5F" />
+                    <SolidColorBrush x:Key="CodeBlockBgBrush" Color="#282C34" />
+                    <SolidColorBrush x:Key="McqWrongBgBrush" Color="#450A0A" />
+                    <!-- Text -->
+                    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E2E8F0" />
+                    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
+                    <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B" />
+                    <SolidColorBrush x:Key="TextAccentBrush" Color="#FBBF24" />
+                    <SolidColorBrush x:Key="TextHoverBrush" Color="#CBD5E1" />
+                    <SolidColorBrush x:Key="TextPressedBrush" Color="#475569" />
+                    <SolidColorBrush x:Key="TextOnAccentBrush" Color="White" />
+                    <SolidColorBrush x:Key="TextOnAccentMutedBrush" Color="#BFDBFE" />
+                    <!-- Accents -->
+                    <SolidColorBrush x:Key="AccentBlueBrush" Color="#7C0AED" />
+                    <SolidColorBrush x:Key="AccentTealBrush" Color="#7C0AED" />
+                    <SolidColorBrush x:Key="AccentTealDarkBrush" Color="#6908C9" />
+                    <SolidColorBrush x:Key="AccentRedBrush" Color="#EF4444" />
+                    <SolidColorBrush x:Key="AccentAmberBrush" Color="#FBBF24" />
+                    <SolidColorBrush x:Key="AccentGreenBrush" Color="#10B981" />
+                    <SolidColorBrush x:Key="AccentPurpleBrush" Color="#7C3AED" />
+                    <SolidColorBrush x:Key="AccentSelectionBrush" Color="#A78BFA" />
+                    <SolidColorBrush x:Key="AccentPinkBrush" Color="#EC4899" />
+                    <!-- Button states -->
+                    <SolidColorBrush x:Key="ButtonDefaultBgBrush" Color="#E2E8F0" />
+                    <SolidColorBrush x:Key="ButtonDefaultFgBrush" Color="#1E293B" />
+                    <SolidColorBrush x:Key="ButtonHoverBgBrush" Color="#CBD5E1" />
+                    <SolidColorBrush x:Key="ButtonPressedBgBrush" Color="#94A3B8" />
+                    <SolidColorBrush x:Key="ButtonPressedFgBrush" Color="#475569" />
+                    <SolidColorBrush x:Key="ButtonFadedBgBrush" Color="#F1F5F9" />
+                    <SolidColorBrush x:Key="ButtonFadedFgBrush" Color="#94A3B8" />
+                    <SolidColorBrush x:Key="ButtonFadedHoverBgBrush" Color="#E2E8F0" />
+                    <SolidColorBrush x:Key="ButtonFadedHoverFgBrush" Color="#64748B" />
+                    <SolidColorBrush x:Key="ButtonFadedPressedBgBrush" Color="#CBD5E1" />
+                    <SolidColorBrush x:Key="ButtonFadedPressedFgBrush" Color="#475569" />
+                    <!-- Secondary / tertiary button backgrounds -->
+                    <SolidColorBrush x:Key="CommandPaletteHoverBgBrush" Color="#2D3748" />
+                    <SolidColorBrush x:Key="ButtonSecondaryBgBrush" Color="#334155" />
+                    <SolidColorBrush x:Key="ButtonPrimaryBgBrush" Color="#2563EB" />
+                    <SolidColorBrush x:Key="ButtonSuccessBgBrush" Color="#7C0AED" />
+                    <SolidColorBrush x:Key="ButtonDangerBgBrush" Color="#EF4444" />
+                    <!-- Borders -->
+                    <SolidColorBrush x:Key="BorderDefaultBrush" Color="#334155" />
+                    <SolidColorBrush x:Key="BorderMutedBrush" Color="#475569" />
+                    <!-- Modal -->
+                    <SolidColorBrush x:Key="ModalBackdropBrush" Color="#80000000" />
+                    <!-- Heatmap stats -->
+                    <SolidColorBrush x:Key="StatMinutesBrush" Color="#FDBA74" />
+                    <SolidColorBrush x:Key="StatPagesBrush" Color="#60A5FA" />
+                    <SolidColorBrush x:Key="StatDecksBrush" Color="#34D399" />
+                    <SolidColorBrush x:Key="StatStreakBrush" Color="#F472B6" />
+                    <!-- Heatmap levels -->
+                    <SolidColorBrush x:Key="HeatmapLevel0" Color="#1E293B" />
+                    <SolidColorBrush x:Key="HeatmapLevel1" Color="#FED7AA" />
+                    <SolidColorBrush x:Key="HeatmapLevel2" Color="#FDBA74" />
+                    <SolidColorBrush x:Key="HeatmapLevel3" Color="#FB923C" />
+                    <SolidColorBrush x:Key="HeatmapLevel4" Color="#EA580C" />
+                    <SolidColorBrush x:Key="HeatmapLevel5" Color="#C2410C" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>

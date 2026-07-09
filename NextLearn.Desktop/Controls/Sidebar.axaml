@@ -4,92 +4,92 @@
              x:Class="NextLearn.Desktop.Controls.Sidebar"
              x:DataType="vm:MainWindowViewModel">
     <Panel IsVisible="{Binding IsSidebarOpen}" ZIndex="200">
-        <Border Background="#80000000" PointerPressed="CloseOnBackdrop">
-            <Border Background="#1E293B" Width="280" HorizontalAlignment="Right"
-                    BorderBrush="#334155" BorderThickness="1,0,0,0">
+        <Border Background="{StaticResource ModalBackdropBrush}" PointerPressed="CloseOnBackdrop">
+            <Border Background="{StaticResource PanelBgBrush}" Width="280" HorizontalAlignment="Right"
+                    BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1,0,0,0">
                 <Grid RowDefinitions="*,Auto,Auto" Margin="20">
                     <ScrollViewer Grid.Row="0">
                         <StackPanel Spacing="16">
                         <DockPanel>
                             <Button DockPanel.Dock="Left" Command="{Binding ToggleSidebarCommand}"
                                     Background="Transparent" Padding="6">
-                                <TextBlock Text="✕" FontSize="16" Foreground="#94A3B8"/>
+                                <TextBlock Text="✕" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                             </Button>
-                            <TextBlock Text="Sidebar" FontSize="20" FontWeight="Bold" Foreground="#E2E8F0" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            <TextBlock Text="Sidebar" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
                         </DockPanel>
-                        <Border Height="1" Background="#334155"/>
+                        <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
                         <Button Command="{Binding OpenDecksFolderCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="📂" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="📂" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Open Decks Folder" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowPinnedViewCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="📌" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="📌" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Pinned" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowArchivedViewCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="🗄️" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="🗄️" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Archived" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowFlashcardPanelCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="🃏" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="🃏" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Anki Flashcards" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowMcqPanelCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="📝" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="📝" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  MCQ Quiz" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowTagInferenceCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="🏷" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="🏷" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Tag Inference" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding ShowHeatmapCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="🔥" FontSize="16" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="🔥" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="  Streak" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                         <Button Command="{Binding NavigateToDocumentationCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 HorizontalAlignment="Stretch">
                             <DockPanel>
-                                <TextBlock Text="?" FontSize="18" Foreground="#94A3B8" VerticalAlignment="Center" FontWeight="Bold"/>
+                                <TextBlock Text="?" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontWeight="Bold"/>
                                 <TextBlock Text="  Documentation" FontSize="14" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Button>
                     </StackPanel>
                     </ScrollViewer>
-                    <Border Grid.Row="1" Height="1" Background="#334155" Margin="0,0,0,12"/>
+                    <Border Grid.Row="1" Height="1" Background="{StaticResource SurfaceBgBrush}" Margin="0,0,0,12"/>
                     <Button Grid.Row="2" Command="{Binding OpenSettingsCommand}"
-                            Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                            Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                             HorizontalAlignment="Stretch">
                         <DockPanel>
-                            <TextBlock Text="⚙" FontSize="18" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                            <TextBlock Text="⚙" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                             <TextBlock Text="  Settings" FontSize="14" VerticalAlignment="Center"/>
                         </DockPanel>
                     </Button>

@@ -21,37 +21,38 @@
     <Panel>
         <!-- Main content panels -->
         <Panel IsVisible="{Binding IsLearning}">
-            <DockPanel Background="#1E293B">
-                <Border DockPanel.Dock="Top" Padding="16,12" Background="#1E293B">
+            <DockPanel Background="{StaticResource PanelBgBrush}">
+                <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource PanelBgBrush}">
                     <Grid ColumnDefinitions="Auto,*,Auto">
                         <Button Command="{Binding ExitLearningCommand}"
                                 Background="Transparent" Padding="12,8" VerticalAlignment="Center">
-                            <TextBlock Text="←" FontSize="20" Foreground="#94A3B8"/>
+                            <TextBlock Text="←" FontSize="20" Foreground="{StaticResource TextSecondaryBrush}"/>
                         </Button>
                         <TextBlock Grid.Column="1" Text="{Binding LearningViewModel.DeckTitle}"
-                                   FontSize="16" FontWeight="SemiBold" Foreground="#E2E8F0"
+                                   FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"
                                    HorizontalAlignment="Center" TextAlignment="Center"
                                    MaxWidth="500" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
                             <Button Command="{Binding ToggleSidebarCommand}"
                                     Background="Transparent" Padding="12,8">
-                                <TextBlock Text="☰" FontSize="20" Foreground="#94A3B8"/>
+                                <TextBlock Text="☰" FontSize="20" Foreground="{StaticResource TextSecondaryBrush}"/>
                             </Button>
                         </StackPanel>
                     </Grid>
                 </Border>
 
-                <Border DockPanel.Dock="Bottom" Padding="24,12" Background="#1E293B">
+                <Border DockPanel.Dock="Bottom" Padding="24,12" Background="{StaticResource PanelBgBrush}">
                     <Grid ColumnDefinitions="Auto,*,Auto">
-                        <Border Grid.Column="0" Background="#0D9488" CornerRadius="8" Padding="12,6"
+                        <Border Grid.Column="0" Background="{StaticResource AccentTealBrush}" CornerRadius="8" Padding="12,6"
                                 HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBlock Text="{Binding LearningViewModel.ProgressText}" FontSize="14"
                                        Foreground="White" FontWeight="SemiBold"/>
                         </Border>
+
                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12">
                             <Button Classes="Faded" Content="← Previous" Command="{Binding LearningViewModel.PreviousPageCommand}"
                                     IsEnabled="{Binding LearningViewModel.CanGoBack}" Padding="20,12"
-                                    Background="#334155" Foreground="#94A3B8"/>
+                                    Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}"/>
                             <Button Content="{Binding LearningViewModel.NextButtonText}" Command="{Binding LearningViewModel.CompleteAndGoHomeCommand}"
                                     Background="{Binding LearningViewModel.NextButtonColor}" Foreground="White" Padding="48,16" FontSize="18"/>
                         </StackPanel>
@@ -60,10 +61,10 @@
 
                 <Grid RowDefinitions="0.1*,3.9*,0.1*" ColumnDefinitions="2*,96*,2*">
                     <Border Grid.Row="1" Grid.Column="1"
-                            Background="#0D9488" CornerRadius="12" Padding="0"
+                            Background="{StaticResource AccentTealBrush}" CornerRadius="12" Padding="0"
                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Grid RowDefinitions="Auto,*">
-                            <Border Grid.Row="0" Padding="16,8" Background="#0B7E72"
+                            <Border Grid.Row="0" Padding="16,8" Background="{StaticResource AccentTealDarkBrush}"
                                     CornerRadius="12,12,0,0">
                                 <TextBlock Text="{Binding LearningViewModel.CurrentSectionBreadcrumb}"
 FontSize="20" Foreground="White"
@@ -71,7 +72,7 @@ FontSize="20" Foreground="White"
                                            HorizontalAlignment="Center"
                                            MaxWidth="600" TextTrimming="CharacterEllipsis"/>
                             </Border>
-                            <Border Grid.Row="1" Background="#1E293B">
+                            <Border Grid.Row="1" Background="{StaticResource CardBgBrush}">
                                 <nwv:NativeWebView x:Name="ContentWebView"
                                     Focusable="False"
                                     NavigationStarted="OnWebViewNavigationStarted"
@@ -89,11 +90,11 @@ FontSize="20" Foreground="White"
 
         <Panel IsVisible="{Binding !IsLearning}">
             <DockPanel>
-                <Border DockPanel.Dock="Top" Background="#2563EB" Padding="16">
+                <Border DockPanel.Dock="Top" Background="{StaticResource AccentBlueBrush}" Padding="16">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="16">
                             <TextBlock Text="NextLearn" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                            <TextBlock Text="Let's Fight Distraction" FontSize="14" Foreground="#BFDBFE" VerticalAlignment="Center"/>
+                            <TextBlock Text="Let's Fight Distraction" FontSize="14" Foreground="{StaticResource TextOnAccentMutedBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
 
                         <DockPanel DockPanel.Dock="Right">
@@ -117,41 +118,42 @@ FontSize="20" Foreground="White"
                         <StackPanel Spacing="24">
                             <StackPanel Spacing="8">
                                 <TextBlock Text="What do you want to learn?" FontSize="28" FontWeight="Bold"/>
-                                <TextBlock Text="Choose a deck and start learning" FontSize="16" Foreground="#64748B"/>
+                                <TextBlock Text="Choose a deck and start learning" FontSize="16" Foreground="{StaticResource TextMutedBrush}"/>
                             </StackPanel>
 
                             <Grid ColumnDefinitions="*,Auto">
-                                <TextBox x:Name="HomeSearchBox" Text="{Binding HomeViewModel.SearchText}" Watermark="🔍 Search by title, description, #tag, or regex..." Padding="12" FontSize="16"/>
+                                <TextBox x:Name="HomeSearchBox" Text="{Binding HomeViewModel.SearchText}" Watermark="🔍 Search by title, description, #tag, or regex..." Padding="12" FontSize="16" Background="{StaticResource SearchBoxBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding HomeViewModel.UseRegex}"
                                           Content="Regex" VerticalAlignment="Center" Margin="8,0,0,0"
-                                          Foreground="#94A3B8"/>
+                                          Background="{StaticResource CheckboxBgBrush}" BorderBrush="{StaticResource AccentAmberBrush}" BorderThickness="1"
+                                          Foreground="{StaticResource CheckmarkFgBrush}"/>
                             </Grid>
 
                             <ItemsControl ItemsSource="{Binding HomeViewModel.Decks}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="0,0,0,16"
-                                                BorderBrush="#334155" BorderThickness="1">
+                                        <Border Background="{StaticResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16"
+                                                BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
                                             <DockPanel>
                                                 <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
                                                     <Button Content="Learn"
                                                             Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).NavigateToLearningCommand}"
                                                             CommandParameter="{Binding Id}"
-                                                            Background="#2563EB" Foreground="White" Padding="16,8"/>
-                                                    <Button Content="⋮" Background="#334155" Foreground="#94A3B8" Padding="8,4" FontSize="16"
-                                                            BorderBrush="#334155" BorderThickness="1" x:CompileBindings="False">
+                                                            Background="{StaticResource AccentBlueBrush}" Foreground="White" Padding="16,8"/>
+                                                    <Button Content="⋮" Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}" Padding="8,4" FontSize="16"
+                                                            BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1" x:CompileBindings="False">
                                                         <Button.Flyout>
                                                             <Flyout Placement="Bottom">
-                                                                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="8">
+                                                                <Border Background="{StaticResource PanelBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                                                                     <StackPanel Spacing="4">
                                                                         <Button Content="📌 Pin"
                                                                                 Command="{Binding $parent[ItemsControl].DataContext.HomeViewModel.TogglePinDeckCommand}"
                                                                                 CommandParameter="{Binding}"
-                                                                                Background="Transparent" Foreground="#E2E8F0" Padding="8,4" HorizontalAlignment="Stretch"/>
+                                                                                Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}" Padding="8,4" HorizontalAlignment="Stretch"/>
                                                                         <Button Content="🗄️ Archive"
                                                                                 Command="{Binding $parent[ItemsControl].DataContext.HomeViewModel.ArchiveDeckCommand}"
                                                                                 CommandParameter="{Binding}"
-                                                                                Background="Transparent" Foreground="#E2E8F0" Padding="8,4" HorizontalAlignment="Stretch"/>
+                                                                                Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}" Padding="8,4" HorizontalAlignment="Stretch"/>
                                                                     </StackPanel>
                                                                 </Border>
                                                             </Flyout>
@@ -160,14 +162,14 @@ FontSize="20" Foreground="White"
                                                 </StackPanel>
                                                     <StackPanel Margin="0,0,24,0">
                                                         <DockPanel>
-                                                             <TextBlock DockPanel.Dock="Right" Text="{Binding Title}" FontSize="14" Foreground="#E2E8F0" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
-                                                            <TextBlock FontSize="13" Foreground="#FBBF24" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                                                             <TextBlock DockPanel.Dock="Right" Text="{Binding Title}" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                                                            <TextBlock FontSize="13" Foreground="{StaticResource TextAccentBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                                                                 <Run Text="Name: "/>
                                                                 <Run Text="{Binding FileName}"/>
                                                             </TextBlock>
                                                          </DockPanel>
-                                                         <TextBlock Text="{Binding Description}" Foreground="#94A3B8" TextWrapping="Wrap"/>
-                                                        <TextBlock Foreground="#94A3B8" FontSize="13">
+                                                         <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                                        <TextBlock Foreground="{StaticResource TextSecondaryBrush}" FontSize="13">
                                                             <Run Text="{Binding PageCount, StringFormat='{}{0} pages'}"/>
                                                             <Run Text=" | "/>
                                                             <Run Text="{Binding Tags}"/>
@@ -202,14 +204,14 @@ FontSize="20" Foreground="White"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 Margin="0,16,0,0"
-                Background="#1E293B"
-                BorderBrush="#334155"
+                Background="{StaticResource PanelBgBrush}"
+                BorderBrush="{StaticResource BorderDefaultBrush}"
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="20,10"
                 Opacity="0.95">
             <TextBlock Text="{Binding ChordDisplayText}"
-                       Foreground="#E2E8F0"
+                       Foreground="{StaticResource TextPrimaryBrush}"
                        FontSize="14"
                        FontFamily="Consolas, monospace"
                        HorizontalAlignment="Center"/>
@@ -219,12 +221,12 @@ FontSize="20" Foreground="White"
         <Panel ZIndex="9999"
                IsVisible="{Binding IsDeckLinkPromptOpen}"
                Background="Transparent">
-            <Border Background="#80000000"
+            <Border Background="{StaticResource ModalBackdropBrush}"
                     PointerPressed="CloseDeckLinkPromptOnBackdrop"/>
             <Border HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Background="#1E293B"
-                    BorderBrush="#334155"
+                    Background="{StaticResource PanelBgBrush}"
+                    BorderBrush="{StaticResource BorderDefaultBrush}"
                     BorderThickness="1"
                     CornerRadius="12"
                     Padding="24"
@@ -233,16 +235,16 @@ FontSize="20" Foreground="White"
                     <TextBlock Text="{Binding DeckLinkPromptTitle}"
                                FontSize="16"
                                FontWeight="SemiBold"
-                               Foreground="#E2E8F0"/>
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
                     <Button Content="{Binding DeckLinkPromptActionText}"
                             Command="{Binding NavigateToDeckLinkCommand}"
-                            Background="#2563EB"
+                            Background="{StaticResource AccentBlueBrush}"
                             Foreground="White"
                             HorizontalAlignment="Stretch"/>
                     <Button Content="Cancel"
                             Command="{Binding DismissDeckLinkPromptCommand}"
-                            Background="#334155"
-                            Foreground="#E2E8F0"
+                            Background="{StaticResource SurfaceBgBrush}"
+                            Foreground="{StaticResource TextPrimaryBrush}"
                             HorizontalAlignment="Stretch"/>
                 </StackPanel>
             </Border>
@@ -253,27 +255,27 @@ FontSize="20" Foreground="White"
 
     <Window.Styles>
         <Style Selector="Button">
-            <Setter Property="Background" Value="#E2E8F0"/>
-            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="Background" Value="{StaticResource ButtonDefaultBgBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ButtonDefaultFgBrush}"/>
             <Setter Property="Padding" Value="16,12"/>
         </Style>
         <Style Selector="Button:pointerover">
-            <Setter Property="Background" Value="#CBD5E1"/>
+            <Setter Property="Background" Value="{StaticResource ButtonHoverBgBrush}"/>
         </Style>
         <Style Selector="Button:pressed">
-            <Setter Property="Background" Value="#94A3B8"/>
+            <Setter Property="Background" Value="{StaticResource ButtonPressedBgBrush}"/>
         </Style>
         <Style Selector="Button.Faded">
-            <Setter Property="Background" Value="#F1F5F9"/>
-            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="Background" Value="{StaticResource ButtonFadedBgBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ButtonFadedFgBrush}"/>
         </Style>
         <Style Selector="Button.Faded:pointerover">
-            <Setter Property="Background" Value="#E2E8F0"/>
-            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="Background" Value="{StaticResource ButtonFadedHoverBgBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ButtonFadedHoverFgBrush}"/>
         </Style>
         <Style Selector="Button.Faded:pressed">
-            <Setter Property="Background" Value="#CBD5E1"/>
-            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="Background" Value="{StaticResource ButtonFadedPressedBgBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ButtonFadedPressedFgBrush}"/>
         </Style>
     </Window.Styles>
 

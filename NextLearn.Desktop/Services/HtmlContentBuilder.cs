@@ -9,19 +9,36 @@ namespace NextLearn.Desktop.Services;
 
 public static class HtmlContentBuilder
 {
-    public static string Build(Page? page, bool isOrgFile, string? imageDir = null, string? fontFamily = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? allFootnotes = null, string? decksPath = null, string? currentDir = null)
+    public static string Build(Page? page, bool isOrgFile, string? imageDir = null, string? fontFamily = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? allFootnotes = null, string? decksPath = null, string? currentDir = null, bool isPlainText = false)
     {
         if (page == null)
         {
             return EmptyHtml(fontFamily);
         }
 
-        var body = RenderBlock(page.TextContent ?? string.Empty, isOrgFile, imageDir, accumulatedImagePaths, allFootnotes, decksPath, currentDir);
+        var body = RenderBlock(page.TextContent ?? string.Empty, isOrgFile, imageDir, accumulatedImagePaths, allFootnotes, decksPath, currentDir, isPlainText);
         return WrapInHtml(body, fontFamily);
     }
 
-    public static string RenderBlock(string text, bool isOrgFile = false, string? imageDir = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? allFootnotes = null, string? decksPath = null, string? currentDir = null)
+    public static string RenderBlock(string text, bool isOrgFile = false, string? imageDir = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? allFootnotes = null, string? decksPath = null, string? currentDir = null, bool isPlainText = false)
     {
+        if (isPlainText)
+        {
+            if (text == null)
+            {
+                return string.Empty;
+            }
+
+            var sb = new StringBuilder();
+            var paragraphs = text.Split(["\n\n"], StringSplitOptions.RemoveEmptyEntries);
+            foreach (var p in paragraphs)
+            {
+                sb.Append("<p>").Append(System.Net.WebUtility.HtmlEncode(p.Trim())).Append("</p>");
+            }
+
+            return sb.ToString();
+        }
+
         var body = new StringBuilder();
 
         var localFootnotes = new Dictionary<string, string>();

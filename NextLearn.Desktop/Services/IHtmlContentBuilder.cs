@@ -15,6 +15,7 @@ public interface IHtmlContentBuilder
     /// <param name="allFootnotes">Optional merged footnotes from all pages (enables cross-page hover preview). If null, only local page footnotes are used.</param>
     /// <param name="decksPath">Optional decks root directory for resolving wiki-link targets.</param>
     /// <param name="currentDir">Optional current deck file directory for same-dir wiki-link resolution.</param>
+    /// <param name="isPlainText">True to render as plain text (no markdown/org parsing).</param>
     /// <returns>A complete HTML document string.</returns>
-    string Build(Page? page, bool isOrgFile, string? imageDir = null, string? fontFamily = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? allFootnotes = null, string? decksPath = null, string? currentDir = null);
+    string Build(Page? page, bool isOrgFile, string? imageDir = null, string? fontFamily = null, List<string>? accumulatedImagePaths = null, IReadOnlyDictionary<string, string>? allFootnotes = null, string? decksPath = null, string? currentDir = null, bool isPlainText = false);
 }

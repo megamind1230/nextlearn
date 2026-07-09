@@ -5,77 +5,79 @@
              x:Class="NextLearn.Desktop.Controls.SettingsPanel"
              x:DataType="vm:MainWindowViewModel">
     <Panel IsVisible="{Binding IsSettingsOpen}" ZIndex="300">
-        <DockPanel Background="#1E293B">
-            <Border DockPanel.Dock="Top" Padding="16,12" Background="#1E293B">
+        <DockPanel Background="{StaticResource PanelBgBrush}">
+            <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource PanelBgBrush}">
                 <DockPanel>
                     <Button Command="{Binding CloseSettingsCommand}"
                             Background="Transparent" Padding="12,8">
-                        <TextBlock Text="← Back" FontSize="16" Foreground="#94A3B8"/>
+                        <TextBlock Text="← Back" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </Button>
                     <TextBlock Text="Settings" FontSize="20" FontWeight="Bold"
-                               Foreground="#E2E8F0" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"
                                Margin="16,0,0,0"/>
                 </DockPanel>
             </Border>
             <ScrollViewer Margin="24">
                 <StackPanel Spacing="16">
-                    <TextBlock Text="Theme" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="Theme" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <ComboBox SelectedItem="{Binding Theme}" FontSize="13"
-                              Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155">
+                                Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource SelectorBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}">
                         <ComboBox.Items>
                             <sys:String>Dark</sys:String>
                             <sys:String>Light</sys:String>
                         </ComboBox.Items>
                     </ComboBox>
+                    <TextBlock Text="Restart required to fully apply" FontSize="11"
+                               Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0"/>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="Font" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="Font" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <TextBox Text="{Binding Font}" Watermark="Inter"
-                             Padding="8" FontSize="13" Foreground="#E2E8F0"
-                             Background="#1E293B" BorderBrush="#334155"/>
+                             Padding="8" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"
+                             Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="Decks Path (restart required)" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="Decks Path (restart required)" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Command="{Binding BrowseDecksPathCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 Content="Browse" FontSize="13" Margin="8,0,0,0"/>
                         <TextBox Text="{Binding DecksPath}" Watermark="~/nextlearn/decks"
-                                 Padding="8" FontSize="13" Foreground="#E2E8F0"
-                                 Background="#1E293B" BorderBrush="#334155"/>
+                                 Padding="8" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"
+                                 Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
                     </DockPanel>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="Flashcards Path" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="Flashcards Path" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Command="{Binding BrowseFlashcardsPathCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 Content="Browse" FontSize="13" Margin="8,0,0,0"/>
                         <TextBox Text="{Binding FlashcardsPath}" Watermark="~/magnus/nextlearn/flashcards"
-                                 Padding="8" FontSize="13" Foreground="#E2E8F0"
-                                 Background="#1E293B" BorderBrush="#334155"/>
+                                 Padding="8" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"
+                                 Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
                     </DockPanel>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="MCQs Path" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="MCQs Path" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Command="{Binding BrowseMcqsPathCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 Content="Browse" FontSize="13" Margin="8,0,0,0"/>
                         <TextBox Text="{Binding McqsPath}" Watermark="~/magnus/nextlearn/mcqs"
-                                 Padding="8" FontSize="13" Foreground="#E2E8F0"
-                                 Background="#1E293B" BorderBrush="#334155"/>
+                                 Padding="8" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"
+                                 Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
                     </DockPanel>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="Key Bindings" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
-                    <ComboBox SelectedItem="{Binding KeyBindingsProfile}" FontSize="13"
-                              Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155">
+                    <TextBlock Text="Key Bindings" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                     <ComboBox SelectedItem="{Binding KeyBindingsProfile}" FontSize="13"
+                               Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource SelectorBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}">
                         <ComboBox.Items>
                             <sys:String>Vim</sys:String>
                             <sys:String>Emacs</sys:String>
@@ -84,37 +86,38 @@
                         </ComboBox.Items>
                     </ComboBox>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="Falcon Eye (Table of Contents)" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="Falcon Eye (Table of Contents)" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <CheckBox IsChecked="{Binding IsFalconEyeEnabled}"
-                              Content="Enabled" Foreground="#E2E8F0"/>
+                              Background="{StaticResource CheckboxBgBrush}" BorderBrush="{StaticResource AccentAmberBrush}" BorderThickness="1"
+                              Foreground="{StaticResource CheckmarkFgBrush}"/>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="Gemini API Key" FontSize="14" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                    <TextBlock Text="Gemini API Key" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Command="{Binding OpenGeminiApiUrlCommand}"
-                                Background="#334155" Foreground="#E2E8F0" Padding="12,8"
+                                Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="12,8"
                                 Content="Get free key" FontSize="13" Margin="8,0,0,0"/>
                         <TextBox Text="{Binding GeminiApiKey}" Watermark="Paste your Gemini API key"
                                  PasswordChar="•"
-                                 Padding="8" FontSize="13" Foreground="#E2E8F0"
-                                 Background="#1E293B" BorderBrush="#334155"/>
+                                 Padding="8" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"
+                                 Background="{StaticResource PathFieldBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
                     </DockPanel>
-                    <TextBlock Text="Free at aistudio.google.com" FontSize="11" Foreground="#64748B"/>
+                    <TextBlock Text="Free at aistudio.google.com" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
 
-                    <Border Height="1" Background="#334155"/>
+                    <Border Height="1" Background="{StaticResource SurfaceBgBrush}"/>
 
-                    <TextBlock Text="{Binding SettingsStatus}" FontSize="13" Foreground="#10B981"
+                    <TextBlock Text="{Binding SettingsStatus}" FontSize="13" Foreground="{StaticResource AccentGreenBrush}"
                                HorizontalAlignment="Center" TextWrapping="Wrap"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-                        <Button Command="{Binding SaveSettingsCommand}" Background="#0D9488"
+                        <Button Command="{Binding SaveSettingsCommand}" Background="{StaticResource AccentTealBrush}"
                                 Foreground="White" Padding="24,10" FontSize="14"
                                 Content="Save"/>
-                        <Button Command="{Binding ResetSettingsCommand}" Background="#334155"
-                                Foreground="#94A3B8" Padding="24,10" FontSize="14"
+                        <Button Command="{Binding ResetSettingsCommand}" Background="{StaticResource SurfaceBgBrush}"
+                                Foreground="{StaticResource TextSecondaryBrush}" Padding="24,10" FontSize="14"
                                 Content="Reset to defaults"/>
                     </StackPanel>
                 </StackPanel>

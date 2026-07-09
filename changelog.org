@@ -108,3 +108,15 @@ buttons. Two dedicated prompts (tab-separated Q&A vs single-line
 {{c1::}} sentences). Mode-aware response parsing. Cards saved as
 .basic.txt / .cloze.txt for direct Anki import. Model fallback chain,
 exponential retry. 6 new files, 7 modified.
+
+** 2026-07-09 --- Search prefixes, dark/light theme, .txt support
+:PROPERTIES:
+:CUSTOM_ID: search-prefixes-darklight-theme-txt-support
+:END:
+- file:/title:/desc:/description:/tags: search prefixes with quote-aware
+  tokenization (DeckFilter.cs, 4 ViewModels refactored)
+- Dark/light theme system with live switching via Settings dropdown
+  (ThemeHelper.cs, 13+ .axaml files from inline hex → {StaticResource})
+- .txt file support: 25-line page splitting, sentence-break readability,
+  plain-text HTML rendering, excluded from tag inference
+- Accent color alignment: teal → primary accent (#7C0AED)

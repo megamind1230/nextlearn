@@ -141,7 +141,7 @@ public class DeckFileService : IDeckFileService
     public static List<Deck> GetArchivedDecks(string decksPath)
     {
         var list = new List<Deck>();
-        var extensions = new[] { "*.md~", "*.org~" };
+        var extensions = new[] { "*.md~", "*.org~", "*.txt~" };
         foreach (var ext in extensions)
         {
             foreach (var file in Directory.GetFiles(decksPath, ext, SearchOption.AllDirectories))
@@ -160,7 +160,7 @@ public class DeckFileService : IDeckFileService
     public static List<Deck> GetPinnedDecks(string decksPath)
     {
         var list = new List<Deck>();
-        var extensions = new[] { "+*.md", "+*.org" };
+        var extensions = new[] { "+*.md", "+*.org", "+*.txt" };
         foreach (var ext in extensions)
         {
             foreach (var file in Directory.GetFiles(decksPath, ext, SearchOption.AllDirectories))

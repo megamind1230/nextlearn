@@ -831,6 +831,11 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    partial void OnThemeChanged(string value)
+    {
+        ThemeHelper.ApplyTheme(value);
+    }
+
     [RelayCommand]
     public void OpenSettings()
     {

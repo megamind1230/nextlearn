@@ -1,4 +1,4 @@
-#+TITLE: Screenshots Gallery
+﻿#+TITLE: Screenshots Gallery
 
 * Home & Navigation
 :PROPERTIES:
@@ -102,3 +102,16 @@ WebView --- 2×2 option grid, scoring, timer.
 
 [[file:screenshots/mcq-quiz-logs-tab.png]] MCQ quiz logs tab --- review
 past quiz results and performance.
+
+* Updated UI
+:PROPERTIES:
+:CUSTOM_ID: updated-ui
+:END:
+
+[[file:screenshots/default-dark-theme.png]] updated default dark theme
+
+[[file:screenshots/default-light-theme.png]] default light theme
+
+[[file:screenshots/default-light-theme-sidebar.png]] sidebar in light theme
+
+[[file:screenshots/default-light-theme-heatmap.png]] heatmap in light theme

@@ -4,20 +4,20 @@
              x:Class="NextLearn.Desktop.Controls.MarketplacePanel"
              x:DataType="vm:MainWindowViewModel">
     <Panel IsVisible="{Binding IsMarketplaceOpen}" ZIndex="310">
-        <DockPanel Background="#1E293B">
-            <Border DockPanel.Dock="Top" Padding="16,12" Background="#1E293B">
+        <DockPanel Background="{StaticResource PanelBgBrush}">
+            <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource PanelBgBrush}">
                 <DockPanel>
                     <Button Command="{Binding CloseMarketplaceCommand}"
                             Background="Transparent" Padding="12,8">
-                        <TextBlock Text="← Back" FontSize="16" Foreground="#94A3B8"/>
+                        <TextBlock Text="← Back" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </Button>
                 </DockPanel>
             </Border>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16" Margin="48">
                 <TextBlock Text="Marketplace coming soon in later updates.." FontSize="24" FontWeight="Bold"
-                           Foreground="#E2E8F0" TextWrapping="Wrap" TextAlignment="Center"/>
+                           Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" TextAlignment="Center"/>
                 <TextBlock Text="you can share notes with Telegram, 0x0.st, google drive ..etc for now"
-                           FontSize="16" Foreground="#94A3B8" TextWrapping="Wrap" TextAlignment="Center"/>
+                           FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" TextAlignment="Center"/>
             </StackPanel>
         </DockPanel>
     </Panel>

@@ -5,15 +5,15 @@
              x:Class="NextLearn.Desktop.Controls.TagInferencePanel"
              x:DataType="vm:MainWindowViewModel">
     <Panel IsVisible="{Binding IsTagInferenceOpen}" ZIndex="300">
-        <DockPanel Background="#1E293B">
-            <Border DockPanel.Dock="Top" Padding="16,12" Background="#1E293B">
+        <DockPanel Background="{StaticResource PanelBgBrush}">
+            <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource PanelBgBrush}">
                 <DockPanel>
                     <Button Command="{Binding CloseTagInferenceCommand}"
                             Background="Transparent" Padding="12,8">
-                        <TextBlock Text="← Back" FontSize="16" Foreground="#94A3B8"/>
+                        <TextBlock Text="← Back" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </Button>
                     <TextBlock Text="🏷 Tag Inference" FontSize="20" FontWeight="Bold"
-                               Foreground="#E2E8F0" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"
                                Margin="16,0,0,0"/>
                 </DockPanel>
             </Border>
@@ -21,7 +21,7 @@
             <Border DockPanel.Dock="Top" Height="4" IsVisible="{Binding TagInferenceViewModel.IsInferring}">
                 <ProgressBar Value="{Binding TagInferenceViewModel.InferenceProgress}"
                              Minimum="0" Maximum="100"
-                             Foreground="#2563EB" Background="#334155" Height="4"/>
+                             Foreground="{StaticResource AccentBlueBrush}" Background="{StaticResource SurfaceBgBrush}" Height="4"/>
             </Border>
 
             <ScrollViewer x:Name="TagInferenceScrollViewer" Margin="24">
@@ -29,7 +29,7 @@
 
                     <TextBlock Text="{Binding TagInferenceViewModel.InferenceStatus}"
                                IsVisible="{Binding TagInferenceViewModel.IsInferring}"
-                               Foreground="#94A3B8" FontSize="14"/>
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
 
                     <TextBox Text="{Binding TagInferenceViewModel.ErrorMessage}"
                              IsVisible="{Binding TagInferenceViewModel.HasError}"
@@ -38,9 +38,9 @@
                              TextWrapping="Wrap"
                              Padding="8"
                              FontSize="13"
-                             Foreground="#EF4444"
-                             Background="#1E293B"
-                             BorderBrush="#EF4444"
+                             Foreground="{StaticResource AccentRedBrush}"
+                             Background="{StaticResource PanelBgBrush}"
+                             BorderBrush="{StaticResource AccentRedBrush}"
                              MinHeight="40"
                              MaxHeight="300"/>
 
@@ -50,43 +50,44 @@
                                  Text="{Binding TagInferenceViewModel.SearchText}"
                                  Watermark="🔍 Search by title, description, #tag, or regex…"
                                  Padding="12" FontSize="14"
-                                 Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155"/>
-                        <CheckBox Grid.Column="1"
+                                 Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource SearchBoxBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
+                         <CheckBox Grid.Column="1"
                                   IsChecked="{Binding TagInferenceViewModel.UseRegex}"
                                   Content="Regex"
                                   VerticalAlignment="Center"
                                   Margin="8,0,0,0"
-                                  Foreground="#94A3B8"/>
+                                  Background="{StaticResource CheckboxBgBrush}" BorderBrush="{StaticResource AccentAmberBrush}" BorderThickness="1"
+                                  Foreground="{StaticResource CheckmarkFgBrush}"/>
                     </Grid>
 
                     <Border IsVisible="{Binding TagInferenceViewModel.IsPreviewVisible}"
-                            Background="#1E293B" CornerRadius="12" Padding="20"
-                            BorderBrush="#334155" BorderThickness="1">
+                            Background="{StaticResource CardBgBrush}" CornerRadius="12" Padding="20"
+                            BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
                         <StackPanel Spacing="12">
-                            <TextBlock Text="Tag Preview" FontSize="16" FontWeight="Bold" Foreground="#E2E8F0"/>
+                            <TextBlock Text="Tag Preview" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <TextBlock Text="Ensure this file is not being modified externally during inference."
-                                       Foreground="#FBBF24" FontSize="12" TextWrapping="Wrap"/>
-                            <Border Background="#0F172A" CornerRadius="8" Padding="16">
+                                       Foreground="{StaticResource TextAccentBrush}" FontSize="12" TextWrapping="Wrap"/>
+                            <Border Background="{StaticResource PageBgBrush}" CornerRadius="8" Padding="16">
                                 <StackPanel Spacing="8">
                                     <DockPanel>
-                                        <TextBlock Text="Current: " Foreground="#94A3B8" FontSize="13"/>
+                                        <TextBlock Text="Current: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
                                         <TextBlock Text="{Binding TagInferenceViewModel.ExistingTagsDisplay}"
-                                                   Foreground="#E2E8F0" FontSize="13" TextWrapping="Wrap"/>
+                                                   Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" TextWrapping="Wrap"/>
                                     </DockPanel>
                                     <DockPanel>
-                                        <TextBlock Text="Proposed: " Foreground="#94A3B8" FontSize="13"/>
+                                        <TextBlock Text="Proposed: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
                                         <TextBlock Text="{Binding TagInferenceViewModel.ProposedTagsDisplay}"
-                                                   Foreground="#10B981" FontSize="13" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource AccentGreenBrush}" FontSize="13" TextWrapping="Wrap"
                                                    FontWeight="SemiBold"/>
                                     </DockPanel>
                                 </StackPanel>
                             </Border>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
                                 <Button Command="{Binding TagInferenceViewModel.CancelPreviewCommand}"
-                                        Background="#334155" Foreground="#94A3B8"
+                                        Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}"
                                         Padding="24,10" FontSize="14" Content="Cancel"/>
                                 <Button Command="{Binding TagInferenceViewModel.ApplyTagsCommand}"
-                                        Background="#0D9488" Foreground="White"
+                                        Background="{StaticResource AccentTealBrush}" Foreground="White"
                                         Padding="24,10" FontSize="14" Content="Apply Tags"/>
                             </StackPanel>
                         </StackPanel>
@@ -96,26 +97,26 @@
                                   IsVisible="{Binding TagInferenceViewModel.ShowDeckList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="models:Deck">
-                                <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="0,0,0,16"
-                                        BorderBrush="#334155" BorderThickness="1">
+                                <Border Background="{StaticResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16"
+                                        BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
                                     <DockPanel>
                                         <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center">
                                             <Button Content="Infer Tags →"
                                                     Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).TagInferenceViewModel.InferTagsCommand}"
                                                     CommandParameter="{Binding}"
-                                                    Background="#2563EB" Foreground="White" Padding="16,8"/>
+                                                    Background="{StaticResource AccentBlueBrush}" Foreground="White" Padding="16,8"/>
                                         </StackPanel>
                                         <StackPanel Margin="0,0,24,0">
                                             <DockPanel>
                                                 <TextBlock DockPanel.Dock="Right" Text="{Binding Title}" FontSize="14"
-                                                           Foreground="#E2E8F0" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
-                                                <TextBlock FontSize="13" Foreground="#FBBF24" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                                                           Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                                                <TextBlock FontSize="13" Foreground="{StaticResource TextAccentBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                                                     <Run Text="Name: "/>
                                                     <Run Text="{Binding FileName}"/>
                                                 </TextBlock>
                                             </DockPanel>
-                                            <TextBlock Text="{Binding Description}" Foreground="#94A3B8" TextWrapping="Wrap"/>
-                                            <TextBlock Foreground="#94A3B8" FontSize="13">
+                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                            <TextBlock Foreground="{StaticResource TextSecondaryBrush}" FontSize="13">
                                                 <Run Text="{Binding PageCount, StringFormat='{}{0} pages'}"/>
                                                 <Run Text=" | "/>
                                                 <Run Text="{Binding Tags}"/>

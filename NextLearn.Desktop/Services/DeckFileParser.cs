@@ -21,6 +21,14 @@ public static class DeckFileParser
                 ? Path.GetRelativePath(relativeTo, filePath).Replace('\\', '/')
                 : Path.GetFileName(filePath);
             bool isOrg = fileName.EndsWith(".org", StringComparison.OrdinalIgnoreCase);
+            bool isTxt = fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase);
+
+            if (isTxt)
+            {
+                var text = string.Join('\n', lines);
+                text = Regex.Replace(text, @"(?<=[.!?])\s+(?=[A-Z0-9""'\(])", "\n\n");
+                lines = text.Split('\n');
+            }
 
             string title;
             string description;
@@ -28,7 +36,16 @@ public static class DeckFileParser
             int contentStart;
             bool hasExplicitTitle;
 
-            if (isOrg)
+            if (isTxt)
+            {
+                hasExplicitTitle = false;
+                var nonEmpty = lines.Where(l => !string.IsNullOrWhiteSpace(l.Trim())).Take(2).ToArray();
+                title = nonEmpty.Length > 0 ? nonEmpty[0].Trim() : Path.GetFileName(filePath);
+                description = nonEmpty.Length > 1 ? (nonEmpty[1].Length > 200 ? nonEmpty[1][..200] : nonEmpty[1]) : string.Empty;
+                tags = string.Empty;
+                contentStart = 0;
+            }
+            else if (isOrg)
             {
                 var orgMeta = ParseOrgKeywords(lines);
                 hasExplicitTitle = orgMeta.title != null;
@@ -59,7 +76,7 @@ public static class DeckFileParser
                 }
             }
 
-            var pages = ParsePages(lines, contentStart, title, isOrg);
+            var pages = isTxt ? SplitIntoLineChunks(lines, contentStart, title) : ParsePages(lines, contentStart, title, isOrg);
             if (pages.Count == 0)
             {
                 pages.Add(new Page
@@ -560,6 +577,51 @@ public static class DeckFileParser
                 SectionTitle = currentSection,
                 Title = currentTitle,
                 TextContent = currentContent.ToString().Trim(),
+                ContentType = ContentType.Text,
+                PageNumber = pageNum++,
+            });
+        }
+
+        return pages;
+    }
+
+    private static List<Page> SplitIntoLineChunks(string[] lines, int startLine, string fallbackTitle)
+    {
+        var pages = new List<Page>();
+        int pageNum = 1;
+        for (int i = startLine; i < lines.Length; i += 25)
+        {
+            var end = Math.Min(i + 25, lines.Length);
+            var content = string.Join('\n', lines[i..end]).Trim();
+            if (content.Length == 0)
+            {
+                continue;
+            }
+
+            var firstLine = string.Empty;
+            for (int j = i; j < end && string.IsNullOrWhiteSpace(firstLine); j++)
+            {
+                if (!string.IsNullOrWhiteSpace(lines[j]))
+                {
+                    firstLine = lines[j].Trim();
+                }
+            }
+
+            if (string.IsNullOrEmpty(firstLine))
+            {
+                firstLine = $"{fallbackTitle} (page {pageNum})";
+            }
+
+            if (firstLine.Length > 100)
+            {
+                firstLine = firstLine[..100];
+            }
+
+            pages.Add(new Page
+            {
+                Id = Guid.NewGuid(),
+                Title = firstLine,
+                TextContent = content,
                 ContentType = ContentType.Text,
                 PageNumber = pageNum++,
             });

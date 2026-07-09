@@ -80,12 +80,22 @@ public partial class HeatmapPanel : UserControl
         {
             var isToday = cell.Date == today;
 
+            var levelKey = cell.Count switch
+            {
+                0 => "HeatmapLevel0",
+                <= 5 => "HeatmapLevel1",
+                <= 15 => "HeatmapLevel2",
+                <= 30 => "HeatmapLevel3",
+                <= 60 => "HeatmapLevel4",
+                _ => "HeatmapLevel5",
+            };
+
             var border = new Border
             {
                 Width = cellSize,
                 Height = cellSize,
                 CornerRadius = new CornerRadius(2),
-                Background = new SolidColorBrush(ColorFromHex(cell.Color)),
+                Background = Application.Current!.Resources[levelKey] as IBrush ?? new SolidColorBrush(Colors.Transparent),
                 Tag = cell,
             };
 

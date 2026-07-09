@@ -56,6 +56,9 @@ public partial class LearningViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isOrgFile;
 
+    [ObservableProperty]
+    private bool _isTxtFile;
+
     public bool HasSection => !string.IsNullOrEmpty(CurrentSectionBreadcrumb);
 
     [ObservableProperty]
@@ -118,6 +121,7 @@ public partial class LearningViewModel : ViewModelBase
         _pages = deck.Pages.OrderBy(p => p.PageNumber).ToList();
         DeckTitle = deck.HasExplicitTitle ? deck.Title : deck.FileName;
         IsOrgFile = deck.FileName?.EndsWith(".org", StringComparison.OrdinalIgnoreCase) ?? false;
+        IsTxtFile = deck.FileName?.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ?? false;
         TotalPages = _pages.Count;
 
         CollectAllFootnotes();
@@ -211,7 +215,7 @@ public partial class LearningViewModel : ViewModelBase
             return;
         }
 
-        var extensions = new[] { "*.md", "*.org" };
+        var extensions = new[] { "*.md", "*.org", "*.txt" };
         Deck? deck = null;
 
         foreach (var ext in extensions)
@@ -250,6 +254,7 @@ public partial class LearningViewModel : ViewModelBase
         _pages = deck.Pages.OrderBy(p => p.PageNumber).ToList();
         DeckTitle = deck.HasExplicitTitle ? deck.Title : deck.FileName;
         IsOrgFile = deck.FileName?.EndsWith(".org", StringComparison.OrdinalIgnoreCase) ?? false;
+        IsTxtFile = deck.FileName?.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ?? false;
         TotalPages = _pages.Count;
 
         CollectAllFootnotes();
@@ -374,7 +379,7 @@ public partial class LearningViewModel : ViewModelBase
         var imagePaths = new List<string>();
         var imageDir = GetCurrentImageDir();
         var currentDir = GetCurrentDeckDir();
-        RenderedHtml = _htmlContentBuilder.Build(CurrentPage, IsOrgFile, imageDir, _mainViewModel.Font, imagePaths, _allFootnotes, _decksPath, currentDir);
+        RenderedHtml = _htmlContentBuilder.Build(CurrentPage, IsOrgFile, imageDir, _mainViewModel.Font, imagePaths, _allFootnotes, _decksPath, currentDir, IsTxtFile);
         CurrentPageImagePaths = imagePaths;
 
         var isLastPage = CurrentPageIndex >= TotalPages - 1;

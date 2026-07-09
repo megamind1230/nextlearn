@@ -13,9 +13,9 @@
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Background="#1E293B" CornerRadius="8,8,0,0"
+      <Border Grid.Row="0" Background="{StaticResource PanelBgBrush}" CornerRadius="8,8,0,0"
               Margin="8,0,8,0" Padding="4,4,14,4" MaxHeight="240"
-              BorderThickness="1,1,1,0" BorderBrush="#334155"
+              BorderThickness="1,1,1,0" BorderBrush="{StaticResource BorderDefaultBrush}"
               IsVisible="{Binding HasFilteredCommands}">
         <ScrollViewer Name="CommandListScrollViewer">
           <ListBox Name="CommandListBox"
@@ -31,15 +31,15 @@
                     <TextBlock Grid.Column="0" Text="{Binding Name}"
                                FontFamily="Consolas,Monospace"
                                FontSize="14" FontWeight="SemiBold"
-                               Foreground="#FBBF24" Margin="0,0,8,0"/>
+                               Foreground="{StaticResource TextAccentBrush}" Margin="0,0,8,0"/>
                     <TextBlock Grid.Column="1" Text="{Binding Description}"
-                               FontSize="13" Foreground="#94A3B8"
+                               FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Grid.Column="2" Text="{Binding ShortcutText}"
-                               FontSize="12" Foreground="#A78BFA"
+                               FontSize="12" Foreground="{StaticResource AccentSelectionBrush}"
                                Margin="8,0,8,0"/>
                     <TextBlock Grid.Column="3" Text="{Binding AliasesText}"
-                               FontSize="12" Foreground="#64748B"
+                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
                                Margin="0,0,0,0"/>
                   </Grid>
                 </Border>
@@ -51,11 +51,11 @@
                 <Setter Property="Padding" Value="0"/>
               </Style>
               <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                <Setter Property="Background" Value="#334155"/>
+                <Setter Property="Background" Value="{StaticResource SurfaceBgBrush}"/>
                 <Setter Property="CornerRadius" Value="4"/>
               </Style>
               <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                <Setter Property="Background" Value="#2D3748"/>
+                <Setter Property="Background" Value="{StaticResource CommandPaletteHoverBgBrush}"/>
                 <Setter Property="CornerRadius" Value="4"/>
               </Style>
             </ListBox.Styles>
@@ -63,17 +63,17 @@
         </ScrollViewer>
       </Border>
 
-      <Border Grid.Row="1" Height="30" Background="#0F172A" Padding="8,0"
-              BorderThickness="0,1,0,0" BorderBrush="#334155">
+      <Border Grid.Row="1" Height="30" Background="{StaticResource PageBgBrush}" Padding="8,0"
+              BorderThickness="0,1,0,0" BorderBrush="{StaticResource BorderDefaultBrush}">
         <Grid ColumnDefinitions="Auto,*">
           <TextBlock Grid.Column="0" Text=":" FontSize="16" FontWeight="Bold"
-                     Foreground="#FBBF24" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                     Foreground="{StaticResource TextAccentBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
           <TextBox Grid.Column="1" Name="CommandInput"
                    Text="{Binding CommandPaletteInput}"
                    Watermark="type a command..."
                    FontSize="14" FontFamily="Consolas,Monospace"
                    Padding="4,0" Background="Transparent"
-                   Foreground="#E2E8F0" BorderThickness="0"
+                   Foreground="{StaticResource TextPrimaryBrush}" BorderThickness="0"
                    KeyDown="OnTextBoxKeyDown"/>
         </Grid>
       </Border>

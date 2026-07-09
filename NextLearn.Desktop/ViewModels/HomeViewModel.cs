@@ -97,7 +97,7 @@ public partial class HomeViewModel : ViewModelBase
 
         if (_allDecks.Count == 0)
         {
-            var extensions = new[] { "*.md", "*.org" };
+            var extensions = new[] { "*.md", "*.org", "*.txt" };
             foreach (var ext in extensions)
             {
                 foreach (var file in Directory.GetFiles(decksPath, ext, SearchOption.AllDirectories))

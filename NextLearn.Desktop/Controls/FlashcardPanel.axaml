@@ -5,15 +5,15 @@
              x:Class="NextLearn.Desktop.Controls.FlashcardPanel"
              x:DataType="vm:MainWindowViewModel">
     <Panel IsVisible="{Binding IsFlashcardOpen}" ZIndex="300">
-        <DockPanel Background="#1E293B">
-            <Border DockPanel.Dock="Top" Padding="16,12" Background="#1E293B">
+        <DockPanel Background="{StaticResource PanelBgBrush}">
+            <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource PanelBgBrush}">
                 <DockPanel>
                     <Button Command="{Binding CloseFlashcardPanelCommand}"
                             Background="Transparent" Padding="12,8">
-                        <TextBlock Text="← Back" FontSize="16" Foreground="#94A3B8"/>
+                        <TextBlock Text="← Back" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </Button>
                     <TextBlock Text="🃏 Anki Flashcards" FontSize="20" FontWeight="Bold"
-                               Foreground="#E2E8F0" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"
                                Margin="16,0,0,0"/>
                 </DockPanel>
             </Border>
@@ -21,7 +21,7 @@
             <Border DockPanel.Dock="Top" Height="4" IsVisible="{Binding FlashcardViewModel.IsGenerating}">
                 <ProgressBar Value="{Binding FlashcardViewModel.GenerationProgress}"
                              Minimum="0" Maximum="100"
-                             Foreground="#2563EB" Background="#334155" Height="4"/>
+                             Foreground="{StaticResource AccentBlueBrush}" Background="{StaticResource SurfaceBgBrush}" Height="4"/>
             </Border>
 
             <ScrollViewer x:Name="FlashcardScrollViewer" Margin="24">
@@ -29,7 +29,7 @@
 
                     <TextBlock Text="{Binding FlashcardViewModel.GenerationStatus}"
                                IsVisible="{Binding FlashcardViewModel.IsGenerating}"
-                               Foreground="#94A3B8" FontSize="14"/>
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
 
                     <TextBox Text="{Binding FlashcardViewModel.ErrorMessage}"
                              IsVisible="{Binding FlashcardViewModel.HasError}"
@@ -38,21 +38,21 @@
                              TextWrapping="Wrap"
                              Padding="8"
                              FontSize="13"
-                             Foreground="#EF4444"
-                             Background="#1E293B"
-                             BorderBrush="#EF4444"
+                             Foreground="{StaticResource AccentRedBrush}"
+                             Background="{StaticResource PanelBgBrush}"
+                             BorderBrush="{StaticResource AccentRedBrush}"
                              MinHeight="40"
                              MaxHeight="300"/>
 
                     <!-- Success message after export -->
                     <Border IsVisible="{Binding FlashcardViewModel.HasSuccessMessage}"
-                            Background="#0F172A" CornerRadius="8" Padding="16"
-                            BorderBrush="#10B981" BorderThickness="1">
+                            Background="{StaticResource PageBgBrush}" CornerRadius="8" Padding="16"
+                            BorderBrush="{StaticResource AccentGreenBrush}" BorderThickness="1">
                         <StackPanel Spacing="8">
                             <TextBlock Text="✅ Export Successful" FontSize="16" FontWeight="Bold"
-                                       Foreground="#10B981"/>
+                                       Foreground="{StaticResource AccentGreenBrush}"/>
                             <TextBlock Text="{Binding FlashcardViewModel.SuccessMessage}"
-                                       Foreground="#94A3B8" FontSize="13"
+                                       Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"
                                        TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
@@ -63,41 +63,42 @@
                                  Text="{Binding FlashcardViewModel.SearchText}"
                                  Watermark="🔍 Search by title, description, #tag, or regex…"
                                  Padding="12" FontSize="14"
-                                 Foreground="#E2E8F0" Background="#1E293B" BorderBrush="#334155"/>
-                        <CheckBox Grid.Column="1"
+                                 Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource SearchBoxBgBrush}" BorderBrush="{StaticResource BorderDefaultBrush}"/>
+                         <CheckBox Grid.Column="1"
                                   IsChecked="{Binding FlashcardViewModel.UseRegex}"
                                   Content="Regex"
                                   VerticalAlignment="Center"
                                   Margin="8,0,0,0"
-                                  Foreground="#94A3B8"/>
+                                  Background="{StaticResource CheckboxBgBrush}" BorderBrush="{StaticResource AccentAmberBrush}" BorderThickness="1"
+                                  Foreground="{StaticResource CheckmarkFgBrush}"/>
                     </Grid>
 
                     <Border IsVisible="{Binding FlashcardViewModel.IsPreviewVisible}"
-                            Background="#1E293B" CornerRadius="12" Padding="20"
-                            BorderBrush="#334155" BorderThickness="1">
+                            Background="{StaticResource CardBgBrush}" CornerRadius="12" Padding="20"
+                            BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
                         <StackPanel Spacing="12">
-                            <TextBlock Text="{Binding FlashcardViewModel.PreviewHeader}" FontSize="16" FontWeight="Bold" Foreground="#E2E8F0"/>
+                            <TextBlock Text="{Binding FlashcardViewModel.PreviewHeader}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <TextBlock Text="Review the TSV content below. Each line is one flashcard. Accept to save or Cancel to discard."
-                                       Foreground="#FBBF24" FontSize="12" TextWrapping="Wrap"/>
-                            <Border Background="#0F172A" CornerRadius="8" Padding="16"
-                                    BorderBrush="#334155" BorderThickness="1">
+                                       Foreground="{StaticResource TextAccentBrush}" FontSize="12" TextWrapping="Wrap"/>
+                            <Border Background="{StaticResource PageBgBrush}" CornerRadius="8" Padding="16"
+                                    BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
                                 <TextBox Text="{Binding FlashcardViewModel.PreviewText}"
                                          IsReadOnly="True"
                                          AcceptsReturn="True"
                                          TextWrapping="NoWrap"
                                          FontFamily="Consolas, Courier New, monospace"
                                          FontSize="12"
-                                         Foreground="#E2E8F0" Background="#0F172A"
+                                         Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource PageBgBrush}"
                                          BorderThickness="0"
                                          MinHeight="200"
                                          MaxHeight="400"/>
                             </Border>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
                                 <Button Command="{Binding FlashcardViewModel.CancelPreviewCommand}"
-                                        Background="#334155" Foreground="#94A3B8"
+                                        Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}"
                                         Padding="24,10" FontSize="14" Content="Cancel"/>
                                 <Button Command="{Binding FlashcardViewModel.AcceptFlashcardsCommand}"
-                                        Background="#0D9488" Foreground="White"
+                                        Background="{StaticResource AccentTealBrush}" Foreground="White"
                                         Padding="24,10" FontSize="14" Content="Accept &amp; Export"/>
                             </StackPanel>
                         </StackPanel>
@@ -107,34 +108,34 @@
                                   IsVisible="{Binding FlashcardViewModel.ShowDeckList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="models:Deck">
-                                <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="0,0,0,16"
-                                        BorderBrush="#334155" BorderThickness="1">
+                                <Border Background="{StaticResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16"
+                                        BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1">
                                     <DockPanel>
                                         <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <Button Content="Basic"
                                                         Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FlashcardViewModel.GenerateBasicCommand}"
                                                         CommandParameter="{Binding}"
-                                                        Background="#2563EB" Foreground="White"
+                                                        Background="{StaticResource AccentBlueBrush}" Foreground="White"
                                                         Padding="16,8" FontSize="13"/>
                                                 <Button Content="Cloze"
                                                         Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).FlashcardViewModel.GenerateClozeCommand}"
                                                         CommandParameter="{Binding}"
-                                                        Background="#7C3AED" Foreground="White"
+                                                        Background="{StaticResource AccentPurpleBrush}" Foreground="White"
                                                         Padding="16,8" FontSize="13"/>
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel Margin="0,0,24,0">
                                             <DockPanel>
                                                 <TextBlock DockPanel.Dock="Right" Text="{Binding Title}" FontSize="14"
-                                                           Foreground="#E2E8F0" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
-                                                <TextBlock FontSize="13" Foreground="#FBBF24" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                                                           Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                                                <TextBlock FontSize="13" Foreground="{StaticResource TextAccentBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                                                     <Run Text="Name: "/>
                                                     <Run Text="{Binding FileName}"/>
                                                 </TextBlock>
                                             </DockPanel>
-                                            <TextBlock Text="{Binding Description}" Foreground="#94A3B8" TextWrapping="Wrap"/>
-                                            <TextBlock Foreground="#94A3B8" FontSize="13">
+                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                            <TextBlock Foreground="{StaticResource TextSecondaryBrush}" FontSize="13">
                                                 <Run Text="{Binding PageCount, StringFormat='{}{0} pages'}"/>
                                                 <Run Text=" | "/>
                                                 <Run Text="{Binding Tags}"/>

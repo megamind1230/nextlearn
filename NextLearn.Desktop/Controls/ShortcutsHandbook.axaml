@@ -4,14 +4,14 @@
              x:Class="NextLearn.Desktop.Controls.ShortcutsHandbook"
              x:DataType="vm:MainWindowViewModel">
     <Panel IsVisible="{Binding IsShortcutsHandbookOpen}" ZIndex="999">
-        <Border Background="#80000000" PointerPressed="CloseOnBackdrop">
-            <Border Background="#1E293B" CornerRadius="16" Padding="28" Margin="100"
+        <Border Background="{StaticResource ModalBackdropBrush}" PointerPressed="CloseOnBackdrop">
+            <Border Background="{StaticResource PanelBgBrush}" CornerRadius="16" Padding="28" Margin="100"
                     VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="520" MaxHeight="540">
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                         <Button DockPanel.Dock="Right" Content="✕" Command="{Binding CloseShortcutsHandbookCommand}"
-                                Padding="8,4" Background="#334155" Foreground="#94A3B8" FontSize="14"/>
-                        <TextBlock Text="⌨ Shortcuts Handbook" FontSize="20" FontWeight="Bold" Foreground="#E2E8F0"/>
+                                Padding="8,4" Background="{StaticResource SurfaceBgBrush}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
+                        <TextBlock Text="⌨ Shortcuts Handbook" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                     </DockPanel>
                     <ScrollViewer>
                         <ItemsControl ItemsSource="{Binding HandbookSections}">
@@ -19,24 +19,24 @@
                                 <DataTemplate x:DataType="vm:ShortcutSection">
                                     <StackPanel Spacing="4">
                                         <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Bold"
-                                                   Foreground="#0D9488" Margin="0,0,0,4"/>
+                                                   Foreground="{StaticResource AccentTealBrush}" Margin="0,0,0,4"/>
                                         <ItemsControl ItemsSource="{Binding Entries}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:ShortcutEntry">
                                                     <Grid ColumnDefinitions="130,*">
                                                         <TextBlock Grid.Column="0" Text="{Binding KeyText}"
                                                                    FontFamily="Consolas,Monospace"
-                                                                   Foreground="#FBBF24"
+                                                                   Foreground="{StaticResource TextAccentBrush}"
                                                                    Margin="0,0,12,4"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Description}"
-                                                                   Foreground="#94A3B8"
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
                                                                    TextWrapping="Wrap"
                                                                    Margin="0,0,0,4"/>
                                                     </Grid>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
-                                        <Border Height="1" Background="#334155" Margin="0,4"/>
+                                        <Border Height="1" Background="{StaticResource SurfaceBgBrush}" Margin="0,4"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

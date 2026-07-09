@@ -1,5 +1,36 @@
 #+TITLE: NextLearn — Plan & Todos
 
+* DONE Theme system (NextDark / NextLight)
+:PROPERTIES:
+:CUSTOM_ID: done-theme-system-nextdark-nextlight
+:END:
+** Done
+:PROPERTIES:
+:CUSTOM_ID: done
+:END:
+- Resource brushes centralized in =App.axaml= as ={StaticResource}= keys
+- =Services/ThemeHelper.cs=: two dictionaries (=DarkColors= / =LightColors=)
+  with 45+ resource keys, =ApplyTheme()= for live switching
+- 13 =.axaml= files refactored from inline hex to ={StaticResource}=
+- =MainWindowViewModel.OnThemeChanged= partial method for live preview
+- Theme setting persisted in =settings.yaml=
+- Accent colors aligned: teal → primary purple (#7C0AED)
+
+* DONE .txt file support
+:PROPERTIES:
+:CUSTOM_ID: done-txt-file-support
+:END:
+** Done
+:PROPERTIES:
+:CUSTOM_ID: done-1
+:END:
+- =DeckFileParser.cs=: =.txt= detection, sentence-break regex, 25-line chunk
+  page splitting via =SplitIntoLineChunks()=
+- No frontmatter parsing — title/desc from first lines, tags = empty
+- Plain-text HTML rendering (no markdown/org) via =HtmlContentBuilder= =isPlainText= flag
+- All scan globs updated: =HomeViewModel=, =LearningViewModel=, =DeckFileService=
+- Excluded from tag inference (no tags to infer)
+
 * DONE Clean Code Initiative
 Phase 5 of the clean code initiative is complete:
 
@@ -1267,3 +1298,54 @@ plus double-quote support for phrase matching in =file:=, =title:=, =desc:= / =d
 - =ViewModels/FlashcardViewModel.cs= --- same
 - =ViewModels/McqGenerationViewModel.cs= --- same
 - =ViewModels/TagInferenceViewModel.cs= --- same
+
+* DONE Theme system (NextDark / NextLight)
+:PROPERTIES:
+:CUSTOM_ID: done-theme-system-nextdark-nextlight
+:END:
+** What
+Theme system with live switching between "Dark" and "Light" modes.
+Resource brushes defined inline in =App.axaml= (not external files).
+Theme switching via =ThemeHelper.ApplyTheme()= --- replaces all
+=SolidColorBrush= colors in =Application.Current.Resources=.
+
+** Architecture
+- All colors centralized as named resources (=PanelBgBrush=,
+  =TextPrimaryBrush=, etc.) in =App.axaml → Application.Resources=
+- All 13 =.axaml= files refactored from inline hex to
+  ={StaticResource ResourceKey=...}=
+- =Services/ThemeHelper.cs=: two dictionaries (=DarkColors= /
+  =LightColors=), =ApplyTheme(string? theme)= replaces each brush color
+  and sets =RequestedThemeVariant=
+- =App.axaml.cs=: calls =ThemeHelper.ApplyTheme(vm.Theme)= on startup
+- =MainWindowViewModel.OnThemeChanged= (partial method): calls
+  =ThemeHelper.ApplyTheme(value)= --- live preview as user toggles
+  ComboBox
+- Setting + Save persists in =settings.yaml= (existing infrastructure)
+
+** Resource keys (45 total)
+| Key | Dark | Light |
+|-----|------|-------|
+| =PageBgBrush= | =#0F172A= | =#F8FAFC= |
+| =PanelBgBrush= | =#1E293B= | =#FFFFFF= |
+| =SurfaceBgBrush= | =#334155= | =#F1F5F9= |
+| =TextPrimaryBrush= | =#E2E8F0= | =#1E293B= |
+| =TextSecondaryBrush= | =#94A3B8= | =#64748B= |
+| =TextMutedBrush= | =#64748B= | =#94A3B8= |
+| =BorderDefaultBrush= | =#334155= | =#E2E8F0= |
+| =ButtonSecondaryBgBrush= | =#334155= | =#E2E8F0= |
+| (button states, heatmap, accents --- see =ThemeHelper.cs=) |
+
+** Files created
+- =Services/ThemeHelper.cs=
+
+** Files modified
+- =App.axaml= --- removed =RequestedThemeVariant="Dark"=, added inline
+  resources
+- =App.axaml.cs= --- apply saved theme on startup
+- =ViewModels/MainWindowViewModel.cs= --- =OnThemeChanged= partial method
+- All 13 =.axaml= files --- inline hex → ={StaticResource}=
+
+** HTML/MCQ embeds
+Skipped. Phase 4 not implemented (quiz WebView, code blocks, LaTeX
+rendering stay dark-theme hardcoded).
