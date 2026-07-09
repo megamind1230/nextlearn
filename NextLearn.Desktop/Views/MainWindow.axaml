@@ -10,6 +10,7 @@
         x:Class="NextLearn.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="NextLearn - Let's Fight Distraction"
+        Icon="/Assets/nextlearn-logo.png"
         Width="900" Height="650"
         MinWidth="600" MinHeight="400"
         KeyDown="OnKeyDown">

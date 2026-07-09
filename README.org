@@ -27,6 +27,8 @@
 :PROPERTIES:
 :CUSTOM_ID: description
 :END:
+
+[[file:screenshots/nextlearn-logo.png]]
 nextlearn is a distraction-free desktop app for learning anything
 through bite-sized decks. You write decks as =.md= files with YAML
 frontmatter, =.org= frontmatter / inline metadata, or plain =.txt=

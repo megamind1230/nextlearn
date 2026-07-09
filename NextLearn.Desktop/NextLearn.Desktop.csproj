@@ -30,6 +30,10 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="InstallLinuxIcon" AfterTargets="Build" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <Exec Command="chmod +x $(ProjectDir)install-icon.sh 2>/dev/null; $(ProjectDir)install-icon.sh '$(ProjectDir)Assets/nextlearn-logo.png' '$(TargetPath)'" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.12" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.12" />
