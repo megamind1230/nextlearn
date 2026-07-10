@@ -5,7 +5,7 @@
 :CUSTOM_ID: home-navigation
 :END:
 
-[[file:screenshots/nextlearn-logo-high-res.png]]
+[[file:screenshots/nextlearn-logo.png]]
 
 
 [[file:screenshots/home-search-page.png]] Home page with search bar,

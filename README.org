@@ -28,7 +28,7 @@
 :CUSTOM_ID: description
 :END:
 
-[[file:screenshots/nextlearn-logo-high-res.png]]
+[[file:screenshots/nextlearn-logo.png]]
 
 nextlearn is a distraction-free desktop app for learning anything
 through bite-sized decks. You write decks as =.md= files with YAML
@@ -212,7 +212,7 @@ heatmap, export) work completely offline with no network calls.
 - =~/.config/nextlearn/focus-timer.yaml= --- Focus Timer persistent data
   (todos + session log)
 
-  
+
 ** Project Structure
 :PROPERTIES:
 :CUSTOM_ID: project-structure
