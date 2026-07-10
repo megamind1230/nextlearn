@@ -1,0 +1,85 @@
+@startuml
+!theme plain
+skinparam backgroundColor #F8FAFC
+skinparam entityFontSize 10
+
+entity "User" as user {
+  * Id : GUID (PK)
+  --
+  * DisplayName : string
+  * CreatedAt : DateTime
+  * TotalDecksCompleted : int
+  * CurrentStreak : int
+  * LastActiveDate : DateTime
+  * IsGuest : bool
+}
+
+entity "Deck" as deck {
+  * Id : GUID (PK)
+  --
+  * FileName : string (500)
+  * Title : string (200)
+  * HasExplicitTitle : bool
+  * Description : string (1000)
+  * Tags : string (500)
+  * AuthorId : GUID (FK -> User)
+  * IsPublished : bool
+  * IsReviewed : bool
+  * IsArchived : bool
+  * IsPinned : bool
+  * CreatedAt : DateTime
+  * PageCount : int
+}
+
+entity "Page" as page {
+  * Id : GUID (PK)
+  --
+  * DeckId : GUID (FK -> Deck)
+  * PageNumber : int
+  * SectionTitle : string (200) [nullable]
+  * Title : string (200)
+  * ContentType : enum
+  * TextContent : string [nullable]
+}
+
+entity "UserProgress" as up {
+  * Id : GUID (PK)
+  --
+  * UserId : GUID (FK -> User)
+  * DeckId : GUID (FK -> Deck)
+  * CurrentPage : int
+  * IsCompleted : bool
+  * LastAccessedAt : DateTime
+}
+
+entity "ActiveLearning" as al {
+  * Id : GUID (PK)
+  --
+  * UserId : GUID (FK -> User)
+  * DeckId : GUID (FK -> Deck)
+  * Slot : int (max 2)
+}
+
+entity "DailyActivity" as da {
+  * Id : GUID (PK)
+  --
+  * UserId : GUID (FK -> User)
+  * Date : DateTime
+  * PagesViewed : int
+  * MinutesLearned : int
+}
+
+user ||--o{ deck : authors
+user ||--o{ up : has
+user ||--o{ al : is
+user ||--o{ da : logs
+deck ||--o{ page : contains
+deck ||--o{ up : tracked
+deck ||--o{ al : active
+
+note top of deck : Index: Title
+note top of page : Unique: (DeckId, PageNumber)
+note top of up : Unique: (UserId, DeckId)
+note top of al : Unique: (UserId, Slot)
+note top of da : Unique: (UserId, Date)
+@enduml

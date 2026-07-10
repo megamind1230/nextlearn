@@ -1,0 +1,75 @@
+@startuml
+!theme plain
+skinparam backgroundColor #F8FAFC
+skinparam componentFontSize 10
+
+package "Presentation Layer" {
+  [MainWindow.axaml] as MW
+  [Controls/*] as CTRL
+  [MainWindow.axaml.cs] as MWCS
+}
+
+package "ViewModels Layer" {
+  [MainWindowViewModel] as MWVM
+  [HomeViewModel] as HV
+  [LearningViewModel] as LV
+  [FocusTimerViewModel] as FTVM
+  [FlashcardViewModel] as FCVM
+  [TagInferenceViewModel] as TIVM
+  [McqPanelViewModel] as MPVM
+  [McqQuizViewModel] as QZVM
+}
+
+package "Services Layer" {
+  [DeckFileParser] as DFP
+  [DeckService] as DS
+  [DeckFileService] as DFS
+  [HtmlContentBuilder] as HCB
+  [HtmlContentService] as HCS
+  [KeyBindingService] as KBS
+  [KeyboardHandler] as KH
+  [WebViewBridge] as WVB
+  [TagInferenceService] as TIS
+  [FlashcardService] as FCS
+  [McqGenerationService] as MGS
+  [McqQuizHtmlBuilder] as MQHB
+  [UserService] as US
+  [SettingsService] as SS
+  [ThemeHelper] as TH
+  [FalconEyeBuilder] as FEB
+}
+
+package "Data Layer" {
+  [AppDbContext] as DB
+  [SQLite Database] as SQL
+  [File System (Decks)] as FS
+  [YAML Config Files] as YAML
+}
+
+MW --> CTRL : contains
+MWCS --> MWVM : binding
+CTRL --> MWVM : binding
+
+MWVM --> HV : navigation
+MWVM --> LV : navigation
+MWVM --> FTVM : navigation
+MWVM --> FCVM : navigation
+MWVM --> TIVM : navigation
+MWVM --> MPVM : navigation
+
+HV --> DS : query
+HV --> DFS : file ops
+LV --> DS : progress
+LV --> HCB : build HTML
+LV --> HCS : enrich HTML
+LV --> WVB : load
+TIS --> "Google Gemini API"
+FCS --> "Google Gemini API"
+MGS --> "Google Gemini API"
+
+DS --> DB : EF Core
+DB --> SQL : SQLite
+DFS --> FS : file I/O
+SS --> YAML : read/write
+
+@enduml

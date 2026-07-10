@@ -1,0 +1,87 @@
+﻿@startuml
+!theme plain
+skinparam backgroundColor #F8FAFC
+skinparam classFontSize 10
+left to right direction
+interface IDeckService {
+  + GetDecks()
+  + SaveOrUpdateDeck()
+  + SyncDeckMetadata()
+  + GetUserProgress()
+}
+interface IDeckFileService {
+  + PinDeck()
+  + UnpinDeck()
+  + ArchiveDeck()
+  + UnarchiveDeck()
+}
+interface ISettingsService {
+  + Load()
+  + Save()
+  + Reset()
+}
+interface IUserService {
+  + GetOrCreateCurrentUser()
+  + RecordActivity()
+  + ComputeStreak()
+}
+interface ITagInferenceService {
+  + InferTagsAsync()
+}
+interface IFlashcardService {
+  + GenerateFlashcardsAsync()
+}
+interface IMcqGenerationService {
+  + GenerateMcqAsync()
+}
+
+DeckService ..|> IDeckService
+DeckFileService ..|> IDeckFileService
+SettingsService ..|> ISettingsService
+UserService ..|> IUserService
+TagInferenceService ..|> ITagInferenceService
+FlashcardService ..|> IFlashcardService
+McqGenerationService ..|> IMcqGenerationService
+
+DeckService --> AppDbContext
+DeckFileService --> FileSystem
+TagInferenceService --> HttpClient
+FlashcardService --> HttpClient
+McqGenerationService --> HttpClient
+
+class HtmlContentBuilder {
+  + Build()
+  + RenderBlock()
+}
+class MarkdownInlineRenderer
+class OrgInlineRenderer
+class HtmlContentService {
+  + Build()
+}
+class WebViewBridge {
+  + LoadHtml()
+  + EnrichHtml()
+}
+class KeyBindingService {
+  + GetBindings()
+  + GetProfile()
+}
+class KeyboardHandler {
+  + HandleKey()
+}
+class ThemeHelper {
+  + ApplyTheme()
+}
+class FalconEyeBuilder {
+  + BuildToc()
+}
+class McqQuizHtmlBuilder {
+  + BuildQuestionHtml()
+  + BuildReviewHtml()
+}
+
+HtmlContentBuilder --> MarkdownInlineRenderer
+HtmlContentBuilder --> OrgInlineRenderer
+HtmlContentService --> HtmlContentBuilder
+HtmlContentService --> WebViewBridge
+@enduml

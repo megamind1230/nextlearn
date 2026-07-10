@@ -1,0 +1,62 @@
+@startuml
+title User Flow — AI Feature Usage
+start
+
+:User opens Sidebar;
+
+if (Which AI feature?) then (Tag Inference)
+  :Select deck from list;
+  :Send to Gemini API;
+  :Parse response;
+  :Show diff preview;
+  if (Apply?) then (yes)
+    :Detect tag format;
+    :Write new tags to file;
+    :Show success message;
+  else (no)
+    :Discard changes;
+  endif
+
+elseif (Flashcards)
+  :Select deck from list;
+  if (Mode?) then (Basic)
+    :Use TSV prompt;
+  else (Cloze)
+    :Use Cloze prompt;
+  endif
+  :Send to Gemini API;
+  :Parse response\n(TSV lines or Cloze lines);
+  :Show raw preview;
+  if (Accept?) then (yes)
+    :Save to .basic.txt / .cloze.txt;
+    :Show success message;
+  else (no)
+    :Discard output;
+  endif
+
+elseif (MCQ Quiz)
+  if (Tab?) then (Generate)
+    :Select deck;
+    :Set question count;
+    :Send to Gemini API;
+    :Parse MCQ blocks;
+    :Show preview;
+    if (Accept?) then (yes)
+      :Save as .mcq file;
+    else (no)
+      :Discard output;
+    endif
+  else (Take Quiz)
+    :Select .mcq file;
+    :Start quiz state machine;
+    repeat
+      :Display question in WebView\n(2x2 option grid);
+      :User selects answer\nor presses Next to skip;
+    repeat while (more questions?) is (yes)
+    :Build review summary;
+    :Show score + explanations;
+  endif
+
+endif
+stop
+@enduml

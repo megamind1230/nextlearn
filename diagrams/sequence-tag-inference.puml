@@ -1,0 +1,45 @@
+@startuml
+actor User
+participant "TagInferencePanel" as UI
+participant "TagInferenceViewModel" as VM
+participant "TagInferenceService" as SVC
+participant "Google Gemini API" as API
+participant "DeckFileWriter" as WRITER
+participant "File System" as FS
+
+User -> UI : Click "Infer Tags"
+UI -> VM : InferTagsCommand(deck)
+VM -> VM : Set status "Parsing deck content..." (10%)
+VM -> VM : Read deck content from file
+
+VM -> SVC : InferTagsAsync(content, existingTags)
+SVC -> SVC : Estimate tokens
+alt > 900K tokens
+  SVC -> VM : Error "Deck too large"
+  VM -> UI : Show error
+else > 700K tokens
+  SVC -> SVC : Truncate with warning
+end
+
+SVC -> API : POST /v1beta/models/gemini-2.5-flash:generateContent
+VM -> VM : Set status "Contacting Gemini..." (30%)
+VM -> VM : Set status "Analyzing content..." (70%)
+
+alt Success
+  API -> SVC : JSON response with tags
+  SVC -> VM : TagInferenceResult (suggested tags)
+  VM -> VM : Set status "Formatting results..." (90%)
+  VM -> UI : Show diff preview (existing vs proposed tags)
+  User -> UI : Click "Apply"
+  UI -> VM : ApplyTagsCommand
+  VM -> WRITER : WriteTags(filePath, newTags)
+  WRITER -> FS : Write file (preserving tag format)
+  FS -> WRITER : Success
+  WRITER -> VM : Done
+  VM -> UI : Show success message
+else Rate Limit / Error
+  API -> SVC : 429 / Error
+  SVC -> VM : Error with retry hint
+  VM -> UI : Show inline error
+end
+@enduml

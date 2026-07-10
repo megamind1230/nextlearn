@@ -18,6 +18,8 @@
 # Files
 **/*.pdf
 
+# Files
+**/*.jar
 # Debugging + logging
 **/*.log
 

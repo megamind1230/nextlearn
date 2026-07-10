@@ -1,0 +1,40 @@
+@startuml
+title User Flow — Complete Study Session
+start
+
+:Launch NextLearn;
+:Load settings from YAML;
+:Create guest user (first run);
+:Scan decks directory recursively;
+:Sync deck metadata to DB;
+:Display home screen with deck list;
+
+:User views deck cards\n(search/filter using prefixes);
+
+:User selects a deck;
+
+:Load deck from file;
+:Load user progress from DB;
+:Build HTML from page content;
+:Enrich with KaTeX & highlight.js;
+:Load HTML into WebView;
+:Show learning view;
+
+repeat
+  :User reads page content;
+  :User navigates pages\n(N/P, arrows, ← →);
+  :User scrolls content\n(J/K, C-v/M-v);
+  :Progress saved to DB\nafter each navigation;
+  :User interacts with features\n(Falcon Eye, zoom, images, links\ncommand palette, handbook);
+repeat while (more pages?) is (yes)
+
+:User presses Q/D/Esc to exit;
+
+:Save final progress to DB;
+:Record daily activity\n(pages viewed, minutes);
+:Return to home screen;
+
+:User closes app;
+:Log.CloseAndFlush() writes logs;
+stop
+@enduml

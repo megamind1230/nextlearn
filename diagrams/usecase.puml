@@ -1,0 +1,47 @@
+﻿@startuml
+skinparam backgroundcolor #f8fafc
+skinparam defaultfontsize 10
+skinparam usecasefontsize 10
+skinparam actorfontsize 10
+skinparam nodesep 20
+skinparam ranksep 20
+left to right direction
+actor user
+actor "google gemini api" as gemini
+
+rectangle nextlearn {
+  usecase "browse & search decks" as uc1
+  usecase "study deck" as uc2
+  usecase "pin / archive decks" as uc3
+  usecase "view heatmap" as uc4
+  usecase "configure settings" as uc5
+  usecase "ai infer tags" as uc6
+  usecase "generate flashcards" as uc7
+  usecase "focus timer & tasks" as uc11
+  usecase "open command palette" as uc12
+  usecase "mcq tabs panel" as uc8
+  usecase "take mcq quiz" as uc9
+  usecase "view mcqs logs" as uc10
+  usecase "generate mcq" as uc13
+}
+
+user --> uc1
+user --> uc2
+user --> uc3
+user --> uc4
+user --> uc5
+user --> uc6
+user --> uc7
+user --> uc8
+user --> uc11
+user --> uc12
+
+uc8 --> uc9
+uc8 --> uc10
+uc8 --> uc13
+
+uc6 --> gemini
+uc7 --> gemini
+uc13 --> gemini
+
+@enduml

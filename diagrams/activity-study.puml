@@ -1,0 +1,31 @@
+@startuml
+start
+:User launches app;
+:HomeViewModel loads decks\nfrom vault directory;
+
+repeat
+  :User searches/filters decks;
+  :User selects a deck;
+  :LearningViewModel loads\ndeck pages from DB;
+  :HtmlContentBuilder builds\nHTML from page content;
+  :HtmlContentService enriches\nHTML with KaTeX/highlight.js;
+  :WebViewBridge loads HTML\ninto NativeWebView;
+  :User reads page content;
+
+  repeat
+    :User navigates pages\n(N / P / arrows);
+    :Progress saved to DB\non each navigation;
+  repeat while (more pages to read?) is (yes)
+
+  :Deck completed?\n(section);
+
+  if (Go to home?) then (yes)
+    :Progress persisted;
+  else (no)
+    :Continue studying;
+  endif
+repeat while (done?) is (no)
+
+:User exits app;
+stop
+@enduml

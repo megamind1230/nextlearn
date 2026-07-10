@@ -1,0 +1,34 @@
+@startuml
+start
+:User opens MCQ Quiz panel;
+if (Generate or Take Quiz?) then (Generate)
+  :Select deck;
+  :Set question count;
+  :McqGenerationService sends\nGemini API request;
+  if (Valid response?) then (yes)
+    :Preview questions;
+    if (Accept?) then (yes)
+      :Save as .mcq file;
+    else (no)
+      :Discard;
+    endif
+  else (no)
+    :Show error message;
+  endif
+else (Take Quiz)
+  :Select .mcq file;
+  :McqQuizViewModel starts\nquiz state machine;
+  :McqQuizHtmlBuilder builds\nquestion HTML (2×2 grid);
+
+  repeat
+    :Display question in\ndedicated WebView;
+    :User selects answer (A/B/C/D)\nor presses Next to skip;
+    :Answer recorded (or null for skip);
+    :Show next question;
+  repeat while (last question?) is (no)
+
+  :McqQuizHtmlBuilder builds\nreview HTML (score + explanations);
+  :Display review summary;
+endif
+stop
+@enduml

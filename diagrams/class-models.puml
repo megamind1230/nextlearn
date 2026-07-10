@@ -1,0 +1,73 @@
+@startuml
+!theme plain
+skinparam backgroundColor #F8FAFC
+skinparam classFontSize 10
+
+class User {
+  - Guid Id
+  - string DisplayName
+  - DateTime CreatedAt
+  - int TotalDecksCompleted
+  - int CurrentStreak
+  - DateTime LastActiveDate
+  - bool IsGuest
+}
+
+class Deck {
+  - Guid Id
+  - string FileName
+  - string Title
+  - bool HasExplicitTitle
+  - string Description
+  - string Tags
+  - Guid AuthorId
+  - bool IsPublished
+  - bool IsReviewed
+  - bool IsArchived
+  - bool IsPinned
+  - DateTime CreatedAt
+  - int PageCount
+}
+
+class Page {
+  - Guid Id
+  - Guid DeckId
+  - int PageNumber
+  - string SectionTitle
+  - string Title
+  - ContentType ContentType
+  - string TextContent
+}
+
+class UserProgress {
+  - Guid Id
+  - Guid UserId
+  - Guid DeckId
+  - int CurrentPage
+  - bool IsCompleted
+  - DateTime LastAccessedAt
+}
+
+class ActiveLearning {
+  - Guid Id
+  - Guid UserId
+  - Guid DeckId
+  - int Slot
+}
+
+class DailyActivity {
+  - Guid Id
+  - Guid UserId
+  - DateTime Date
+  - int PagesViewed
+  - int MinutesLearned
+}
+
+User "1" -- "0..*" Deck : authors
+User "1" -- "0..*" UserProgress : tracks
+User "1" -- "0..*" ActiveLearning : learns
+User "1" -- "0..*" DailyActivity : activity
+Deck "1" -- "0..*" Page : contains
+Deck "1" -- "0..*" UserProgress : progress
+Deck "1" -- "0..*" ActiveLearning : active
+@enduml
