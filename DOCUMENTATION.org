@@ -48,33 +48,33 @@ IT department \\[1em]
 :CUSTOM_ID: problem-statement
 :END:
 
-Modern learners face a fragmented landscape of study tools. The typical
-student juggles multiple applications --- a note-taking app for course
-content, a flashcard app for memorization, a quiz platform for
-self-assessment, and a calendar or timer for study sessions. Each tool
-has its own data format, its own synchronization mechanism, and
-critically --- its own set of distractions.
+- Modern learners face a tsunami of study tools. The typical student juggles multiple applications
+  - a note-taking app for course content
+  - a flashcard app for memorization
+  - a quiz platform for self-assessment
+  - and a calendar or timer for study sessions.
+Each tool has its own data format, its own synchronization mechanism, and
+critically **its own set of distractions**.
 
-The core problem is twofold:
+- The core problem is twofold:
+  - **Context Switching Cost** — Moving between tools breaks the mental
+      state of deep study. Every application boundary is an opportunity
+      for distraction: notifications, advertisements, social features, and
+      unrelated content compete for the learner's attention.
 
-1. **Context Switching Cost** — Moving between tools breaks the mental
-   state of deep study. Every application boundary is an opportunity
-   for distraction: notifications, advertisements, social features, and
-   unrelated content compete for the learner's attention.
+  - **Vendor Lock-in and Data Portability** — Most learning platforms
+      store content in proprietary databases. Exporting to a different
+      tool is difficult or impossible. The learner's intellectual work is
+      trapped inside a single ecosystem.
 
-2. **Vendor Lock-in and Data Portability** — Most learning platforms
-   store content in proprietary databases. Exporting to a different
-   tool is difficult or impossible. The learner's intellectual work is
-   trapped inside a single ecosystem.
+  - **Customization Constraints** — Mainstream study apps offer limited
+      keyboard customization, few theming options, and no scripting
+      capabilities. Users who prefer keyboard-centric workflows (Vim,
+      Emacs) or require accessibility accommodations are underserved.
 
-3. **Customization Constraints** — Mainstream study apps offer limited
-   keyboard customization, few theming options, and no scripting
-   capabilities. Users who prefer keyboard-centric workflows (Vim,
-   Emacs) or require accessibility accommodations are underserved.
-
-4. **AI Integration Fragmentation** — When AI-powered features exist,
-   they are typically tied to subscription tiers, have opaque
-   algorithms, and cannot be used with locally-stored content.
+  - **AI Integration Fragmentation** — When AI-powered features exist,
+      they are typically tied to subscription tiers, have opaque
+      algorithms, and cannot be used with locally-stored content.
 
 \newpage
 
@@ -87,19 +87,22 @@ NextLearn addresses these problems by providing a single, distraction-free
 desktop application that integrates:
 
 - **File-based content management** — Decks are plain-text =.md=, =.org=,
-  or =.txt= files stored in a local vault. No proprietary database for
-  content. Your study material is portable, version-controllable (git),
-  and editable in any text editor.
+  or =.txt= files stored in a local vault.
+  - No proprietary database for content.
+  - Your study material is portable
+  - version-controllable (git),
+  - and editable in any text editor.
 
 - **Keyboard-centric navigation** — Three built-in keybinding profiles
   (Vim, Emacs, VS Code) with multi-key chords, a command palette, and
-  a customizable keybinding system. Every action is accessible without
-  touching the mouse.
+  a customizable keybinding system. Every action is accessible
+  **without touching the mouse**.
 
 - **Offline-first architecture** — All core features (deck reading,
-  search, study, heatmap tracking, focus timer) work without an
-  internet connection. Only optional AI features (tag inference,
-  flashcard generation, MCQ generation) require the network.
+  search, study, heatmap tracking, focus timer), which is almost 80%
+  of the app, work without an internet connection. Only optional AI
+   features (tag inference, flashcard generation, MCQ generation)
+   require the network.
 
 - **Integrated AI with local-first workflow** — Google Gemini API is
   used for optional AI assistance: tag suggestion, flashcard creation,
@@ -111,12 +114,12 @@ desktop application that integrates:
   timer — all within the same application window.
 
 
-The significance of this work lies in demonstrating that a single-d
+The significance of this work lies in demonstrating that a single
 developer can build a professional-grade, cross-platform study
 environment using free and open-source technologies (.NET, Avalonia UI,
 SQLite), integrate AI services without compromising local control, and
 create a keyboard-first user experience that rivals mainstream
-applications.
+applications. **IT IS POSSIBLE.**
 
 \newpage
 ** Existing Solutions — Limitations vs NextLearn Advantages
@@ -125,73 +128,73 @@ applications.
 :END:
 
 *** anki
-| Aspect                | Anki                        |
-|-----------------------+-----------------------------|
-| Content Format        | Proprietary .apkg           |
-| Keyboard Navigation   | Basic shortcuts             |
-| AI Integration        | No native AI                |
-| Assessment            | SRS flashcards only         |
-| Offline Capability    | Full                        |
-| Customizability       | Add-ons only                |
-| Cross-Platform        | Windows/macOS/Linux/Android |
-| Study Streak Tracking | Basic                       |
-| File Portability      | Requires export             |
-| Cost                  | Free                        |
-| Focus / Timer         | No                          |
+| Aspect                | Anki                                |
+|-----------------------+-------------------------------------|
+| Content Format        | in action it uses proprietary .apkg |
+| Keyboard Navigation   | Basic shortcuts                     |
+| AI Integration        | No native AI                        |
+| Assessment            | flashcards only                     |
+| Offline Capability    | Full [+1]                           |
+| Customizability       | Add-ons only                        |
+| Cross-Platform        | Windows/macOS/Linux/Android [+1]    |
+| Study Streak Tracking | Basic                               |
+| File Portability      | Requires export                     |
+| Cost                  | Free [+1]                           |
+| Focus / Timer         | No                                  |
 
 *** obsidian.md
-| Aspect                | Obsidian                   |
-|-----------------------+----------------------------|
-| Content Format        | Markdown files             |
-| Keyboard Navigation   | Limited                    |
-| AI Integration        | Community plugins only     |
-| Assessment            | No native quizzes          |
-| Offline Capability    | Full                       |
-| Customizability       | Plugin system              |
-| Cross-Platform        | Windows/macOS/Linux/mobile |
-| Study Streak Tracking | Community plugin           |
-| File Portability      | Native (plain markdown)    |
-| Cost                  | Free (sync paid)           |
-| Focus / Timer         | Community plugin           |
+| Aspect                | Obsidian                        |
+|-----------------------+---------------------------------|
+| Content Format        | Markdown files                  |
+| Keyboard Navigation   | Limited                         |
+| AI Integration        | Community plugins only          |
+| Assessment            | No native quizzes               |
+| Offline Capability    | Full [+1]                       |
+| Customizability       | Plugin system                   |
+| Cross-Platform        | Windows/macOS/Linux/mobile [+1] |
+| Study Streak Tracking | Community plugin                |
+| File Portability      | Native (plain markdown) [+1]    |
+| Cost                  | Free (sync paid) [+1]           |
+| Focus / Timer         | Community plugin                |
 
 \newpage
 *** superMemo
-| Aspect                | Roam Research | SuperMemo         |
-|-----------------------+---------------+-------------------|
-| Content Format        | Proprietary   | Proprietary .sm   |
-| Keyboard Navigation   | Moderate      | Minimal           |
-| AI Integration        | Limited AI    | No                |
-| Assessment            | No            | SRS + some tests  |
-| Offline Capability    | Limited       | Full              |
-| Customizability       | Limited       | Minimal           |
-| Cross-Platform        | Web-based     | Windows (limited) |
-| Study Streak Tracking | No            | Basic             |
-| File Portability      | Export only   | Export only       |
-| Cost                  | Subscription  | Paid              |
-| Focus / Timer         | No            | No                |
+| Aspect                | Roam Research  | SuperMemo             |
+|-----------------------+----------------+-----------------------|
+| Content Format        | Proprietary    | Proprietary .sm       |
+| Keyboard Navigation   | Moderate       | Minimal               |
+| AI Integration        | Limited AI     | No                    |
+| Assessment            | No             | SRS + some tests [+1] |
+| Offline Capability    | Limited        | Full [+1]             |
+| Customizability       | Limited        | Minimal               |
+| Cross-Platform        | Web-based [+1] | Windows (limited)     |
+| Study Streak Tracking | No             | Basic                 |
+| File Portability      | Export only    | Export only           |
+| Cost                  | Subscription   | Paid                  |
+| Focus / Timer         | No             | No                    |
 
 *** nextlearn
-| Aspect                | NextLearn                      |
-|-----------------------+--------------------------------|
-| Content Format        | .md / .org / .txt files        |
-| Keyboard Navigation   | Vim/Emacs/VS Code profiles     |
-| AI Integration        | Built-in Gemini (tags, MCQs)   |
-| Assessment            | Flashcards + MCQ + Focus Timer |
-| Offline Capability    | Full (AI optional)             |
-| Customizability       | YAML config + keybinding YAML  |
-| Cross-Platform        | Linux/macOS (Windows planned)  |
-| Study Streak Tracking | Built-in heatmap + daily log   |
-| File Portability      | Native (plain text)            |
-| Cost                  | Free (open source)             |
-| Focus / Timer         | Built-in Pomodoro + todos      |
+| Aspect                | NextLearn                           |
+|-----------------------+-------------------------------------|
+| Content Format        | .md / .org / .txt files [+1]        |
+| Keyboard Navigation   | Vim/Emacs/VS Code profiles [+1]     |
+| AI Integration        | Built-in Gemini (tags, MCQs) [+1]   |
+| Assessment            | Flashcards + MCQ + Focus Timer [+1] |
+| Offline Capability    | Full (AI optional)  [+1]            |
+| Customizability       | YAML config + keybinding YAML [+1]  |
+| Cross-Platform        | Linux/macOS (Windows planned)       |
+| Study Streak Tracking | Built-in heatmap + daily log [+1]   |
+| File Portability      | Native (plain text) [+1]            |
+| Cost                  | Free (open source) [+1]             |
+| Focus / Timer         | Built-in Pomodoro + todos [+1]      |
 
 
 
-+ Key advantages of NextLearn over existing solutions:
-  1) Single-application integration of reading, flashcards, quizzes, timer, and streak tracking — eliminating context switching.
+- Key advantages of NextLearn over existing solutions:
+  1) Single-application gear for reading, flashcards, quizzes, timer, and streak tracking — eliminating context switching.
   2) Plain-text file format as the source of truth — not a database dump.
-  3) Keyboard profiles that match the user's existing muscle memory.
-  4) Deterministic deck identity via SHA256 file path hashing — progress survives file renames and OS reinstallation.
+  3) Keyboard profiles that match the user's existing muscle memory(vim, emacs, vscode, custom).
+  4) Deterministic deck identity via SHA256 file path hashing — progress survives the file renames and OS reinstallation.
   5) AI features that write to the user's local file system, not a locked cloud service.
 
 \newpage
@@ -221,7 +224,7 @@ philosophy draws heavily from the Unix tradition:
   (=~/.config/nextlearn/=, =~/nextlearn/decks/=). No hidden databases
   or opaque binary formats.
 
-*** Vim and Emacs Influence
+*** Vim, Emacs and VScode Influence
 :PROPERTIES:
 :CUSTOM_ID: vim-emacs-influence
 :END:
@@ -237,7 +240,7 @@ traditions of modal editing:
 - **Emacs profile** — Chords with modifier keys (=C-n=, =C-p=), prefix
   key sequences (=C-x=, =C-c=), and the =M-x= command palette. The
   chord display indicator shows pending key sequences with a 500ms
-  timeout, reminiscent of Emacs's =C-g= cancel mechanism.
+  timeout, also got inspiration for Emacs's =C-g= cancel mechanism.
 
 - **VS Code profile** — Familiar shortcuts for users coming from the
   most popular modern editor (=Ctrl+Shift+P= for command palette,
@@ -264,18 +267,25 @@ The technical foundation is .NET 10.0 with Avalonia UI, chosen for:
 - NativeWebView control for HTML content rendering, enabling rich
   text display with KaTeX math and highlight.js syntax highlighting.
 
+Notice: The reason why the app is not cross-platform currently is not because of AvaloniaUI. It's because of Windows using a different WebView that the one used on Linux.
+
 ** Methodology
 :PROPERTIES:
 :CUSTOM_ID: methodology
 :END:
 
-*** Chosen Methodology — Kanban (Lean/Agile)
+*** Chosen Methodology and choices
 :PROPERTIES:
 :CUSTOM_ID: chosen-methodology-kanban
 :END:
 
-NextLearn was developed using a Kanban-style approach, documented in
-=plan-todos.org= (1351 lines of feature planning). The choice was driven
+**** Kanban planning
+NextLearn was developed using a Kanban-style approach, the obsidian Kanban plugin
+
+https://github.com/obsidian-community/obsidian-kanban
+
+, also documented in
+=plan-todos.org= which is for plans & todos (1351 lines of feature planning). The choice was driven
 by:
 
 - Single-developer project — no need for sprint ceremonies or
@@ -283,7 +293,8 @@ by:
 - Evolving scope — features were added based on user (self) feedback and
   practical need, not a fixed requirements document.
 - Continuous delivery — every feature went through the same pipeline:
-  plan → implement → test → document → commit.
+
+  plan → implement → test → feedback → document → commit.
 
 The Kanban board is informal but effective:
 #+begin_src text
@@ -297,19 +308,25 @@ Each feature entry in =plan-todos.org= includes:
 - Test impact assessment
 - Progress UI step table (where applicable)
 
+
+**** Choices
+- I chose to use the WebView because it allowing for  a customization layer on rendering (Plain-text, markdown, org-mode files)
+- I chose to make the desktop version first because:
+  1. I needed that app to work mostly offline.
+  2. It's more likely for students to serious study session on their laptops or PCs, not their mobiles.
+
+     
 \newpage
-*** Other Methodologies Considered
+*** Other choices
 :PROPERTIES:
-:CUSTOM_ID: other-methodologies
+:CUSTOM_ID: other-choices
 :END:
 
-| Methodology  | Considered | Rejected Because                           |
-|--------------+------------+--------------------------------------------|
-| Waterfall    | Yes        | Scope evolved during development           |
-| Scrum        | Yes        | Overhead for single developer              |
-| Spiral       | Yes        | Risk analysis overhead not justified       |
-| RAD          | Yes        | Prototyping not needed — domain understood |
-| Extreme (XP) | Yes        | Pair programming not applicable            |
+| Choise                     | Rejected Because                                          |
+|----------------------------+-----------------------------------------------------------|
+| Avalonia.Controls.Markdown | Tightly coupled to .md files, no extensibility            |
+| Markdig                    | newly heard of, no idea if it's better or not             |
+| Markdown.Avalonia          | bloated, full editor, adds more lag, no custom font sizes |
 
 ** Project Objectives
 :PROPERTIES:
@@ -317,7 +334,7 @@ Each feature entry in =plan-todos.org= includes:
 :END:
 
 1. **Study Environment** — Provide a distraction-free, keyboard-centric
-   application for reading markdown and org-mode decks as paginated
+   application for reading markdown, org-mode, plain-text decks as paginated
    slides.
 
 2. **File-First Architecture** — Use plain text files as the source of
@@ -332,6 +349,8 @@ Each feature entry in =plan-todos.org= includes:
 5. **Optional AI Assistance** — Integrate AI services (Google Gemini)
    for tag suggestion, flashcard creation, and quiz generation without
    requiring internet connectivity for core features.
+   FYI, you can just go to https://github.com/megamind1230/nextlearn
+   to copy the AI prompts.
 
 6. **Progress Tracking** — Track study streaks, daily minutes, and
    page-level progress with a persistent heatmap visualization.
@@ -362,7 +381,7 @@ constraints:
 - **Platform Focus**: Linux (primary). WebView rendering uses
   =libwpewebkit-2.0= and related WPE dependencies available on Linux.
   macOS builds pass CI but are less tested. Windows is not currently
-  supported (requires WebView2; the author lacks a Windows machine for
+  supported (requires WebView2; I lack a Windows machine for
   consistent testing).
 
 - **Single-User Mode**: The app creates a local "Guest" user on first
@@ -388,7 +407,7 @@ design philosophy:
 |---------------------+-----------------------------------------------|
 | VS Code             | Primary IDE for C# and XAML development       |
 | Vim                 | Fast edits, configuration file changes, shell |
-| Emacs (org-mode)    | Documentation and planning                    |
+| Emacs (org-mode)    | Documentation, planning and some code edits   |
 | Git (CLI)           | Version control                               |
 | JetBrains Rider     | Tried as alternative IDE                      |
 | Avalonia Hot Reload | XAML live preview                             |
@@ -421,25 +440,25 @@ design philosophy:
 :CUSTOM_ID: tech-stack
 :END:
 
-*** versions
-| Technology                   | Version        |
-|------------------------------+----------------|
-| .NET                         | 10.0           |
-| Avalonia UI                  | 11.3.12        |
-| CommunityToolkit.Mvvm        | 8.2.1          |
-| Entity Framework Core        | 8.0.0          |
-| SQLite                       | (EF Core)      |
-| Serilog                      | 4.3.1          |
-| NativeWebView                | 0.1.0-alpha.3  |
-| NativeWebView.Platform.Linux | 0.1.0-alpha.3  |
-| YamlDotNet                   | 18.0.0         |
-| highlight.js                 | 11.11.1        |
-| KaTeX                        | (bundled)      |
-| StyleCop.Analyzers           | 1.2.0-beta.556 |
-| Google Gemini API            | REST           |
-| xUnit                        | (latest)       |
-| FluentAssertions             | (latest)       |
-| NSubstitute                  | (latest)       |
+*** versions @10jul2026
+| Technology                   | Version                  |
+|------------------------------+--------------------------|
+| .NET                         | 10.0                     |
+| Avalonia UI                  | 11.3.12                  |
+| CommunityToolkit.Mvvm        | 8.2.1                    |
+| Entity Framework Core        | 8.0.0                    |
+| SQLite                       | (EF Core) 3.53.3         |
+| Serilog                      | 4.3.1                    |
+| NativeWebView                | 0.1.0-alpha.3            |
+| NativeWebView.Platform.Linux | 0.1.0-alpha.3            |
+| YamlDotNet                   | 18.0.0                   |
+| highlight.js                 | 11.11.1 (edited, custom) |
+| KaTeX                        | (bundled)                |
+| StyleCop.Analyzers           | 1.2.0-beta.556           |
+| Google Gemini API            | REST                     |
+| xUnit                        | (latest)                 |
+| FluentAssertions             | (latest)                 |
+| NSubstitute                  | (latest)                 |
 
 *** why used
 | Technology                   | Purpose                                                         |
@@ -448,7 +467,7 @@ design philosophy:
 | Avalonia UI                  | Cross-platform desktop UI framework                             |
 | CommunityToolkit.Mvvm        | Source-generated MVVM pattern                                   |
 | Entity Framework Core        | ORM for SQLite                                                  |
-| SQLite                       | Embedded local database                                         |
+| SQLite                       | fast, lightweight, embedded local database                      |
 | Serilog                      | Structured logging (file + console)                             |
 | NativeWebView                | System WebView HTML rendering                                   |
 | NativeWebView.Platform.Linux | Linux WebView backend (WPE WebKit)                              |
@@ -502,7 +521,9 @@ design philosophy:
 
 *** Study & Navigation
 :PROPERTIES:
-:NEXT:
+:CUSTOM_ID: study-and-nav
+:END:
+
 - FR-11: Page-by-page learning with previous/next navigation
 - FR-12: Section breadcrumb showing current position in deck hierarchy
 - FR-13: Rendered markdown and org-mode content in WebView
@@ -533,7 +554,7 @@ design philosophy:
   indicator
 - FR-29: Command palette with fuzzy search (activated by =:= or =M-x=)
 - FR-30: Shortcuts handbook (auto-generated from current profile)
-- FR-31: 67 keyboard action types across multiple contexts (Learning,
+- FR-31: 67 keyboard actions (ISTG I didn't mean to make this up) across multiple contexts (Learning,
   Home, ImageOverlay, McqQuiz)
 - FR-32: Esc-based overlay closing priority chain
 
@@ -543,11 +564,11 @@ design philosophy:
 :END:
 
 - FR-33: AI tag inference — suggest 2--15 tags per deck, diff preview,
-  apply to frontmatter (supports 7 tag formats)
+  apply to frontmatter (supports 7 tag format styles)
 - FR-34: Anki flashcard generation — Basic (TSV) and Cloze ({{c1::}})
   modes, separate prompts, save to =.basic.txt= / =.cloze.txt= files
 - FR-35: MCQ quiz generation — AI-generated questions, interactive
-  quiz in dedicated WebView (2x2 option grid, timer, scoring)
+  quiz in dedicated WebView (4 option list, timer, scoring)
 - FR-36: Model auto-discovery and fallback chain (gemini-2.5-flash →
   gemini-2.0-flash → etc.)
 - FR-37: Exponential retry with backoff (1s, 5s, 10s, 20s, 40s, 80s)
@@ -561,7 +582,7 @@ design philosophy:
 
 - FR-39: Per-user progress tracking (current page, completed decks)
 - FR-40: Daily activity tracking (pages viewed, minutes learned)
-- FR-41: Study streak heatmap (snake layout, 6-level orange, green for
+- FR-41: Study streak heatmap (snake layout, 6-level orange, green border for
   today)
 - FR-42: Stable progress across restarts (SQLite persistence)
 
@@ -597,12 +618,12 @@ design philosophy:
 | Requirement                | Description                                                 |
 |----------------------------+-------------------------------------------------------------|
 | Offline Operation          | Core features must work without internet                    |
-| Startup Time               | App must launch within 3 seconds                            |
+| Startup Time               | App must launch within 10 seconds                           |
 | File Change Responsiveness | Deck list must refresh within 500ms of file change          |
 | Memory Footprint           | Must run on 4GB RAM systems (low-end machine target)        |
 | Single-User Architecture   | No multi-user sync or authentication required               |
 | Data Durability            | No data loss on crash — SQLite WAL mode, YAML atomic writes |
-| Keyboard-Only Operation    | All features accessible without mouse                       |
+| no Keyboard-Only Operation | All features accessible without mouse                       |
 | Open Data Format           | All user data in plain text (.md, .org, .yaml, .txt)        |
 | Cross-Platform Compatible  | Builds on Linux (x64), macOS (arm64), Windows (x64)         |
 | No Vendor Lock-In          | User can stop using the app and keep all data intact        |
@@ -666,7 +687,7 @@ which overlays).
 :CUSTOM_ID: uml-diagrams
 :END:
 
-*** Use Case Diagram (make it vertical #baka) #ok
+*** Use Case Diagram
 :PROPERTIES:
 :CUSTOM_ID: use-case-diagram
 :END:
@@ -685,7 +706,7 @@ which overlays).
   #+ATTR_ORG: :width 
   [[file:diagrams/class-models.png]]
 
-*** Class Diagram — Core Services (need this one to vertical #baka)
+*** Class Diagram — Core Services
 :PROPERTIES:
 :CUSTOM_ID: class-diagram-core-services
 :END:
@@ -739,7 +760,7 @@ which overlays).
 :END:
 
 The SQLite database is stored at =~/.config/nextlearn/nextlearn.db= and
-contains six tables managed by Entity Framework Core 8.0.0. The database
+contains 6 tables managed by Entity Framework Core 8.0.0. The database
 stores only metadata and progress — deck content lives in the file system.
 
 *** Table: Users
@@ -773,7 +794,7 @@ stores only metadata and progress — deck content lives in the file system.
   FileName         string(500) NOT NULL            Relative vault path
   Title            string(200) NOT NULL            Indexed
   HasExplicitTitle bool        NOT NULL
-  Description      string(1000) NOT NULL
+  Description      string(1000)NOT NULL
   Tags             string(500) NOT NULL            Comma-separated
   AuthorId         GUID        FK → Users.Id
   IsPublished      bool        NOT NULL
@@ -948,12 +969,12 @@ locations:
 | FlashcardResult         | AI flashcard generation result DTO                                 |
 | McqFileParser           | Parse/serialize .mcq files (YAML frontmatter + question blocks)    |
 | McqFileService          | List/read/delete .mcq files                                        |
-| McqQuizHtmlBuilder      | Interactive quiz HTML (2×2 grid, timer, scoring, review)           |
+| McqQuizHtmlBuilder      | Interactive quiz HTML (4 option list, timer, scoring, review)      |
 | McqGenerationService    | Gemini API client for MCQ generation                               |
 | McqGenerationResult     | MCQ generation result DTO                                          |
 | McqResultLogger         | Logs quiz results to .mcq.result files                             |
 | McqFileInfo             | MCQ file metadata DTO                                              |
-| KeyBindingService       | Keyboard profiles: Vim/Emacs/VS Code/Custom; binding definitions   |
+| KeyBindingService       | Keyboard profiles: Vim/Emacs/VScode/Custom; binding definitions    |
 | KeyboardHandler         | Routes key events to actions by context + profile                  |
 | KeyboardActionKind      | Enum: 67 possible keyboard actions                                 |
 | WebViewBridge           | native communication (key bridge, URI interception, image overlay) |
@@ -998,8 +1019,6 @@ Test project location: =tests/NextLearn.Desktop.Tests/=
 :CUSTOM_ID: test-approach
 :END:
 
-- **Repository pattern for DB**: Entity Framework Core InMemory provider
-  for database tests — no real SQLite dependency.
 - **File system isolation**: DeckFileServiceTests use temporary
   directories created and cleaned per test.
 - **Mocked HTTP**: TagInferenceService, FlashcardService, and
@@ -1009,6 +1028,8 @@ Test project location: =tests/NextLearn.Desktop.Tests/=
   cycles with assertion of equivalence.
 - **Edge case tables**: plan-todos.org contains exhaustive edge case
   tables for every AI feature, with each case tested.
+- **Repository pattern for DB**: Entity Framework Core InMemory provider
+  for database tests — no real SQLite dependency.
 
 ** CI/CD Pipeline
 :PROPERTIES:
@@ -1053,9 +1074,9 @@ GitHub Actions (=.github/workflows/ci.yml=) runs on every push:
 
 The NextLearn logo features a stylized brain/network motif in purple
 gradient (#7C0AED primary). The design communicates:
-- Neural connections (learning)
-- Structured thinking (network graph)
-- Modern, minimalist aesthetic
+- Learning (The book)
+- Continuity (The arrow)
+- Mnemontics (NextLearn ==> the next button in Study UI)
 
 The application icon is rendered in the title bar and used as the
 application launcher icon (installed via =install-icon.sh= on Linux).
@@ -1076,7 +1097,7 @@ application launcher icon (installed via =install-icon.sh= on Linux).
 #+ATTR_ORG: :width 550 
 [[file:./screenshots/home-search-page.png]]
 
-*Figure 1: Home page with search bar, showing filtered deck list.*
+*Figure 1: Home page with search bar.*
 
 #+ATTR_LATEX: :width 550 
 #+ATTR_ORG: :width 550 
@@ -1130,13 +1151,13 @@ section breadcrumbs.*
 #+ATTR_ORG: :width 550 
 [[file:./screenshots/zoom-in-text.png]]
 
-*Figure 9: Text zoomed in via Ctrl+Shift++.*
+*Figure 9: Text zoomed in via `ctrl shift =`.*
 
 #+ATTR_LATEX: :width 550 
 #+ATTR_ORG: :width 550 
 [[file:./screenshots/zoom-out-text.png]]
 
-*Figure 10: Text zoomed out via Ctrl+Shift+-.*
+*Figure 10: Text zoomed out via `ctrl shift -`.*
 
 *** Command Palette & Handbook
 :PROPERTIES:
@@ -1153,7 +1174,7 @@ section breadcrumbs.*
 #+ATTR_ORG: :width 550 
 [[file:./screenshots/shortcuts-handbook-feature.png]]
 
-*Figure 12: Shortcuts handbook, auto-generated from current keybinding profile.*
+*Figure 12: Shortcuts handbook, auto-generated depending on current keybinding profile.*
 
 *** Falcon Eye (TOC)
 :PROPERTIES:
@@ -1263,7 +1284,7 @@ diff preview, apply with one click.*
 #+ATTR_ORG: :width 550 
 [[file:./screenshots/default-light-theme.png]]
 
-*Figure 24: Default light theme.*
+*Figure 24: The updated default light theme.*
 
 #+ATTR_LATEX: :width 550 
 #+ATTR_ORG: :width 550 
@@ -1295,7 +1316,8 @@ diff preview, apply with one click.*
 :END:
 
 NextLearn features a live-switchable dark/light theme system with 45+
-named resource keys defined in =ThemeHelper.cs=.
+named resource keys defined in =ThemeHelper.cs=, which could be used
+for later Preset Themes features.
 
 *** Architecture
 :PROPERTIES:
@@ -1331,6 +1353,7 @@ named resource keys defined in =ThemeHelper.cs=.
 Complementary colors (green for today, warning amber, etc.) maintain
 readability across both themes.
 
+Disclaimer: I didn't study Design at all, It's just how I see the things.
 \newpage
 
 * Proposed Workflow
@@ -1355,13 +1378,13 @@ user session with NextLearn.
    to filter decks tagged with "programming". The deck list narrows
    in real-time.
 
-3. **Start Study**: User presses =Enter= on the selected deck. The
-   app loads the deck file, parses it into pages, builds HTML with
+3. **Start Study**: The app loads the deck file, parses it into pages,
+   builds HTML with
    KaTeX/highlight.js enrichment, and displays the first page in the
    WebView.
 
-4. **Navigate**: User reads through pages using =N= (next) and =P=
-   (previous). The section breadcrumb shows current position:
+4. **Navigate**: User reads through pages using =n= (next) and =p=
+   (previous). The section breadcrumb shows current position: ex
    ="Data Structures → Binary Trees "=. Progress is saved to the
    database after each page navigation.
 
@@ -1375,12 +1398,12 @@ user session with NextLearn.
    fill-in-the-blank cards. User reviews and accepts → saved as
    =binary-trees.cloze.txt= for Anki import.
 
-7. **Self-Assessment**: User opens the MCQ Quiz panel, generates 10
-   questions from the deck via Gemini. Takes the interactive quiz
-   in the dedicated WebView — 2×2 option grid, timer running.
+7. **Self-Assessment**: User opens the MCQ Quiz panel, generates usually
+    5 questions from the deck via Gemini. Takes the interactive quiz
+   in the dedicated WebView — 4 option list, timer running.
    Review the score summary at the end.
 
-8. **Review Progress**: User opens the Heatmap overlay (Ctrl+H).
+8. **Review Progress**: User opens the Heatmap overlay (ctrl h).
    The snake-layout heatmap shows the past 12 months of study
    activity. Today's cell is green. Current streak is displayed.
 
@@ -1449,7 +1472,8 @@ user session with NextLearn.
   chain, but extended outages break AI features.
 - **Mitigation**: All AI features are optional. The core study
   functionality works fully offline. API responses are saved as local
-  files — the user is never locked into any AI provider.
+  files — the user is never locked into any AI provider. Also can copy
+  the Gemini Prompts from the github repo.
 - **Risk**: Low (AI is additive, not required).
 
 ** Single-User Offline Model
@@ -1473,7 +1497,7 @@ user session with NextLearn.
   no UI automation tests (Avalonia UI testing framework not integrated).
 - **Mitigation**: ViewModels contain minimal logic — most complexity
   is in Services layer which is well-tested.
-- **Risk**: Low-medium. UI bugs are caught manually during development.
+- **Risk**: Low-medium. UI bugs are caught manually by eye during development.
 
 ** Performance on Very Large Decks
 :PROPERTIES:
@@ -1508,9 +1532,9 @@ inspired by Vim and Emacs, provides a mouse-free experience unmatched
 by mainstream study applications. The optional AI integration via
 Google Gemini adds modern convenience without compromising local
 control.
-
-
 \end{center}
+
+
 \begin{center}
 The project is currently in active development with all core features
 implemented: deck management, paginated study, image rendering, LaTeX
@@ -1518,17 +1542,17 @@ math, code syntax highlighting, AI tag inference, flashcard
 generation, interactive MCQ quizzes, a focus timer, and streak
 tracking. The application builds and runs on Linux (primary) and
 macOS, with GitHub Actions CI ensuring cross-platform compatibility.
-
-
 \end{center}
+
+
 \begin{center}
 At approximately 20,000+ lines of code across 41 service files, 13
 ViewModels, 14 user controls, and 6 database tables, NextLearn is a
 substantial software engineering project that applies modern .NET
 practices (MVVM, EF Core, dependency injection preparation, structured
 logging, YAML configuration) to a focused domain problem.
-
 \end{center}
+
 \newpage
 ** Future Potential Work & Features
 :PROPERTIES:
@@ -1569,6 +1593,10 @@ logging, YAML configuration) to a focused domain problem.
   and alternative providers (Anthropic, OpenAI).
 - Windows support — WebView2 backend for cross-platform
 - Mobile app — native iOS/Android via Avalonia MAUI
+- CLI mode
+- helix extension
+- neovim extension
+- emacs extension
 
 
 \newpage
@@ -1632,10 +1660,9 @@ logging, YAML configuration) to a focused domain problem.
 :CUSTOM_ID: license
 :END:
 
-This project is currently distributed without an explicit license file.
 All rights reserved by the author. Users may view and build the source
 code for personal use. A permissive open-source license (MIT) is planned
-for future release.
+for future releases.
 
 ** Source Code
 :PROPERTIES:
