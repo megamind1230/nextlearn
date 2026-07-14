@@ -1,4 +1,4 @@
-#+TITLE: NextLearn — Project Documentation
+﻿#+TITLE: NextLearn — Project Documentation
 
 #+LATEX_COMPILER: xelatex
 #+LATEX_CLASS_OPTIONS: [14pt]
@@ -28,10 +28,14 @@
 {\large Project Documentation} \\[3em]
 
 \textbf{Zagazig University} \\
-Faculty of Computer Science and Informatics \\[1em]
+Faculty of Computers and Informatics \\[1em]
 IT department \\[1em]
 
-\textbf{Author:} Hassan Ahmad Darwish (NSB) \\[1em]
+\Large \textbf{By: Hassan Ahmad Darwish (NSB)} \\[1em]
+
+\Large \textbf{Supervised By:} \\[1em]
+\Large \textbf{Eng. Ahmad Atif} \\[1em]
+\Large \textbf{Dr. Ehab Rushdy} \\[1em]
 
 \textbf{Version:} 1.0.0
 \end{center}
@@ -315,7 +319,7 @@ Each feature entry in =plan-todos.org= includes:
   1. I needed that app to work mostly offline.
   2. It's more likely for students to serious study session on their laptops or PCs, not their mobiles.
 
-     
+
 \newpage
 *** Other choices
 :PROPERTIES:
@@ -702,8 +706,8 @@ which overlays).
 :CUSTOM_ID: class-diagram-core-models
 :END:
 
-  #+ATTR_LATEX: :width 
-  #+ATTR_ORG: :width 
+  #+ATTR_LATEX: :width
+  #+ATTR_ORG: :width
   [[file:diagrams/class-models.png]]
 
 *** Class Diagram — Core Services
@@ -721,8 +725,8 @@ which overlays).
 :CUSTOM_ID: activity-diagram-study-flow
 :END:
 
-  #+ATTR_LATEX: :width 
-  #+ATTR_ORG: :width 
+  #+ATTR_LATEX: :width
+  #+ATTR_ORG: :width
   #+ATTR_LATEX: :height 700
   #+ATTR_ORG: :height 700
   [[file:diagrams/activity-study.png]]
@@ -732,8 +736,8 @@ which overlays).
 :CUSTOM_ID: activity-diagram-mcq-flow
 :END:
 
-  #+ATTR_LATEX: :width 
-  #+ATTR_ORG: :width 
+  #+ATTR_LATEX: :width
+  #+ATTR_ORG: :width
   [[file:diagrams/activity-mcq.png]]
 
 *** Sequence Diagram — AI Tag Inference
@@ -750,8 +754,8 @@ which overlays).
 :CUSTOM_ID: er-diagram
 :END:
 
-  #+ATTR_LATEX: :width 
-  #+ATTR_ORG: :width 
+  #+ATTR_LATEX: :width
+  #+ATTR_ORG: :width
   [[file:diagrams/er-database.png]]
 
 ** Database Design
@@ -836,8 +840,8 @@ stores only metadata and progress — deck content lives in the file system.
   UserId              GUID        FK → Users.Id
   DeckId              GUID        FK → Decks.Id
   CurrentPage         int         NOT NULL       Default 1
-  IsCompleted         bool        NOT NULL          
-  LastAccessedAt      DateTime    NOT NULL          
+  IsCompleted         bool        NOT NULL
+  LastAccessedAt      DateTime    NOT NULL
 
   UNIQUE INDEX: (UserId, DeckId)
 #+end_src
@@ -887,8 +891,8 @@ stores only metadata and progress — deck content lives in the file system.
 :END:
 
 \newpage
-  #+ATTR_LATEX: :width 
-  #+ATTR_ORG: :width 
+  #+ATTR_LATEX: :width
+  #+ATTR_ORG: :width
   #+ATTR_LATEX: :height 700
   #+ATTR_ORG: :height 700
   [[file:diagrams/flow-study.png]]
@@ -898,8 +902,8 @@ stores only metadata and progress — deck content lives in the file system.
 :CUSTOM_ID: ai-feature-flow
 :END:
 
-  #+ATTR_LATEX: :width 
-  #+ATTR_ORG: :width 
+  #+ATTR_LATEX: :width
+  #+ATTR_ORG: :width
   [[file:diagrams/flow-ai.png]]
 
 ** Core Services
@@ -1093,44 +1097,44 @@ application launcher icon (installed via =install-icon.sh= on Linux).
 :END:
 
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/home-search-page.png]]
 
 *Figure 1: Home page with search bar.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/sidebar-panel.png]]
 
 *Figure 2: Sidebar panel with navigation links and settings.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/settings-panel.png]]
 
 *Figure 3: Settings page — theme, font, paths, keybinding profile, Gemini API key.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/pinned-panel.png]]
 
 *Figure 4: Pinned decks overlay for quick access to favorite decks.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/archived-panel.png]]
 
 *Figure 5: Archived decks overlay.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/open-decks-directory-feature.png]]
 
 *Figure 6: Open decks folder in system file manager.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/reveal-deck-feature.png]]
 
 *Figure 7: Reveal current deck file in file manager.*
@@ -1140,21 +1144,21 @@ application launcher icon (installed via =install-icon.sh= on Linux).
 :CUSTOM_ID: screenshots-study-page
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/study-page.png]]
 
 *Figure 8: Main study view with deck loaded — page content, page counter,
 section breadcrumbs.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/zoom-in-text.png]]
 
 *Figure 9: Text zoomed in via `ctrl shift =`.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/zoom-out-text.png]]
 
 *Figure 10: Text zoomed out via `ctrl shift -`.*
@@ -1164,14 +1168,14 @@ section breadcrumbs.*
 :CUSTOM_ID: screenshots-command-palette
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/cmd-palette-feature.png]]
 
 *Figure 11: Command palette for quick action lookup.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/shortcuts-handbook-feature.png]]
 
 *Figure 12: Shortcuts handbook, auto-generated depending on current keybinding profile.*
@@ -1181,8 +1185,8 @@ section breadcrumbs.*
 :CUSTOM_ID: screenshots-falcon-eye
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/falcon-eye-feature.png]]
 
 *Figure 13: Falcon Eye table of contents — clickable entries navigate to
@@ -1193,14 +1197,14 @@ exact page.*
 :CUSTOM_ID: screenshots-image-overlay
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/image-overlay-feature.png]]
 
 *Figure 14: Image overlay with navigation, zoom slider, and toolbar.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/image-overlay-invert-colors.png]]
 
 *Figure 15: Image overlay with inverted colors for dark mode readability.*
@@ -1210,8 +1214,8 @@ exact page.*
 :CUSTOM_ID: screenshots-heatmap
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/heatmap-streak-panel.png]]
 
 *Figure 16: Study streak heatmap — snake layout, 6-level orange scale,
@@ -1222,8 +1226,8 @@ green for today.*
 :CUSTOM_ID: screenshots-tag-inference
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/tags-inferencing-panel.png]]
 
 *Figure 17: AI tag inference panel using Google Gemini — select deck,
@@ -1234,8 +1238,8 @@ diff preview, apply with one click.*
 :CUSTOM_ID: screenshots-flashcard-generation
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/anki-flashcards-generation-panel.png]]
 
 *Figure 18: Anki flashcard generation panel — Basic and Cloze modes.*
@@ -1245,26 +1249,26 @@ diff preview, apply with one click.*
 :CUSTOM_ID: screenshots-mcq-quiz
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/mcq-generate-tab.png]]
 
 *Figure 19: MCQ quiz generate tab — configure and generate via Gemini.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/mcq-take-quiz-tab.png]]
 
 *Figure 20: MCQ quiz take tab — select a quiz and start interactive session.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/mcq-interactive-quiz-ui.png]]
 
 *Figure 21: Interactive MCQ quiz WebView — 4 item list, scoring, timer.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/mcq-quiz-logs-tab.png]]
 
 *Figure 22: MCQ quiz logs tab — review past quiz results and performance.*
@@ -1274,26 +1278,26 @@ diff preview, apply with one click.*
 :CUSTOM_ID: screenshots-theme
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/default-dark-theme.png]]
 
 *Figure 23: The updated default dark theme.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/default-light-theme.png]]
 
 *Figure 24: The updated default light theme.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/default-light-theme-sidebar.png]]
 
 *Figure 25: Sidebar in light theme.*
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/default-light-theme-heatmap.png]]
 
 *Figure 26: Heatmap in light theme.*
@@ -1303,8 +1307,8 @@ diff preview, apply with one click.*
 :CUSTOM_ID: screenshots-focus-timer
 :END:
 
-#+ATTR_LATEX: :width 550 
-#+ATTR_ORG: :width 550 
+#+ATTR_LATEX: :width 550
+#+ATTR_ORG: :width 550
 [[file:./screenshots/focus-timer-panel.png]]
 
 *Figure 27: Focus timer panel — Pomodoro timer, tasks CRUD, and session history.*

@@ -1,4 +1,4 @@
-% Created 2026-07-12 Sun 01:47
+﻿% Created 2026-07-12 Sun 21:29
 % Intended LaTeX compiler: xelatex
 \documentclass[14pt]{article}
 \usepackage{graphicx}
@@ -34,7 +34,7 @@
 
 \newpage
 \section{Cover Page}
-\label{sec:org1350d11}
+\label{sec:org3dc2d0c}
 \begin{center}
 \includegraphics[width=300]{./screenshots/nextlearn-logo-high-res.png}
 \end{center}
@@ -45,19 +45,23 @@
 {\large Project Documentation} \\[3em]
 
 \textbf{Zagazig University} \\
-Faculty of Computer Science and Informatics \\[1em]
+Faculty of Computers and Informatics \\[1em]
 IT department \\[1em]
 
-\textbf{Author:} Hassan Ahmad Darwish (NSB) \\[1em]
+\Large \textbf{By: Hassan Ahmad Darwish (NSB)} \\[1em]
+
+\Large \textbf{Supervised By:} \\[1em]
+\Large \textbf{Eng. Ahmad Atif} \\[1em]
+\Large \textbf{Dr. Ehab Rushdy} \\[1em]
 
 \textbf{Version:} 1.0.0
 \end{center}
 
 \newpage
 \section{Introduction}
-\label{sec:orgf420eda}
+\label{sec:orge8236d3}
 \subsection{Problem Statement}
-\label{sec:orgf40a9c6}
+\label{sec:org3283be4}
 \begin{itemize}
 \item Modern learners face a tsunami of study tools. The typical student juggles multiple applications
 \begin{itemize}
@@ -96,7 +100,7 @@ algorithms, and cannot be used with locally-stored content.
 
 \newpage
 \subsection{Solution \& Significance of Work}
-\label{sec:org6455b6a}
+\label{sec:orgdea4246}
 NextLearn addresses these problems by providing a single, distraction-free
 desktop application that integrates:
 
@@ -141,9 +145,9 @@ applications. \textbf{\textbf{IT IS POSSIBLE.}}
 
 \newpage
 \subsection{Existing Solutions — Limitations vs NextLearn Advantages}
-\label{sec:org58316f2}
+\label{sec:orgbf2bc32}
 \subsubsection{anki}
-\label{sec:org73a9c66}
+\label{sec:orge198f5a}
 \begin{center}
 \begin{tabular}{ll}
 Aspect & Anki\\
@@ -162,7 +166,7 @@ Focus / Timer & No\\
 \end{tabular}
 \end{center}
 \subsubsection{obsidian.md}
-\label{sec:org4f5aa6b}
+\label{sec:org8fc91d3}
 \begin{center}
 \begin{tabular}{ll}
 Aspect & Obsidian\\
@@ -183,7 +187,7 @@ Focus / Timer & Community plugin\\
 
 \newpage
 \subsubsection{superMemo}
-\label{sec:org4134449}
+\label{sec:org4a24664}
 \begin{center}
 \begin{tabular}{lll}
 Aspect & Roam Research & SuperMemo\\
@@ -202,7 +206,7 @@ Focus / Timer & No & No\\
 \end{tabular}
 \end{center}
 \subsubsection{nextlearn}
-\label{sec:org1e2210d}
+\label{sec:org7185e6d}
 \begin{center}
 \begin{tabular}{ll}
 Aspect & NextLearn\\
@@ -236,9 +240,9 @@ Focus / Timer & Built-in Pomodoro + todos [+1]\\
 
 \newpage
 \subsection{Background}
-\label{sec:org53acde5}
+\label{sec:org4296122}
 \subsubsection{Linux Philosophy and Customizability}
-\label{sec:org9041947}
+\label{sec:orga59b943}
 NextLearn was developed on primarily on ArchLinux. The design
 philosophy draws heavily from the Unix tradition:
 
@@ -257,7 +261,7 @@ git-backed version history are first-class concerns.
 or opaque binary formats.
 \end{itemize}
 \subsubsection{Vim, Emacs and VScode Influence}
-\label{sec:orga2219a4}
+\label{sec:orga621120}
 The keyboard shortcut system is directly inspired by the two great
 traditions of modal editing:
 
@@ -283,7 +287,7 @@ scratch.
 
 \newpage
 \subsubsection{.NET Ecosystem and Avalonia UI}
-\label{sec:orgd3b204a}
+\label{sec:org2fab91f}
 The technical foundation is .NET 10.0 with Avalonia UI, chosen for:
 
 \begin{itemize}
@@ -299,11 +303,11 @@ text display with KaTeX math and highlight.js syntax highlighting.
 
 Notice: The reason why the app is not cross-platform currently is not because of AvaloniaUI. It's because of Windows using a different WebView that the one used on Linux.
 \subsection{Methodology}
-\label{sec:orgf74354a}
+\label{sec:org0ae90b0}
 \subsubsection{Chosen Methodology and choices}
-\label{sec:org7eae989}
+\label{sec:orgc186f3a}
 \paragraph{Kanban planning}
-\label{sec:orgd883247}
+\label{sec:org1198668}
 NextLearn was developed using a Kanban-style approach, the obsidian Kanban plugin
 
 \url{https://github.com/obsidian-community/obsidian-kanban}
@@ -336,7 +340,7 @@ Each feature entry in \texttt{plan-todos.org} includes:
 \item Progress UI step table (where applicable)
 \end{itemize}
 \paragraph{Choices}
-\label{sec:org75598ea}
+\label{sec:orgdef3168}
 \begin{itemize}
 \item I chose to use the WebView because it allowing for  a customization layer on rendering (Plain-text, markdown, org-mode files)
 \item I chose to make the desktop version first because:
@@ -349,7 +353,7 @@ Each feature entry in \texttt{plan-todos.org} includes:
 
 \newpage
 \subsubsection{Other choices}
-\label{sec:orgc3bfc87}
+\label{sec:org2862994}
 \begin{center}
 \begin{tabular}{ll}
 Choise & Rejected Because\\
@@ -360,7 +364,7 @@ Markdown.Avalonia & bloated, full editor, adds more lag, no custom font sizes\\
 \end{tabular}
 \end{center}
 \subsection{Project Objectives}
-\label{sec:org8abe99b}
+\label{sec:orgaeb2534}
 \begin{enumerate}
 \item \textbf{\textbf{Study Environment}} — Provide a distraction-free, keyboard-centric
 application for reading markdown, org-mode, plain-text decks as paginated
@@ -395,9 +399,9 @@ for full mouse-free operation.
 
 \newpage
 \section{Planning \& Requirements}
-\label{sec:org15a39e4}
+\label{sec:org71b8ff2}
 \subsection{Project State \& Scope}
-\label{sec:orgdded263}
+\label{sec:org8dac427}
 NextLearn is currently in active development with the following scope
 constraints:
 
@@ -419,7 +423,7 @@ fully without them.
 Only AI features depend on internet access.
 \end{itemize}
 \subsection{Development Tools \& Environment}
-\label{sec:orgc2c031b}
+\label{sec:org6985c05}
 The project was developed using a deliberately minimal toolchain.
 Experience with the tools shaped both the development process and the
 design philosophy:
@@ -465,9 +469,9 @@ projects.
 
 \newpage
 \subsection{Technology Stack}
-\label{sec:orga77d1cf}
+\label{sec:org7455d92}
 \subsubsection{versions @10jul2026}
-\label{sec:org3c907d9}
+\label{sec:orgfda4fec}
 \begin{center}
 \begin{tabular}{ll}
 Technology & Version\\
@@ -491,7 +495,7 @@ NSubstitute & (latest)\\
 \end{tabular}
 \end{center}
 \subsubsection{why used}
-\label{sec:org0a734a4}
+\label{sec:org8c42b09}
 \begin{center}
 \begin{tabular}{ll}
 Technology & Purpose\\
@@ -515,7 +519,7 @@ NSubstitute & Mocking framework\\
 \end{tabular}
 \end{center}
 \subsection{System Dependencies (Linux runtime)}
-\label{sec:org30737d8}
+\label{sec:orgff035e1}
 \begin{itemize}
 \item libwpewebkit-2.0 (WebView engine)
 \item libwpe-1.0
@@ -526,9 +530,9 @@ via \texttt{UseSkia().UseX11()}
 
 \newpage
 \subsection{Functional Requirements}
-\label{sec:orge2f280f}
+\label{sec:org4e70ae5}
 \subsubsection{Core Deck Management}
-\label{sec:org0180ba3}
+\label{sec:org0a5462d}
 \begin{itemize}
 \item FR-01: Read \texttt{.md}, \texttt{.org}, and \texttt{.txt} files from a configurable vault
 directory (default \texttt{\textasciitilde{}/nextlearn/decks/})
@@ -547,7 +551,7 @@ prefix operators \texttt{file:}, \texttt{title:}, \texttt{desc:}, \texttt{tags:}
 \item FR-10: Open decks folder in system file manager
 \end{itemize}
 \subsubsection{Study \& Navigation}
-\label{sec:orgc7937a8}
+\label{sec:org82979a8}
 \begin{itemize}
 \item FR-11: Page-by-page learning with previous/next navigation
 \item FR-12: Section breadcrumb showing current position in deck hierarchy
@@ -570,7 +574,7 @@ navigation, invert colors)
 
 \newpage
 \subsubsection{Keyboard System}
-\label{sec:org586c12c}
+\label{sec:org05f78ea}
 \begin{itemize}
 \item FR-26: Three built-in keybinding profiles (Vim, Emacs, VS Code)
 \item FR-27: Customizable keybinding via YAML config file
@@ -583,7 +587,7 @@ Home, ImageOverlay, McqQuiz)
 \item FR-32: Esc-based overlay closing priority chain
 \end{itemize}
 \subsubsection{AI Features (Google Gemini)}
-\label{sec:org6162576}
+\label{sec:org2729112}
 \begin{itemize}
 \item FR-33: AI tag inference — suggest 2--15 tags per deck, diff preview,
 apply to frontmatter (supports 7 tag format styles)
@@ -597,7 +601,7 @@ gemini-2.0-flash → etc.)
 \item FR-38: Token estimation with 700K truncation limit
 \end{itemize}
 \subsubsection{Progress \& Analytics}
-\label{sec:org1072ac7}
+\label{sec:org9dcd2da}
 \begin{itemize}
 \item FR-39: Per-user progress tracking (current page, completed decks)
 \item FR-40: Daily activity tracking (pages viewed, minutes learned)
@@ -608,7 +612,7 @@ today)
 
 \newpage
 \subsubsection{Focus Timer}
-\label{sec:org68b8b3d}
+\label{sec:orge2ccdb4}
 \begin{itemize}
 \item FR-43: Pomodoro-style work/break countdown timer
 \item FR-44: Configurable work/break durations in settings
@@ -617,7 +621,7 @@ today)
 \item FR-47: Sound notification at session end
 \end{itemize}
 \subsubsection{Settings \& Configuration}
-\label{sec:org0b83db6}
+\label{sec:orgf9d55e1}
 \begin{itemize}
 \item FR-48: Theme switching (Dark/Light) with live preview
 \item FR-49: Configurable decks, MCQs, and flashcards paths
@@ -627,7 +631,7 @@ today)
 \item FR-53: Save/Reset settings
 \end{itemize}
 \subsection{Non-Functional Requirements}
-\label{sec:orgd613d38}
+\label{sec:orga80af77}
 \begin{center}
 \begin{tabular}{ll}
 Requirement & Description\\
@@ -649,9 +653,9 @@ Single-File Distribution & Published as self-contained executable\\
 
 \newpage
 \section{System Design}
-\label{sec:org01b08b3}
+\label{sec:org94994ba}
 \subsection{System Architecture}
-\label{sec:org7cab4d0}
+\label{sec:org3fbef8f}
 NextLearn follows a layered MVVM (Model-View-ViewModel) architecture
 with a single-window UI pattern.
 
@@ -659,7 +663,7 @@ with a single-window UI pattern.
 \includegraphics[width=550]{diagrams/architecture.png}
 \end{center}
 \subsubsection{Single-Window UI Pattern}
-\label{sec:org5198cd6}
+\label{sec:org0c24a2e}
 Unlike most desktop applications that use multiple windows or a
 navigation framework, NextLearn uses a single \texttt{MainWindow.axaml} with
 approximately 15 boolean visibility flags to show/hide panels:
@@ -688,52 +692,52 @@ which overlays).
 
 \newpage
 \subsection{UML Diagrams}
-\label{sec:org64a02e3}
+\label{sec:org877cf4e}
 \subsubsection{Use Case Diagram}
-\label{sec:orgaecf072}
+\label{sec:orgf66ab1f}
 \begin{center}
 \includegraphics[width=550]{diagrams/usecase.png}
 \end{center}
 
 \newpage
 \subsubsection{Class Diagram — Core Models}
-\label{sec:org77a816b}
+\label{sec:org6071761}
 \begin{center}
 \includegraphics[width=.9\linewidth]{diagrams/class-models.png}
 \end{center}
 \subsubsection{Class Diagram — Core Services}
-\label{sec:org307cf5e}
+\label{sec:orga29cad9}
 \newpage
 \begin{center}
 \includegraphics[height=700]{diagrams/class-services.png}
 \end{center}
 \subsubsection{Activity Diagram — Study Flow}
-\label{sec:org11d37e9}
+\label{sec:orgadf57d2}
 \begin{center}
 \includegraphics[height=700]{diagrams/activity-study.png}
 \end{center}
 \subsubsection{Activity Diagram — MCQ Quiz Flow}
-\label{sec:org2121b91}
+\label{sec:org5386cff}
 \begin{center}
 \includegraphics[width=.9\linewidth]{diagrams/activity-mcq.png}
 \end{center}
 \subsubsection{Sequence Diagram — AI Tag Inference}
-\label{sec:org062071e}
+\label{sec:org2f4a347}
 \begin{center}
 \includegraphics[width=550]{diagrams/sequence-tag-inference.png}
 \end{center}
 \subsubsection{ER Diagram — Database Schema}
-\label{sec:orgc57d0c5}
+\label{sec:org685603b}
 \begin{center}
 \includegraphics[width=.9\linewidth]{diagrams/er-database.png}
 \end{center}
 \subsection{Database Design}
-\label{sec:orgadad8ee}
+\label{sec:org28fd98e}
 The SQLite database is stored at \texttt{\textasciitilde{}/.config/nextlearn/nextlearn.db} and
 contains 6 tables managed by Entity Framework Core 8.0.0. The database
 stores only metadata and progress — deck content lives in the file system.
 \subsubsection{Table: Users}
-\label{sec:org0a1f47c}
+\label{sec:org9f3e989}
 \begin{verbatim}
 Column              Type     Constraints Notes
 ──────────────────────────────────────────────────────
@@ -748,7 +752,7 @@ IsGuest             bool     NOT NULL    Always true (single-user)
 
 \newpage
 \subsubsection{Table: Decks}
-\label{sec:org2032efc}
+\label{sec:orgfb86d5d}
 \begin{verbatim}
 Column           Type        Constraints         Notes
 ──────────────────────────────────────────────────────────────
@@ -767,7 +771,7 @@ CreatedAt        DateTime    NOT NULL
 PageCount        int         NOT NULL
 \end{verbatim}
 \subsubsection{Table: Pages}
-\label{sec:org40f6cf2}
+\label{sec:org45ec49e}
 \begin{verbatim}
 Column              Type        Constraints     Notes
 ───────────────────────────────────────────────────────────
@@ -782,7 +786,7 @@ TextContent         string?     NULLABLE        Raw markdown/org
 UNIQUE INDEX: (DeckId, PageNumber)
 \end{verbatim}
 \subsubsection{Table: UserProgress}
-\label{sec:org97a6365}
+\label{sec:orga20e224}
 \begin{verbatim}
 Column              Type        Constraints    Notes
 ──────────────────────────────────────────────────────────
@@ -790,15 +794,15 @@ Id                  GUID        PK
 UserId              GUID        FK → Users.Id
 DeckId              GUID        FK → Decks.Id
 CurrentPage         int         NOT NULL       Default 1
-IsCompleted         bool        NOT NULL          
-LastAccessedAt      DateTime    NOT NULL          
+IsCompleted         bool        NOT NULL
+LastAccessedAt      DateTime    NOT NULL
 
 UNIQUE INDEX: (UserId, DeckId)
 \end{verbatim}
 
 \newpage
 \subsubsection{Table: ActiveLearning}
-\label{sec:orgd10c9b8}
+\label{sec:org8588c64}
 \begin{verbatim}
 Column              Type        Constraints     Notes
 ───────────────────────────────────────────────────────────
@@ -810,7 +814,7 @@ Slot                int         NOT NULL        Up to 2 concurrent
 UNIQUE INDEX: (UserId, Slot)
 \end{verbatim}
 \subsubsection{Table: DailyActivities}
-\label{sec:orgb8d1cc2}
+\label{sec:org1b0d7da}
 \begin{verbatim}
 Column              Type        Constraints     Notes
 ───────────────────────────────────────────────────────────
@@ -823,25 +827,25 @@ MinutesLearned      int         NOT NULL
 UNIQUE INDEX: (UserId, Date)
 \end{verbatim}
 \subsection{User Flow Diagrams}
-\label{sec:org17eff97}
+\label{sec:org51cd256}
 \subsubsection{End-to-End Study Flow}
-\label{sec:org5dbb7b3}
+\label{sec:orge62d2f5}
 \newpage
 \begin{center}
 \includegraphics[height=700]{diagrams/flow-study.png}
 \end{center}
 \subsubsection{AI Feature Usage Flow}
-\label{sec:org7691807}
+\label{sec:orga209bc3}
 \begin{center}
 \includegraphics[width=.9\linewidth]{diagrams/flow-ai.png}
 \end{center}
 \subsection{Core Services}
-\label{sec:org2b027dc}
+\label{sec:org86f92c9}
 NextLearn is built around 21 key services, each with a specific
 responsibility. Below is the complete inventory with roles and file
 locations:
 \subsubsection{services files}
-\label{sec:org88f3829}
+\label{sec:org2b187d1}
 \begin{center}
 \begin{tabular}{ll}
 Service & File\\
@@ -882,7 +886,7 @@ ViewLocator & ViewLocator.cs\\
 
 \newpage
 \subsubsection{what they do}
-\label{sec:org956aa79}
+\label{sec:orgeb04248}
 \begin{center}
 \begin{tabular}{ll}
 Service & Role\\
@@ -924,15 +928,15 @@ ViewLocator & ViewModel→View resolution via naming convention\\
 
 \newpage
 \section{Testing Strategy}
-\label{sec:org2d638be}
+\label{sec:orgcbfdf75}
 \subsection{Unit Test Framework}
-\label{sec:org5f4d9b8}
+\label{sec:orga8d9fc3}
 NextLearn uses xUnit as the test framework with FluentAssertions for
 readable assertions and NSubstitute for mocking.
 
 Test project location: \texttt{tests/NextLearn.Desktop.Tests/}
 \subsection{Test Files}
-\label{sec:org8f2f40c}
+\label{sec:orgc280555}
 \begin{center}
 \begin{tabular}{lll}
 Test File & Lines & Scope\\
@@ -947,7 +951,7 @@ UserServiceTests.cs & \textasciitilde{}200 & User creation, streak computation, 
 \end{tabular}
 \end{center}
 \subsection{Test Approach}
-\label{sec:org63f8b4a}
+\label{sec:org0c85dd1}
 \begin{itemize}
 \item \textbf{\textbf{File system isolation}}: DeckFileServiceTests use temporary
 directories created and cleaned per test.
@@ -962,7 +966,7 @@ tables for every AI feature, with each case tested.
 for database tests — no real SQLite dependency.
 \end{itemize}
 \subsection{CI/CD Pipeline}
-\label{sec:orge634b06}
+\label{sec:org5c3d175}
 GitHub Actions (\texttt{.github/workflows/ci.yml}) runs on every push:
 
 \begin{verbatim}
@@ -984,9 +988,9 @@ Steps:
 
 \newpage
 \section{UI/UX Design}
-\label{sec:orgc825350}
+\label{sec:org7480bcc}
 \subsection{Logo \& Branding}
-\label{sec:orgb42e83a}
+\label{sec:org06c1613}
 \begin{center}
 \includegraphics[width=200]{./screenshots/nextlearn-logo-high-res.png}
 \end{center}
@@ -1002,9 +1006,9 @@ gradient (\#7C0AED primary). The design communicates:
 The application icon is rendered in the title bar and used as the
 application launcher icon (installed via \texttt{install-icon.sh} on Linux).
 \subsection{Screenshot Showcase}
-\label{sec:orgc3f0f55}
+\label{sec:org7d9f38d}
 \subsubsection{Home \& Navigation}
-\label{sec:org1d40fa7}
+\label{sec:org3781019}
 \begin{center}
 \includegraphics[width=550]{./screenshots/home-search-page.png}
 \end{center}
@@ -1047,7 +1051,7 @@ application launcher icon (installed via \texttt{install-icon.sh} on Linux).
 
 \textbf{Figure 7: Reveal current deck file in file manager.}
 \subsubsection{Study Page}
-\label{sec:orgd5575f3}
+\label{sec:orgc7470d7}
 \begin{center}
 \includegraphics[width=550]{./screenshots/study-page.png}
 \end{center}
@@ -1067,7 +1071,7 @@ section breadcrumbs.}
 
 \textbf{Figure 10: Text zoomed out via `ctrl shift -`.}
 \subsubsection{Command Palette \& Handbook}
-\label{sec:orgb0b644f}
+\label{sec:org7f6781a}
 \begin{center}
 \includegraphics[width=550]{./screenshots/cmd-palette-feature.png}
 \end{center}
@@ -1080,7 +1084,7 @@ section breadcrumbs.}
 
 \textbf{Figure 12: Shortcuts handbook, auto-generated depending on current keybinding profile.}
 \subsubsection{Falcon Eye (TOC)}
-\label{sec:orgf04bb02}
+\label{sec:org7445e5e}
 \begin{center}
 \includegraphics[width=550]{./screenshots/falcon-eye-feature.png}
 \end{center}
@@ -1088,7 +1092,7 @@ section breadcrumbs.}
 \textbf{Figure 13: Falcon Eye table of contents — clickable entries navigate to
 exact page.}
 \subsubsection{Image Overlay}
-\label{sec:org76b1b27}
+\label{sec:org912ed49}
 \begin{center}
 \includegraphics[width=550]{./screenshots/image-overlay-feature.png}
 \end{center}
@@ -1101,7 +1105,7 @@ exact page.}
 
 \textbf{Figure 15: Image overlay with inverted colors for dark mode readability.}
 \subsubsection{Heatmap \& Streaks}
-\label{sec:orgfb1f9be}
+\label{sec:org790056d}
 \begin{center}
 \includegraphics[width=550]{./screenshots/heatmap-streak-panel.png}
 \end{center}
@@ -1109,7 +1113,7 @@ exact page.}
 \textbf{Figure 16: Study streak heatmap — snake layout, 6-level orange scale,
 green for today.}
 \subsubsection{Tag Inference}
-\label{sec:orgcdd7b40}
+\label{sec:orgd74727e}
 \begin{center}
 \includegraphics[width=550]{./screenshots/tags-inferencing-panel.png}
 \end{center}
@@ -1117,14 +1121,14 @@ green for today.}
 \textbf{Figure 17: AI tag inference panel using Google Gemini — select deck,
 diff preview, apply with one click.}
 \subsubsection{Flashcard Generation}
-\label{sec:orge3af260}
+\label{sec:org5ee0fd5}
 \begin{center}
 \includegraphics[width=550]{./screenshots/anki-flashcards-generation-panel.png}
 \end{center}
 
 \textbf{Figure 18: Anki flashcard generation panel — Basic and Cloze modes.}
 \subsubsection{MCQ Quiz}
-\label{sec:orgddc0269}
+\label{sec:org8cd228a}
 \begin{center}
 \includegraphics[width=550]{./screenshots/mcq-generate-tab.png}
 \end{center}
@@ -1149,7 +1153,7 @@ diff preview, apply with one click.}
 
 \textbf{Figure 22: MCQ quiz logs tab — review past quiz results and performance.}
 \subsubsection{Theme System}
-\label{sec:org5ffa48a}
+\label{sec:org0641bd4}
 \begin{center}
 \includegraphics[width=550]{./screenshots/default-dark-theme.png}
 \end{center}
@@ -1174,7 +1178,7 @@ diff preview, apply with one click.}
 
 \textbf{Figure 26: Heatmap in light theme.}
 \subsubsection{Focus Timer}
-\label{sec:org849a5ea}
+\label{sec:orgfaba69c}
 \begin{center}
 \includegraphics[width=550]{./screenshots/focus-timer-panel.png}
 \end{center}
@@ -1183,12 +1187,12 @@ diff preview, apply with one click.}
 
 \newpage
 \subsection{Theme System}
-\label{sec:org86e2da7}
+\label{sec:org0c49001}
 NextLearn features a live-switchable dark/light theme system with 45+
 named resource keys defined in \texttt{ThemeHelper.cs}, which could be used
 for later Preset Themes features.
 \subsubsection{Architecture}
-\label{sec:org605eaed}
+\label{sec:org244594b}
 \begin{enumerate}
 \item All colors centralized as named resources (\texttt{PageBgBrush},
 \texttt{TextPrimaryBrush}, etc.) in \texttt{App.axaml → Application.Resources}
@@ -1200,7 +1204,7 @@ for later Preset Themes features.
 \item Theme setting persisted in \texttt{settings.yaml}
 \end{enumerate}
 \subsubsection{Color Palettes}
-\label{sec:org9b131ff}
+\label{sec:org71177f7}
 \begin{center}
 \begin{tabular}{lll}
 Resource Key & Dark Value & Light Value\\
@@ -1223,11 +1227,11 @@ readability across both themes.
 Disclaimer: I didn't study Design at all, It's just how I see the things.
 \newpage
 \section{Proposed Workflow}
-\label{sec:orgbf30778}
+\label{sec:orgcd3e888}
 This section describes the intended end-to-end workflow for a typical
 user session with NextLearn.
 \subsection{Typical Evening Study Session}
-\label{sec:org0ffb684}
+\label{sec:org3392ef2}
 \begin{enumerate}
 \item \textbf{\textbf{Launch}}: User starts NextLearn. The app creates a guest user
 (first run), scans the \texttt{\textasciitilde{}/nextlearn/decks/} directory recursively,
@@ -1274,7 +1278,7 @@ the quiz results were saved as \texttt{.mcq.result} files.
 
 \newpage
 \subsection{Alternative Workflows}
-\label{sec:org3ac2a04}
+\label{sec:org4931bb0}
 \begin{itemize}
 \item \textbf{\textbf{New Deck Creation}}: User creates a \texttt{.md} file outside the app
 (Vim, Emacs, VS Code), saves it to \texttt{\textasciitilde{}/nextlearn/decks/}. The app
@@ -1298,9 +1302,9 @@ deck (.md → .org fallback), shows a prompt, and navigates to
 the linked deck's first page.
 \end{itemize}
 \section{Limitations \& Risk Analysis}
-\label{sec:org1203de6}
+\label{sec:org3fcf096}
 \subsection{Linux WebView Constraint}
-\label{sec:org007ce1f}
+\label{sec:org605235f}
 \begin{itemize}
 \item \textbf{\textbf{Issue}}: NativeWebView on Linux depends on \texttt{libwpewebkit-2.0} and
 related WPE WebKit libraries. These are available on major
@@ -1315,7 +1319,7 @@ require a separate WebView backend (e.g., WebView2).
 
 \newpage
 \subsection{Google Gemini API Dependency}
-\label{sec:orgfbba2bb}
+\label{sec:org42ec541}
 \begin{itemize}
 \item \textbf{\textbf{Issue}}: AI features (tag inference, flashcards, MCQ generation)
 require a Google Gemini API key and internet connectivity.
@@ -1329,7 +1333,7 @@ the Gemini Prompts from the github repo.
 \item \textbf{\textbf{Risk}}: Low (AI is additive, not required).
 \end{itemize}
 \subsection{Single-User Offline Model}
-\label{sec:orgda6b136}
+\label{sec:orgc03e5fe}
 \begin{itemize}
 \item \textbf{\textbf{Issue}}: No multi-user support, no cloud sync, no authentication.
 \item \textbf{\textbf{Mitigation}}: By design — the application targets individual
@@ -1340,7 +1344,7 @@ File-based format makes manual sync trivial (git, rsync, Dropbox).
 
 \newpage
 \subsection{No Automated UI Tests}
-\label{sec:org0929bd8}
+\label{sec:org6f36bb8}
 \begin{itemize}
 \item \textbf{\textbf{Issue}}: The test suite covers service and parser logic but has
 no UI automation tests (Avalonia UI testing framework not integrated).
@@ -1349,7 +1353,7 @@ is in Services layer which is well-tested.
 \item \textbf{\textbf{Risk}}: Low-medium. UI bugs are caught manually by eye during development.
 \end{itemize}
 \subsection{Performance on Very Large Decks}
-\label{sec:org8b32bd0}
+\label{sec:orge71b34c}
 \begin{itemize}
 \item \textbf{\textbf{Issue}}: Single HTML string built for entire deck content could
 be slow for decks with 1000+ pages.
@@ -1361,9 +1365,9 @@ large decks into multiple files.
 
 \newpage
 \section{Conclusion \& Future Work}
-\label{sec:org4f46633}
+\label{sec:orgd2232c5}
 \subsection{Conclusion}
-\label{sec:orgebe22f2}
+\label{sec:org182b13f}
 \begin{center}
 NextLearn demonstrates that a single developer can build a
 professional-grade, distraction-free study environment using free and
@@ -1396,7 +1400,7 @@ logging, YAML configuration) to a focused domain problem.
 
 \newpage
 \subsection{Future Potential Work \& Features}
-\label{sec:org93fd3e7}
+\label{sec:org6a281ba}
 \begin{itemize}
 \item Decide business model:
 \begin{itemize}
@@ -1449,9 +1453,9 @@ and alternative providers (Anthropic, OpenAI).
 
 \newpage
 \section{References \& Inspiration}
-\label{sec:orgcdbe042}
+\label{sec:orgb7ba43e}
 \subsection{Technology References}
-\label{sec:org81de16a}
+\label{sec:orgbf2c3d6}
 \begin{itemize}
 \item Avalonia UI: \url{https://avaloniaui.net/} — Cross-platform desktop UI
 framework for .NET
@@ -1473,7 +1477,7 @@ Avalonia WebView control
 
 \newpage
 \subsection{Design Inspiration}
-\label{sec:orgb484542}
+\label{sec:org291a351}
 \begin{itemize}
 \item \textbf{\textbf{Anki}} (\url{https://apps.ankiweb.net/}) — Spaced repetition flashcard
 system
@@ -1492,14 +1496,14 @@ editor keybinding conventions
 
 \newpage
 \section{License \& Source Code}
-\label{sec:orgc70d883}
+\label{sec:orgbf45058}
 \subsection{License}
-\label{sec:orgb8d616c}
+\label{sec:org503b153}
 All rights reserved by the author. Users may view and build the source
 code for personal use. A permissive open-source license (MIT) is planned
 for future releases.
 \subsection{Source Code}
-\label{sec:org793fd97}
+\label{sec:org99507a6}
 Repository: \url{https://github.com/megamind1230/nextlearn}
 
 Branch: main (default branch)
